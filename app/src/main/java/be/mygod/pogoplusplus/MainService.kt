@@ -53,6 +53,9 @@ class MainService : AccessibilityService() {
                 createNotificationChannel(CHANNEL_NO_BALL, "Out of Poké Balls")
             }
         }
+
+        var isRunning = false
+            private set
     }
 
     private var notificationsCaught = 0
@@ -86,6 +89,7 @@ class MainService : AccessibilityService() {
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
         })
         Log.d("MainService", "started")
+        isRunning = true
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -175,6 +179,7 @@ class MainService : AccessibilityService() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        isRunning = false
         unregisterReceiver(receiver)
         Log.d("MainService", "shutting down")
         return super.onUnbind(intent)
