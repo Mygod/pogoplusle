@@ -186,15 +186,15 @@ class MainService : AccessibilityService() {
         title: CharSequence,
         @DrawableRes icon: Int,
     ) = notificationManager.notify(id, NotificationCompat.Builder(this, channel).apply {
-        setShowWhen(true)
         setCategory(NotificationCompat.CATEGORY_STATUS)
         // color?
         setContentTitle(title)
         setSmallIcon(icon)
-
         setContentIntent(PendingIntent.getActivity(this@MainService, 0, Intent(Intent.ACTION_MAIN).apply {
             setClassName(PACKAGE_POKEMON_GO, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
         }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+        setShowWhen(true)
+        setAutoCancel(true)
         setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         priority = NotificationCompat.PRIORITY_MAX
     }.build())
