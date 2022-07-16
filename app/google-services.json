@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "699779139630",
+    "project_id": "pogoplusplus-68c9e",
+    "storage_bucket": "pogoplusplus-68c9e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:699779139630:android:5ab765b47f1445929af7bf",
+        "android_client_info": {
+          "package_name": "be.mygod.pogoplusplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "699779139630-3rgg0ouckotv2a1drcmsjk1v6hgrt5mp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDym1Sv22Vam356DUzA4Il0TBSxQFtypRw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "699779139630-3rgg0ouckotv2a1drcmsjk1v6hgrt5mp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

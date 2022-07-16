@@ -13,7 +13,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.annotation.DrawableRes
@@ -21,6 +20,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
+import timber.log.Timber
 
 class MainService : AccessibilityService() {
     companion object {
@@ -73,8 +73,7 @@ class MainService : AccessibilityService() {
                     bluetoothClass.hashCode() != BluetoothClass.Device.Major.UNCATEGORIZED ||
                     !device.address.startsWith("98:B6:E9:", true) ||
                     name != DEVICE_NAME_PBP && name != DEVICE_NAME_PGP
-            Log.d("BluetoothPairingHelper",
-                "${intent.action}: ${device.address}, $name, $type, $bluetoothClass, $uuids, $shouldSkip")
+            Timber.d("${intent.action}: ${device.address}, $name, $type, $bluetoothClass, $uuids, $shouldSkip")
             if (shouldSkip) return
             when (intent.action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> onAuxiliaryConnected()
@@ -88,7 +87,7 @@ class MainService : AccessibilityService() {
         registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED).apply {
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
         })
-        Log.d("MainService", "started")
+        Timber.d("MainService started")
         isRunning = true
     }
 
@@ -104,7 +103,6 @@ class MainService : AccessibilityService() {
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
                 val notification = event.parcelableData as Notification
                 val resources = packageManager.getResourcesForApplication(PACKAGE_POKEMON_GO)
-                @SuppressLint("DiscouragedApi")
                 fun getPogoString(name: String) = resources.getString(resources.getIdentifier(
                     name, "string", PACKAGE_POKEMON_GO))
                 val title = getPogoString("Pokemon_Go_Plus")
@@ -131,16 +129,17 @@ class MainService : AccessibilityService() {
                     else -> {
                         val split = getPogoString("Retrieved_Items").split("%s", limit = 2)
                         val matches = if (split.size == 1) {
-                            Log.e("onPokemonGoEvent", "Unrecognized Retrieved_Items ${split[0]}")
+                            Timber.e(Exception("Unrecognized Retrieved_Items ${split[0]}"))
                             false
                         } else text.startsWith(split[0]) && text.endsWith(split[1])
-                        if (matches) notificationManager.cancel(NOTIFICATION_ITEM_FULL)
-                        else Log.e("onPokemonGoEvent", "Unrecognized notification text: $text")
+                        if (matches) {
+                            notificationManager.cancel(NOTIFICATION_ITEM_FULL)
+                        } else Timber.e(Exception("Unrecognized notification text: $text"))
                     }
                 }
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> { }
-            else -> Log.e("MainService", "Unknown event ${event.eventType}")
+            else -> Timber.e(Exception("Unknown event ${event.eventType}"))
         }
     }
 
@@ -170,18 +169,18 @@ class MainService : AccessibilityService() {
                 notificationsCaught--
                 confirm[0].performAction(AccessibilityNodeInfo.ACTION_CLICK)
             }
-            else -> Log.e("MainService", "Unknown event ${event.eventType}")
+            else -> Timber.e(Exception("Unknown event ${event.eventType}"))
         }
     }
 
     override fun onInterrupt() {
-        Log.d("MainService", "interrupted")
+        Timber.d("MainService interrupted")
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
         isRunning = false
         unregisterReceiver(receiver)
-        Log.d("MainService", "shutting down")
+        Timber.d("MainService shutting down")
         return super.onUnbind(intent)
     }
 
