@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat
+        app:key="permission.bluetooth"
+        app:icon="@drawable/ic_device_bluetooth_connected"
+        app:title="Nearby devices permission"
+        app:summary="Improves detection of Bluetooth disconnect"
+        app:persistent="false" />
+    <Preference
+        app:key="permission.notification"
+        app:icon="@drawable/ic_social_notifications_active"
+        app:title="Manage notifications" />
+
+    <PreferenceCategory app:title="About">
+        <Preference
+            app:key="misc.donate"
+            app:icon="@drawable/ic_action_card_giftcard"
+            app:title="Donate"
+            app:summary="I love money"/>
+        <Preference
+            app:key="misc.licenses"
+            app:icon="@drawable/ic_action_code"
+            app:title="@string/oss_license_title"
+            app:summary="@string/preferences_license_summary"/>
+    </PreferenceCategory>
+</PreferenceScreen>

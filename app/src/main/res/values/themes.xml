@@ -3,7 +3,11 @@
     <style name="Base.Theme.PoGo" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="switchPreferenceCompatStyle">@style/Theme.PoGo.Preference.MaterialSwitchPreference</item>
     </style>
 
     <style name="Theme.PoGo" parent="Base.Theme.PoGo" />
+    <style name="Theme.PoGo.Preference.MaterialSwitchPreference" parent="Preference.SwitchPreferenceCompat.Material">
+        <item name="android:widgetLayout">@layout/preference_widget_material_switch</item>
+    </style>
 </resources>
