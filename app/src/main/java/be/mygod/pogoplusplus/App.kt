@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
 import android.util.Log
-import be.mygod.pogoplusplus.util.DeviceStorageApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.initialize
 import timber.log.Timber
 
 class App : Application() {
@@ -15,13 +12,9 @@ class App : Application() {
         lateinit var app: App
     }
 
-    lateinit var deviceStorage: DeviceStorageApp
-
     override fun onCreate() {
         super.onCreate()
         app = this
-        deviceStorage = DeviceStorageApp(this)
-        Firebase.initialize(deviceStorage)
         when (val codename = Build.VERSION.CODENAME) {
             "REL" -> { }
             else -> FirebaseCrashlytics.getInstance().apply {

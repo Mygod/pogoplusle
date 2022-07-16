@@ -9,7 +9,13 @@
     <Preference
         app:key="permission.notification"
         app:icon="@drawable/ic_social_notifications_active"
-        app:title="Manage notifications" />
+        app:title="Manage notifications"
+        app:summary="Turn off your least favorite notifications" />
+    <Preference
+        app:key="game"
+        app:icon="@drawable/ic_av_games"
+        app:title="Launch game"
+        app:summary="Take me back to teh gaem nau!" />
 
     <PreferenceCategory app:title="About">
         <Preference

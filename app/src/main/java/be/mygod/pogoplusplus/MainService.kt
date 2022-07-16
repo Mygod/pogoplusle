@@ -54,6 +54,10 @@ class MainService : AccessibilityService() {
             }
         }
 
+        val gameIntent = Intent(Intent.ACTION_MAIN).apply {
+            setClassName(PACKAGE_POKEMON_GO, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
+        }
+
         var isRunning = false
             private set
     }
@@ -194,9 +198,8 @@ class MainService : AccessibilityService() {
         // color?
         setContentTitle(title)
         setSmallIcon(icon)
-        setContentIntent(PendingIntent.getActivity(this@MainService, 0, Intent(Intent.ACTION_MAIN).apply {
-            setClassName(PACKAGE_POKEMON_GO, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
-        }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+        setContentIntent(PendingIntent.getActivity(this@MainService, 0, gameIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
         setShowWhen(true)
         setAutoCancel(true)
         setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

@@ -1,6 +1,7 @@
 package be.mygod.pogoplusplus
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -12,6 +13,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.TwoStatePreference
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.google.android.material.snackbar.Snackbar
 
 class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var permissionBluetooth: TwoStatePreference
@@ -35,6 +37,14 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 })
                 true
             }
+        }
+        findPreference<Preference>("game")!!.setOnPreferenceClickListener {
+            try {
+                startActivity(MainService.gameIntent)
+            } catch (_: ActivityNotFoundException) {
+                Snackbar.make(requireView(), "You don't even haf teh gaem!", Snackbar.LENGTH_SHORT).show()
+            }
+            true
         }
         findPreference<Preference>("misc.licenses")!!.setOnPreferenceClickListener {
             startActivity(Intent(context, OssLicensesMenuActivity::class.java))
