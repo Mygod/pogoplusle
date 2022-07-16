@@ -19,6 +19,11 @@
 
     <PreferenceCategory app:title="About">
         <Preference
+            app:key="misc.source"
+            app:icon="@drawable/ic_toggle_star"
+            app:title="@string/settings_misc_source"
+            app:summary="@string/settings_misc_source_summary"/>
+        <Preference
             app:key="misc.donate"
             app:icon="@drawable/ic_action_card_giftcard"
             app:title="@string/settings_misc_donate"

@@ -104,11 +104,13 @@ class EBegFragment : AppCompatDialogFragment() {
         }
         binding.donationsGoogleAndroidMarketDonateButton.setOnClickListener {
             val product = productDetails?.getOrNull(binding.donationsGoogleAndroidMarketSpinner.selectedItemPosition)
-            if (product != null) billingClient.launchBillingFlow(requireActivity(), BillingFlowParams.newBuilder().apply {
-                setProductDetailsParamsList(listOf(BillingFlowParams.ProductDetailsParams.newBuilder().apply {
-                    setProductDetails(product)
-                }.build()))
-            }.build()) else {
+            if (product != null) {
+                billingClient.launchBillingFlow(requireActivity(), BillingFlowParams.newBuilder().apply {
+                    setProductDetailsParamsList(listOf(BillingFlowParams.ProductDetailsParams.newBuilder().apply {
+                        setProductDetails(product)
+                    }.build()))
+                }.build())
+            } else {
                 Toast.makeText(app, R.string.donations__google_android_market_not_supported, Toast.LENGTH_SHORT).show()
             }
         }

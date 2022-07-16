@@ -2,6 +2,8 @@
     <string name="app_name">PoGo++</string>
     <string name="service_description">Automagically skips pairing dialog when connecting Pokemon GO Plus (Android 8+),
         and alerts you when things go wrong.</string>
+    <string name="settings_misc_source">Project homepage at GitHub</string>
+    <string name="settings_misc_source_summary">Read manual, star, submit issues and contribute</string>
     <string name="settings_misc_donate">Donate</string>
     <string name="settings_misc_donate_summary">I love money</string>
     <string name="settings_misc_donate_more">PayPal, Flattr, more…</string>
