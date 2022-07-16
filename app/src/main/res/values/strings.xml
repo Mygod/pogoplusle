@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">PoGo++</string>
-    <string name="service_description">Automagically connects Pokemon GO Plus.</string>
+    <string name="service_description">Automagically skips pairing dialog when connecting Pokemon GO Plus (Android 8+),
+        and alerts you when things go wrong.</string>
 </resources>

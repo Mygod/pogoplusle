@@ -14,5 +14,6 @@ class App : Application() {
         super.onCreate()
         app = this
         deviceStorage = DeviceStorageApp(this)
+        MainService.updateNotificationChannels()
     }
 }
