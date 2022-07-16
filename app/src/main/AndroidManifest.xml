@@ -25,13 +25,13 @@
         android:label="@string/app_name"
         android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PoGo"
+        android:theme="@style/Theme.PoGoPlusPlus"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.PoGo">
+            android:theme="@style/Theme.PoGoPlusPlus">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,6 +50,13 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/main_service_config" />
         </service>
+
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/Theme.PoGoPlusPlus.ActionBar"/>
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/Theme.PoGoPlusPlus.ActionBar"/>
     </application>
 
 </manifest>

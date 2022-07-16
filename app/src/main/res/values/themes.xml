@@ -1,13 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.PoGo" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
+    <style name="Base.Theme.PoGoPlusPlus" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="switchPreferenceCompatStyle">@style/Theme.PoGo.Preference.MaterialSwitchPreference</item>
+        <item name="switchPreferenceCompatStyle">@style/Theme.PoGoPlusPlus.Preference.MaterialSwitchPreference</item>
     </style>
 
-    <style name="Theme.PoGo" parent="Base.Theme.PoGo" />
-    <style name="Theme.PoGo.Preference.MaterialSwitchPreference" parent="Preference.SwitchPreferenceCompat.Material">
+    <style name="Theme.PoGoPlusPlus" parent="Base.Theme.PoGoPlusPlus" />
+    <style name="Theme.PoGoPlusPlus.ActionBar">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+    </style>
+    <style name="Theme.PoGoPlusPlus.Preference.MaterialSwitchPreference" parent="Preference.SwitchPreferenceCompat.Material">
         <item name="android:widgetLayout">@layout/preference_widget_material_switch</item>
     </style>
 </resources>
