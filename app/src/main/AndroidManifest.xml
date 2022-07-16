@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <queries>
+        <package android:name="com.nianticlabs.pokemongo" />
+    </queries>
+
     <application
         android:name=".App"
         android:allowBackup="true"

@@ -99,14 +99,15 @@ class MainService : AccessibilityService() {
         when (event.eventType) {
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
                 val notification = event.parcelableData as Notification
-                val resources = packageManager.getResourcesForApplication(DEVICE_NAME_PGP)
+                val resources = packageManager.getResourcesForApplication(PACKAGE_POKEMON_GO)
                 @SuppressLint("DiscouragedApi")
                 fun getPogoString(name: String) = resources.getString(resources.getIdentifier(
                     name, "string", PACKAGE_POKEMON_GO))
                 val title = getPogoString("Pokemon_Go_Plus")
                 if (notification.extras.getString(Notification.EXTRA_TITLE) != title) return
                 onAuxiliaryConnected()
-                val text = notification.extras.getString(Notification.EXTRA_TEXT) ?: return
+                val text = notification.extras.getString(Notification.EXTRA_TEXT)
+                if (text.isNullOrEmpty()) return
                 if (text == getPogoString("Disconnecting_GO_Plus")) return onAuxiliaryDisconnected()
                 var str = getPogoString("Item_Inventory_Full")
                 if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
@@ -190,6 +191,7 @@ class MainService : AccessibilityService() {
         // color?
         setContentTitle(title)
         setSmallIcon(icon)
+
         setContentIntent(PendingIntent.getActivity(this@MainService, 0, Intent(Intent.ACTION_MAIN).apply {
             setClassName(PACKAGE_POKEMON_GO, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
         }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
