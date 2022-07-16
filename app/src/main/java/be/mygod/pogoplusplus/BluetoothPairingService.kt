@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 
 @RequiresApi(26)
 class BluetoothPairingService : AccessibilityService() {
-    var notificationsCaught = 0
+    private var notificationsCaught = 0
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         when (event.eventType) {
