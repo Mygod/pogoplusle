@@ -21,6 +21,7 @@ class BluetoothPairingService : AccessibilityService() {
                 }
                 notificationsCaught++
                 notification.actions[0].actionIntent.send()
+                performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 if (notificationsCaught == 0 ||
