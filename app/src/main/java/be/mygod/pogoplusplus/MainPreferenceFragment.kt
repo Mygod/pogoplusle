@@ -46,6 +46,10 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             }
             true
         }
+        findPreference<Preference>("misc.donate")!!.setOnPreferenceClickListener {
+            EBegFragment().show(parentFragmentManager, "EBegFragment")
+            true
+        }
         findPreference<Preference>("misc.licenses")!!.setOnPreferenceClickListener {
             startActivity(Intent(context, OssLicensesMenuActivity::class.java))
             true

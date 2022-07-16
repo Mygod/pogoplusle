@@ -21,8 +21,8 @@
         <Preference
             app:key="misc.donate"
             app:icon="@drawable/ic_action_card_giftcard"
-            app:title="Donate"
-            app:summary="I love money"/>
+            app:title="@string/settings_misc_donate"
+            app:summary="@string/settings_misc_donate_summary"/>
         <Preference
             app:key="misc.licenses"
             app:icon="@drawable/ic_action_code"

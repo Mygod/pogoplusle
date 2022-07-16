@@ -2,4 +2,17 @@
     <string name="app_name">PoGo++</string>
     <string name="service_description">Automagically skips pairing dialog when connecting Pokemon GO Plus (Android 8+),
         and alerts you when things go wrong.</string>
+    <string name="settings_misc_donate">Donate</string>
+    <string name="settings_misc_donate_summary">I love money</string>
+    <string name="settings_misc_donate_more">PayPal, Flattr, more…</string>
+
+    <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values/donations__strings.xml -->
+    <string name="donations__button_close">Close</string>
+    <string name="donations__description">Do you find this application useful?\nSupport its development by sending a donation to the developer!</string>
+    <string name="donations__google_android_market">Google Play Store</string>
+    <string name="donations__google_android_market_not_supported">In-App Donations are not supported. Is Google Play Store installed correctly?</string>
+    <string name="donations__google_android_market_description">Google charges a fee of 30%</string>
+    <string name="donations__google_android_market_donate_button">Donate!</string>
+    <string name="donations__google_android_market_text">How much?</string>
+    <string name="donations__thanks_dialog">Thanks for donating!\nI really appreciate this!</string>
 </resources>
