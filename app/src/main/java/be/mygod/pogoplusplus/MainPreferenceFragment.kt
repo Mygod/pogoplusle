@@ -50,7 +50,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
         findPreference<Preference>("misc.source")!!.setOnPreferenceClickListener {
-            app.launchUrl(requireContext(), "https://github.com/Mygod/pogoplusplus")
+            app.launchUrl(requireContext(), "https://github.com/Mygod/pogoplusle")
             true
         }
         findPreference<Preference>("misc.donate")!!.setOnPreferenceClickListener {
