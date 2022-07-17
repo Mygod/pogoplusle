@@ -1,11 +1,11 @@
 # PoGo+LE
 
-[![CircleCI](https://circleci.com/gh/Mygod/pogoplusplus.svg?style=shield)](https://circleci.com/gh/Mygod/pogoplusplus)
+[![CircleCI](https://circleci.com/gh/Mygod/pogoplusle.svg?style=shield)](https://circleci.com/gh/Mygod/pogoplusle)
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
-[![Releases](https://img.shields.io/github/downloads/Mygod/pogoplusplus/total.svg)](https://github.com/Mygod/pogoplusplus/releases)
-[![Language: Kotlin](https://img.shields.io/github/languages/top/Mygod/pogoplusplus.svg)](https://github.com/Mygod/pogoplusplus/search?l=kotlin)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e70e52b1a58045819b505c09edcae816)](https://www.codacy.com/gh/Mygod/pogoplusplus/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Mygod/pogoplusplus&amp;utm_campaign=Badge_Grade)
-[![License](https://img.shields.io/github/license/Mygod/pogoplusplus.svg)](LICENSE)
+[![Releases](https://img.shields.io/github/downloads/Mygod/pogoplusle/total.svg)](https://github.com/Mygod/pogoplusle/releases)
+[![Language: Kotlin](https://img.shields.io/github/languages/top/Mygod/pogoplusle.svg)](https://github.com/Mygod/pogoplusle/search?l=kotlin)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e70e52b1a58045819b505c09edcae816)](https://www.codacy.com/gh/Mygod/pogoplusle/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Mygod/pogoplusle&amp;utm_campaign=Badge_Grade)
+[![License](https://img.shields.io/github/license/Mygod/pogoplusle.svg)](LICENSE)
 
 Automagically skips pairing dialog when connecting Pokémon GO Plus (Android 8+), and alerts you when things go wrong.
 
