@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">PoGo++</string>
-    <string name="service_description">Automagically skips pairing dialog when connecting Pokemon GO Plus (Android 8+),
+    <string name="service_description">Automagically skips pairing dialog when connecting Pokémon GO Plus (Android 8+),
         and alerts you when things go wrong.</string>
     <string name="settings_misc_source">Project homepage at GitHub</string>
     <string name="settings_misc_source_summary">Read manual, star, submit issues and contribute</string>
     <string name="settings_misc_donate">Donate</string>
-    <string name="settings_misc_donate_summary">I love money</string>
+    <string name="settings_misc_donate_summary">Plz send money so that I can afford more PokéCoins</string>
     <string name="settings_misc_donate_more">PayPal, Flattr, more…</string>
 
     <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values/donations__strings.xml -->
