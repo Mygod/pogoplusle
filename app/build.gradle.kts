@@ -17,7 +17,6 @@ android {
         versionCode = 2
         versionName = "0.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resourceConfigurations.addAll(arrayOf("en"))
         buildConfigField("boolean", "DONATIONS", "true")
     }
     buildTypes {
@@ -44,6 +43,7 @@ android {
     productFlavors {
         create("freedom") {
             dimension = "freedom"
+            resourceConfigurations.addAll(arrayOf("en"))
         }
         create("google") {
             dimension = "freedom"
