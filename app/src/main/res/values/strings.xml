@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">PoGo+LE</string>
     <string name="service_description">Automagically skips pairing dialog when connecting Pokémon GO Plus (Android 8+),
-        and alerts you when your device is disconnected, etc.</string>
+        and alerts you when your device is disconnected, or when the game complains about the bag being full,
+        etc.</string>
     <string name="settings_misc_source">Project homepage at GitHub</string>
     <string name="settings_misc_source_summary">Read manual, star, submit issues and contribute</string>
     <string name="settings_misc_donate">Donate</string>

@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             if (isChecked) MaterialAlertDialogBuilder(this).apply {
                 binding.serviceSwitch.isChecked = false
                 setTitle("Grant control to this app?")
-                setMessage("This app needs to use Android AccessibilityService API to read and control notifications and screen for system Settings and the game in order to skip pairing dialog for you when connecting Pokémon GO Plus (Android 8+) and notify you when your device is disconnected, etc. No data is collected through this process except for crash logs.\n\nTo grant the permission, click 'Agree', then click on this app and turn on the main switch that says 'Use PoGo+LE'.")
+                setMessage("This app needs to use Android AccessibilityService API to read and control notifications and screen for system Settings and the game in order to click the relevant buttons in the pairing dialog for you when connecting Pokémon GO Plus (Android 8+) and notify you when your device is disconnected, or when the game complains about the bag being full, etc. No data is collected through this process except for crash logs.\n\nTo grant the permission, click 'Agree', then click on this app and turn on the main switch that says 'Use PoGo+LE'.")
                 setNegativeButton("Reject", null)
                 setPositiveButton("Accept") { _, _ ->
                     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
