@@ -171,8 +171,7 @@ class MainService : AccessibilityService() {
                 if (confirm.size != 1) return
                 val title = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/alertTitle")
                 if (title.size != 1 || !title[0].text.contains(DEVICE_NAME_PGP)) return
-                notificationsCaught--
-                confirm[0].performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                if (confirm[0].performAction(AccessibilityNodeInfo.ACTION_CLICK)) notificationsCaught--
             }
             else -> Timber.e(Exception("Unknown event ${event.eventType}"))
         }
