@@ -27,6 +27,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             if (newValue as Boolean) requestBluetoothPermission.launch(Manifest.permission.BLUETOOTH_CONNECT) else {
                 startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", requireContext().packageName, null)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 })
             }
             false
@@ -34,6 +35,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("permission.notification")!!.apply {
             setOnPreferenceClickListener {
                 startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().packageName)
                 })
                 true
