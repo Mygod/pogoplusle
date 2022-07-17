@@ -75,7 +75,8 @@ class MainService : AccessibilityService() {
             val uuids = device.uuids
             val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_LE || uuids != null ||
                     bluetoothClass.hashCode() != BluetoothClass.Device.Major.UNCATEGORIZED ||
-                    !device.address.startsWith("98:B6:E9:", true) ||
+                    !device.address.startsWith("7C:BB:8A:", true) &&
+                        !device.address.startsWith("98:B6:E9:", true) ||
                     name != DEVICE_NAME_PBP && name != DEVICE_NAME_PGP
             Timber.d("${intent.action}: ${device.address}, $name, $type, $bluetoothClass, $uuids, $shouldSkip")
             if (shouldSkip) return
