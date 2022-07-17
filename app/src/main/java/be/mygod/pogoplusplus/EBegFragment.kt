@@ -86,8 +86,7 @@ class EBegFragment : AppCompatDialogFragment() {
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             billingClient.queryProductDetails(QueryProductDetailsParams.newBuilder().apply {
                 setProductList(listOf(
-                    "donate001", "donate002", "donate005", "donate010", "donate020", "donate050",
-                    "donate100", "donate200", "donatemax",
+                    "donate001", "donate002", "donate005", "donate010", "donate020", "donate040", "donate100",
                 ).map {
                     QueryProductDetailsParams.Product.newBuilder().apply {
                         setProductId(it)

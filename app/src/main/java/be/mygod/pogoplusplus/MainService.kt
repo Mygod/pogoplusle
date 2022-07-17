@@ -195,7 +195,6 @@ class MainService : AccessibilityService() {
         @DrawableRes icon: Int,
     ) = notificationManager.notify(id, NotificationCompat.Builder(this, channel).apply {
         setCategory(NotificationCompat.CATEGORY_STATUS)
-        // color?
         setContentTitle(title)
         setSmallIcon(icon)
         setContentIntent(PendingIntent.getActivity(this@MainService, 0, gameIntent,
@@ -203,6 +202,7 @@ class MainService : AccessibilityService() {
         setShowWhen(true)
         setAutoCancel(true)
         setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        color = getColor(R.color.primaryColor)
         priority = NotificationCompat.PRIORITY_MAX
     }.build())
 
