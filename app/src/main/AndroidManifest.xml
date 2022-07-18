@@ -42,13 +42,14 @@
             android:name=".BluetoothPairingService"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:label="PoGo+LE Bluetooth Pairing">
+            android:enabled="@bool/api_ge_26"
+            android:label="PoGo+LE Bluetooth pairing assistant">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
             <meta-data
                 android:name="android.accessibilityservice"
-                android:resource="@xml/main_service_config" />
+                android:resource="@xml/bluetooth_pairing_service_config" />
         </service>
         <service
             android:name=".GameNotificationService"

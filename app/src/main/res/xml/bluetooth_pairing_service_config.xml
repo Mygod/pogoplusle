@@ -3,7 +3,7 @@
     android:accessibilityEventTypes="typeNotificationStateChanged|typeWindowStateChanged"
     android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows"
     android:accessibilityFeedbackType="feedbackGeneric"
-    android:description="@string/service_description"
+    android:description="@string/bluetooth_pairing_service_description"
     android:canRetrieveWindowContent="true"
-    android:packageNames="com.android.settings,com.nianticlabs.pokemongo"
+    android:packageNames="com.android.settings"
     android:settingsActivity="be.mygod.pogoplusplus.MainActivity" />
