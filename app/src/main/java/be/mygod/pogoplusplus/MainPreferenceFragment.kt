@@ -43,7 +43,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         }
         findPreference<Preference>("game")!!.setOnPreferenceClickListener {
             try {
-                startActivity(MainService.gameIntent)
+                startActivity(GameNotificationService.gameIntent)
             } catch (_: ActivityNotFoundException) {
                 Snackbar.make(requireView(), "You don't even haf teh gaem!", Snackbar.LENGTH_SHORT).show()
             }

@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         suppressListener = true
-        binding.serviceSwitch.isChecked = MainService.isRunning
+        binding.serviceSwitch.isChecked = BluetoothPairingService.isRunning
         suppressListener = false
     }
 }

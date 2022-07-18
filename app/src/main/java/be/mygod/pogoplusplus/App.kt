@@ -42,7 +42,7 @@ class App : Application() {
                 }
             }
         })
-        MainService.updateNotificationChannels()
+        GameNotificationService.updateNotificationChannels()
         EBegFragment.init()
     }
 
