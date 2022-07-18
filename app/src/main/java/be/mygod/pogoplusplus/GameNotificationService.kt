@@ -90,7 +90,7 @@ class GameNotificationService : NotificationListenerService() {
         if (!isInterested(sbn)) return
         onAuxiliaryConnected()
         val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
-        Timber.d("PGP notification updated $text")
+        Timber.d("PGP notification updated: $text")
         if (text.isNullOrEmpty()) return
         val resources = packageManager.getResourcesForApplication(sbn.packageName)
         fun getPogoString(name: String) = resources.getString(resources.getIdentifier(
