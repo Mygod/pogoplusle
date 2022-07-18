@@ -26,7 +26,7 @@ class BluetoothPairingService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         when (event.eventType) {
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
-                val notification = event.parcelableData as Notification
+                val notification = event.parcelableData as? Notification ?: return
                 if (notification.channelId != "bluetooth_notification_channel" || notification.extras.getString(
                         Notification.EXTRA_TEXT)?.contains(BluetoothReceiver.DEVICE_NAME_PGP) != true) return
                 notificationsCaught++
