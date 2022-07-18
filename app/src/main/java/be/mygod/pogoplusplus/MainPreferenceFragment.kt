@@ -42,11 +42,10 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             }
         }
         findPreference<Preference>("game")!!.setOnPreferenceClickListener {
-            try {
-                startActivity(GameNotificationService.gameIntent)
-            } catch (_: ActivityNotFoundException) {
+            val intent = GameNotificationService.gameIntent
+            if (intent == null) {
                 Snackbar.make(requireView(), "You don't even haf teh gaem!", Snackbar.LENGTH_SHORT).show()
-            }
+            } else startActivity(intent)
             true
         }
         findPreference<Preference>("misc.source")!!.setOnPreferenceClickListener {

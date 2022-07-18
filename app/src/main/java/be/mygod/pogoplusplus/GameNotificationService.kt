@@ -22,14 +22,20 @@ class GameNotificationService : NotificationListenerService() {
         private const val CHANNEL_POKEMON_FULL = "pokemon_full"
         private const val CHANNEL_NO_BALL = "out_of_pokeballs"
         private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
+        private const val PACKAGE_POKEMON_GO_ARES = "com.nianticlabs.pokemongo.ares"
 
         private const val NOTIFICATION_AUXILIARY_DISCONNECTED = 1
         private const val NOTIFICATION_ITEM_FULL = 2
         private const val NOTIFICATION_POKEMON_FULL = 3
         private const val NOTIFICATION_NO_BALL = 4
 
-        val gameIntent = Intent(Intent.ACTION_MAIN).apply {
-            setClassName(PACKAGE_POKEMON_GO, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
+        private fun gameIntent(packageName: String) = Intent(Intent.ACTION_MAIN).apply {
+            setClassName(packageName, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
+        }
+        val gameIntent: Intent? get() {
+            gameIntent(PACKAGE_POKEMON_GO).apply { if (resolveActivity(app.packageManager) != null) return this }
+            gameIntent(PACKAGE_POKEMON_GO_ARES).apply { if (resolveActivity(app.packageManager) != null) return this }
+            return null
         }
 
         @RequiresApi(26)
@@ -55,16 +61,14 @@ class GameNotificationService : NotificationListenerService() {
             channel: String,
             title: CharSequence,
             @DrawableRes icon: Int,
+            packageName: String? = null,
         ) = notificationManager.notify(id, NotificationCompat.Builder(app, channel).apply {
             setCategory(NotificationCompat.CATEGORY_STATUS)
             setContentTitle(title)
             setSmallIcon(icon)
-            setContentIntent(
-                PendingIntent.getActivity(
-                    app, 0, gameIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            )
+            setContentIntent(PendingIntent.getActivity(app, 0,
+                if (packageName == null) gameIntent else gameIntent(packageName),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             setShowWhen(true)
             setAutoCancel(true)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -74,13 +78,13 @@ class GameNotificationService : NotificationListenerService() {
 
 
         fun onAuxiliaryConnected() = notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
-        fun onAuxiliaryDisconnected(name: String = BluetoothReceiver.DEVICE_NAME_PGP) = pushNotification(
-            NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED, "$name disconnected",
-            R.drawable.ic_device_bluetooth_disabled
-        )
+        fun onAuxiliaryDisconnected(deviceName: String = BluetoothReceiver.DEVICE_NAME_PGP,
+                                    packageName: String? = null) = pushNotification(
+            NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED, "$deviceName disconnected",
+            R.drawable.ic_device_bluetooth_disabled, packageName)
 
         private fun isInterested(sbn: StatusBarNotification): Boolean {
-            if (sbn.packageName != PACKAGE_POKEMON_GO) return false
+            if (sbn.packageName != PACKAGE_POKEMON_GO && sbn.packageName != PACKAGE_POKEMON_GO_ARES) return false
             // com.nianticlabs.pokemongoplus.service.BackgroundService.notificationId
             return if (Build.VERSION.SDK_INT < 26) sbn.id == 2000 else sbn.notification.channelId == sbn.packageName
         }
