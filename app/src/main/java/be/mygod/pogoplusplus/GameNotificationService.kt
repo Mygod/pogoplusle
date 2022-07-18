@@ -91,6 +91,9 @@ class GameNotificationService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        BluetoothPairingService.instance?.apply {
+            if (sbn.packageName == BluetoothPairingService.PACKAGE_SETTINGS) return onNotification(sbn.notification)
+        }
         if (!isInterested(sbn)) return
         onAuxiliaryConnected()
         val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
