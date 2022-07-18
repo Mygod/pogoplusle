@@ -55,7 +55,7 @@
         <service
             android:name=".GameNotificationService"
             android:exported="true"
-            android:label="PoGo+LE Notification Handler"
+            android:label="@string/game_notification_service_name"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />

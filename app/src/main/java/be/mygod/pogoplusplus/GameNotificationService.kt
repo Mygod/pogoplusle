@@ -76,6 +76,8 @@ class GameNotificationService : NotificationListenerService() {
             priority = NotificationCompat.PRIORITY_MAX
         }.build())
 
+        var isRunning = false
+            private set
 
         fun onAuxiliaryConnected() = notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
         fun onAuxiliaryDisconnected(deviceName: String = BluetoothReceiver.DEVICE_NAME_PGP,
@@ -88,6 +90,13 @@ class GameNotificationService : NotificationListenerService() {
             // com.nianticlabs.pokemongoplus.service.BackgroundService.notificationId
             return if (Build.VERSION.SDK_INT < 26) sbn.id == 2000 else sbn.notification.channelId == sbn.packageName
         }
+    }
+
+    override fun onListenerConnected() {
+        isRunning = true
+    }
+    override fun onListenerDisconnected() {
+        isRunning = false
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {

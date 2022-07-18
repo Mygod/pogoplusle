@@ -2,7 +2,9 @@ package be.mygod.pogoplusplus
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.ComponentName
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -45,6 +47,17 @@ class App : Application() {
         GameNotificationService.updateNotificationChannels()
         EBegFragment.init()
     }
+
+    inline fun <reified T> componentName() = ComponentName(this, T::class.java)
+    inline fun <reified T> isEnabled(defaultEnabled: Boolean = true) =
+        when (packageManager.getComponentEnabledSetting(componentName<T>())) {
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
+            PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> defaultEnabled
+            else -> false
+        }
+    inline fun <reified T> setEnabled(value: Boolean) = packageManager.setComponentEnabledSetting(componentName<T>(),
+        if (value) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+        PackageManager.DONT_KILL_APP)
 
     private val customTabsIntent by lazy {
         CustomTabsIntent.Builder().apply {

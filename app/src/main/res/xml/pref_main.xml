@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
     <SwitchPreferenceCompat
+        app:key="service.pairing"
+        app:icon="@drawable/ic_action_touch_app"
+        app:title="Bluetooth pairing assistant"
+        app:summary="Click the pairing dialog for you"
+        app:persistent="false" />
+    <SwitchPreferenceCompat
+        app:key="service.gameNotification"
+        app:icon="@drawable/ic_device_monitor_heart"
+        app:title="@string/game_notification_service_name"
+        app:summary="Receive alerts for disconnections, full bags, etc."
+        app:persistent="false" />
+    <SwitchPreferenceCompat
         app:key="permission.bluetooth"
         app:icon="@drawable/ic_device_bluetooth_connected"
-        app:title="Nearby devices permission"
-        app:summary="Improves detection of Bluetooth disconnect"
+        app:title="Monitor Bluetooth"
+        app:summary="Detect disconnections more reliably"
         app:persistent="false" />
     <Preference
         app:key="permission.notification"

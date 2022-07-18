@@ -2,6 +2,7 @@
     <string name="app_name">PoGo+LE</string>
     <string name="bluetooth_pairing_service_description">Automagically skips pairing dialog when connecting
         Pokémon GO Plus</string>
+    <string name="game_notification_service_name">Monitor game notifications</string>
     <string name="settings_misc_source">Project homepage at GitHub</string>
     <string name="settings_misc_source_summary">Read manual, star, submit issues and contribute</string>
     <string name="settings_misc_donate">Donate</string>
