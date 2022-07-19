@@ -77,7 +77,10 @@ class GameNotificationService : NotificationListenerService() {
         }.build())
 
         var isRunning = false
-            private set
+            private set(value) {
+                field = value
+                MainPreferenceFragment.instance?.updateSwitches()
+            }
 
         fun onAuxiliaryConnected() = notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
         fun onAuxiliaryDisconnected(deviceName: String = BluetoothReceiver.DEVICE_NAME_PGP,

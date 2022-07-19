@@ -15,7 +15,10 @@ class BluetoothPairingService : AccessibilityService() {
         const val PACKAGE_SETTINGS = "com.android.settings"
 
         var instance: BluetoothPairingService? = null
-            private set
+            private set(value) {
+                field = value
+                MainPreferenceFragment.instance?.updateSwitches()
+            }
     }
 
     override fun onServiceConnected() {

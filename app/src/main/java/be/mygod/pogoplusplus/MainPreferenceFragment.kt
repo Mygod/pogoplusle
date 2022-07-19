@@ -17,6 +17,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
 class MainPreferenceFragment : PreferenceFragmentCompat() {
+    companion object {
+        var instance: MainPreferenceFragment? = null
+    }
+
     private lateinit var servicePairing: TwoStatePreference
     private lateinit var serviceGameNotification: TwoStatePreference
     private lateinit var permissionBluetooth: TwoStatePreference
@@ -97,14 +101,24 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
     private val requestBluetoothPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         permissionBluetooth.isChecked = it
-        if (!it) Snackbar.make(requireView(), "Missing Bluetooth permission", Snackbar.LENGTH_LONG).show()
+        if (!it) Snackbar.make(requireView(), "Missing Nearby devices permission", Snackbar.LENGTH_LONG).show()
     }
 
     override fun onResume() {
         super.onResume()
-        servicePairing.isChecked = BluetoothPairingService.instance != null
-        serviceGameNotification.isChecked = GameNotificationService.isRunning
+        instance = this
+        updateSwitches()
         permissionBluetooth.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
                 app.isEnabled<BluetoothReceiver>()
+    }
+
+    fun updateSwitches() {
+        servicePairing.isChecked = BluetoothPairingService.instance != null
+        serviceGameNotification.isChecked = GameNotificationService.isRunning
+    }
+
+    override fun onPause() {
+        instance = null
+        super.onPause()
     }
 }
