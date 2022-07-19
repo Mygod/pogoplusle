@@ -2,6 +2,13 @@
     <string name="app_name">PoGo+LE</string>
     <string name="bluetooth_pairing_service_description">Automagically skips pairing dialog when connecting
         Pokémon GO Plus</string>
+    <string name="bluetooth_pairing_service_disclosure">This feature needs to use Android Accessibility\u200bService API
+        to read and control notifications and screen for system Settings and the game in order to click the buttons
+        <i>Pair &amp; connect</i> in the notification and <i>Pair</i> in the pairing dialog for you when connecting your
+        Pokémon GO Plus. No data is collected through this process except for crash logs.
+
+        \n\nTo grant the permission, click <i>Agree</i>, then click on this app and turn on the main switch that says
+        <i>Use PoGo+LE Bluetooth pairing assistant</i>.</string>
     <string name="game_notification_service_name">Monitor game notifications</string>
     <string name="settings_misc_source">Project homepage at GitHub</string>
     <string name="settings_misc_source_summary">Read manual, star, submit issues and contribute</string>

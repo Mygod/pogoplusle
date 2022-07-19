@@ -38,7 +38,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         if (needsServicePairing) servicePairing.setOnPreferenceChangeListener { _, newValue ->
             if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
                 setTitle("Grant control to this app?")
-                setMessage("This feature needs to use Android AccessibilityService API to read and control notifications and screen for system Settings and the game in order to click the relevant buttons in the pairing dialog for you when connecting Pokémon GO Plus. No data is collected through this process except for crash logs.\n\nTo grant the permission, click 'Agree', then click on this app and turn on the main switch that says 'Use PoGo+LE Bluetooth pairing assistant'.")
+                setMessage(R.string.bluetooth_pairing_service_disclosure)
                 setNegativeButton("Reject", null)
                 setPositiveButton("Accept") { _, _ ->
                     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
