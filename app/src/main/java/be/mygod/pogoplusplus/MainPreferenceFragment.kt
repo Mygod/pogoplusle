@@ -97,6 +97,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
     private val requestBluetoothPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         permissionBluetooth.isChecked = it
+        if (!it) Snackbar.make(requireView(), "Missing Bluetooth permission", Snackbar.LENGTH_LONG).show()
     }
 
     override fun onResume() {
