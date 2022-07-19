@@ -10,6 +10,7 @@ import android.provider.Settings
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -24,6 +25,8 @@ import com.google.android.material.snackbar.Snackbar
 class MainPreferenceFragment : PreferenceFragmentCompat() {
     companion object {
         var instance: MainPreferenceFragment? = null
+
+        private const val EXTRA_KEY_LEGACY = ":settings:fragment_args_key"
     }
 
     private lateinit var servicePairing: TwoStatePreference
@@ -57,10 +60,18 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         } else servicePairing.remove()
         serviceGameNotification = findPreference("service.gameNotification")!!
         serviceGameNotification.setOnPreferenceChangeListener { _, _ ->
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS).apply {
+            // https://stackoverflow.com/a/63914445/2245107
+            startActivity(Intent().apply {
+                val componentName = app.componentName<GameNotificationService>().flattenToString()
+                if (Build.VERSION.SDK_INT >= 30) {
+                    action = Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS
+                    putExtra(Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME, componentName)
+                } else {
+                    action = Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
+                    putExtra(EXTRA_KEY_LEGACY, componentName)
+                    putExtra(":settings:show_fragment_args", bundleOf(EXTRA_KEY_LEGACY to componentName))
+                }
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                putExtra(Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
-                    app.componentName<GameNotificationService>().flattenToString())
             })
             false
         }
