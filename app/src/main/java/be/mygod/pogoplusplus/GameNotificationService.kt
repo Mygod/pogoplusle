@@ -32,10 +32,9 @@ class GameNotificationService : NotificationListenerService() {
         private fun gameIntent(packageName: String) = Intent(Intent.ACTION_MAIN).apply {
             setClassName(packageName, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
         }
-        val gameIntent: Intent? get() {
-            gameIntent(PACKAGE_POKEMON_GO).apply { if (resolveActivity(app.packageManager) != null) return this }
-            gameIntent(PACKAGE_POKEMON_GO_ARES).apply { if (resolveActivity(app.packageManager) != null) return this }
-            return null
+        val gameIntent = Intent(Intent.ACTION_CHOOSER).apply {
+            putExtra(Intent.EXTRA_INTENT, gameIntent(PACKAGE_POKEMON_GO))
+            putExtra(Intent.EXTRA_ALTERNATE_INTENTS, arrayOf(gameIntent(PACKAGE_POKEMON_GO_ARES)))
         }
 
         @RequiresApi(26)

@@ -76,10 +76,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
         findPreference<Preference>("game")!!.setOnPreferenceClickListener {
-            val intent = GameNotificationService.gameIntent
-            if (intent == null) {
-                Snackbar.make(requireView(), "You don't even haf teh gaem!", Snackbar.LENGTH_SHORT).show()
-            } else startActivity(intent)
+            startActivity(GameNotificationService.gameIntent)
             true
         }
         findPreference<Preference>("misc.source")!!.setOnPreferenceClickListener {
