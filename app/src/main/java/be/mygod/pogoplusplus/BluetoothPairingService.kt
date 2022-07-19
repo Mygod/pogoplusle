@@ -3,6 +3,7 @@ package be.mygod.pogoplusplus
 import android.accessibilityservice.AccessibilityService
 import android.annotation.TargetApi
 import android.app.Notification
+import android.app.PendingIntent
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -45,8 +46,10 @@ class BluetoothPairingService : AccessibilityService() {
     fun onNotification(notification: Notification) {
         if (notification.channelId != "bluetooth_notification_channel" || notification.extras.getString(
                 Notification.EXTRA_TEXT)?.contains(BluetoothReceiver.DEVICE_NAME_PGP) != true) return
-        notification.actions[0].actionIntent.send()
-        performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
+        try {
+            notification.actions[0].actionIntent.send()
+            performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
+        } catch (_: PendingIntent.CanceledException) { }
     }
 
     override fun onInterrupt() {
