@@ -22,7 +22,7 @@
         app:key="permission.notification"
         app:icon="@drawable/ic_social_notifications_active"
         app:title="Manage notifications"
-        app:summary="Turn off your least favorite notifications" />
+        app:summary="Turn on your favorite notifications" />
     <Preference
         app:key="game"
         app:icon="@drawable/ic_av_games"

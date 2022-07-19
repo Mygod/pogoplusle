@@ -1,6 +1,7 @@
 package be.mygod.pogoplusplus
 
 import android.Manifest
+import android.annotation.TargetApi
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -55,7 +56,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             false
         } else servicePairing.remove()
         serviceGameNotification = findPreference("service.gameNotification")!!
-        serviceGameNotification.setOnPreferenceChangeListener { _, newValue ->
+        serviceGameNotification.setOnPreferenceChangeListener { _, _ ->
             startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 putExtra(Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
@@ -68,7 +69,9 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             val shouldEnable = newValue as Boolean
             app.setEnabled<BluetoothReceiver>(shouldEnable)
             if (shouldEnable && Build.VERSION.SDK_INT >= 31 && !hasBluetoothPermission) {
-                requestBluetoothPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                requestBluetoothPermission.launch(if (Build.VERSION.SDK_INT >= 33) {
+                    arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.POST_NOTIFICATIONS)
+                } else arrayOf(Manifest.permission.BLUETOOTH_CONNECT))
                 false
             } else true
         }
@@ -109,9 +112,12 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     @get:RequiresApi(31)
     private val hasBluetoothPermission get() = requireContext().checkSelfPermission(
         Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
-    private val requestBluetoothPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        permissionBluetooth.isChecked = it
-        if (!it) Snackbar.make(requireView(), "Missing Nearby devices permission", Snackbar.LENGTH_LONG).show()
+    @TargetApi(31)
+    private val requestBluetoothPermission = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        val granted = permissions.getOrDefault(Manifest.permission.BLUETOOTH_CONNECT, false)
+        permissionBluetooth.isChecked = granted
+        if (!granted) Snackbar.make(requireView(), "Missing Nearby devices permission", Snackbar.LENGTH_LONG).show()
     }
 
     override fun onResume() {
