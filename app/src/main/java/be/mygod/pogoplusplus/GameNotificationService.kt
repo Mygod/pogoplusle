@@ -124,11 +124,12 @@ class GameNotificationService : NotificationListenerService() {
         when (text) {
             str -> pushNotification(NOTIFICATION_NO_BALL, CHANNEL_NO_BALL, str,
                 R.drawable.ic_action_hide_source)
-            getPogoString("Captured_Pokemon") -> {
+            getPogoString("Captured_Pokemon"), getPogoString("Pokemon_Escaped") -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
             }
             getPogoString("Retrieved_an_Item") -> notificationManager.cancel(NOTIFICATION_ITEM_FULL)
+            getPogoString("Pokestop_Cooldown"), getPogoString("Pokestop_Out_Of_Range") -> { }
             else -> {
                 val split = getPogoString("Retrieved_Items").split("%s", limit = 2)
                 val matches = if (split.size == 1) {
