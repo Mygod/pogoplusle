@@ -120,14 +120,14 @@ class GameNotificationService : NotificationListenerService() {
         if (text == getPogoString("Disconnecting_GO_Plus")) return onAuxiliaryDisconnected()
         var str = getPogoString("Item_Inventory_Full")
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
-            R.drawable.ic_action_shopping_bag)
+            R.drawable.ic_action_shopping_bag, sbn.packageName)
         str = getPogoString("Pokemon_Inventory_Full")
         if (text == str) return pushNotification(NOTIFICATION_POKEMON_FULL, CHANNEL_POKEMON_FULL, str,
-            R.drawable.ic_notification_disc_full)
+            R.drawable.ic_notification_disc_full, sbn.packageName)
         str = getPogoString("Out_Of_Pokeballs")
         when (text) {
             str -> pushNotification(NOTIFICATION_NO_BALL, CHANNEL_NO_BALL, str,
-                R.drawable.ic_action_hide_source)
+                R.drawable.ic_action_hide_source, sbn.packageName)
             getPogoString("Captured_Pokemon"), getPogoString("Pokemon_Escaped") -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
