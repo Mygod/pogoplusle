@@ -1,10 +1,10 @@
 package be.mygod.pogoplusplus
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -41,7 +41,9 @@ class GameNotificationService : NotificationListenerService() {
         private fun createNotificationChannel(id: String, name: CharSequence) = NotificationChannel(
             id, name, NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            enableLights(true)
+            lightColor = Color.RED
+            lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
             notificationManager.createNotificationChannel(this)
         }
 
@@ -70,6 +72,8 @@ class GameNotificationService : NotificationListenerService() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             setShowWhen(true)
             setAutoCancel(true)
+            setOnlyAlertOnce(id == NOTIFICATION_AUXILIARY_DISCONNECTED)
+            setLights(Color.RED, 500, 500)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             color = app.getColor(R.color.primaryColor)
             priority = NotificationCompat.PRIORITY_MAX
@@ -107,7 +111,7 @@ class GameNotificationService : NotificationListenerService() {
         }
         if (!isInterested(sbn)) return
         onAuxiliaryConnected()
-        val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
+        val text = sbn.notification.extras.getString(NotificationCompat.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
         if (text.isNullOrEmpty()) return
         val resources = packageManager.getResourcesForApplication(sbn.packageName)
