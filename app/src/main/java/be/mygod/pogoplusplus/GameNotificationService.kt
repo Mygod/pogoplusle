@@ -21,6 +21,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val CHANNEL_ITEM_FULL = "item_inventory_full"
         private const val CHANNEL_POKEMON_FULL = "pokemon_full"
         private const val CHANNEL_NO_BALL = "out_of_pokeballs"
+        private const val CHANNEL_SPIN_FAIL = "spin_fail"
         private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
         private const val PACKAGE_POKEMON_GO_ARES = "com.nianticlabs.pokemongo.ares"
 
@@ -28,6 +29,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val NOTIFICATION_ITEM_FULL = 2
         private const val NOTIFICATION_POKEMON_FULL = 3
         private const val NOTIFICATION_NO_BALL = 4
+        private const val NOTIFICATION_SPIN_FAIL = 5
 
         private fun gameIntent(packageName: String) = Intent(Intent.ACTION_MAIN).apply {
             setClassName(packageName, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
@@ -53,6 +55,7 @@ class GameNotificationService : NotificationListenerService() {
                 createNotificationChannel(CHANNEL_ITEM_FULL, "Bag is full")
                 createNotificationChannel(CHANNEL_POKEMON_FULL, "No more room for Pokémon")
                 createNotificationChannel(CHANNEL_NO_BALL, "Out of Poké Balls")
+                createNotificationChannel(CHANNEL_SPIN_FAIL, "PokéStop spin error")
             }
         }
 
@@ -132,7 +135,10 @@ class GameNotificationService : NotificationListenerService() {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
             }
-            getPogoString("Retrieved_an_Item") -> notificationManager.cancel(NOTIFICATION_ITEM_FULL)
+            getPogoString("Retrieved_an_Item") -> {
+                notificationManager.cancel(NOTIFICATION_ITEM_FULL)
+                notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
+            }
             getPogoString("Pokestop_Cooldown"), getPogoString("Pokestop_Out_Of_Range") -> { }
             else -> {
                 val split = getPogoString("Retrieved_Items").split("%s", limit = 2)
@@ -141,7 +147,16 @@ class GameNotificationService : NotificationListenerService() {
                     false
                 } else text.startsWith(split[0]) && text.endsWith(split[1])
                 if (matches) {
-                    notificationManager.cancel(NOTIFICATION_ITEM_FULL)
+                    try {
+                        val items = text.substring(split[0].length, text.length - split[1].length).toInt()
+                        notificationManager.cancel(NOTIFICATION_ITEM_FULL)
+                        if (items == 0) {
+                            pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
+                                R.drawable.ic_alert_error_outline, sbn.packageName)
+                        } else notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
+                    } catch (e: NumberFormatException) {
+                        Timber.e(Exception("Unrecognized notification text: $text", e))
+                    }
                 } else Timber.e(Exception("Unrecognized notification text: $text"))
             }
         }
