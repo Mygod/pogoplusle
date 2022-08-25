@@ -8,6 +8,7 @@
 [![License](https://img.shields.io/github/license/Mygod/pogoplusle.svg)](LICENSE)
 
 <a href="https://play.google.com/store/apps/details?id=be.mygod.pogoplusplus"><img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height="48"></a>
+([beta](https://play.google.com/apps/testing/be.mygod.pogoplusplus))
 
 Automagically skips pairing dialog when connecting Pokémon GO Plus (Android 8+), and alerts you when things go wrong.
 
