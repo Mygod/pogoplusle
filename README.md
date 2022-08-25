@@ -16,5 +16,11 @@ Context: Pairing dialog were introduced in [November 2020 security patch](https:
 
 ## FAQ
 
+Q: How to use it?  
+A: Install it, launch it, turn on the first switch (optionally turn on the remaining switches and click other buttons) and enjoy! You probably won't need to launch this app ever again.
+
+Q: What do the other two switches do?  
+A: Those would allow PoGo+LE to post a notification when your device is disconnected, bag is full, storage is full, etc. You can manage these notifications in app settings.
+
 Q: Is this app safe to use?  
 A: Yes. This app uses `AccessibilityService` API to help you skip the pairing dialog. Since this app only interacts with Android system interface and system Settings but not the game, PoGo+LE is fully compliant with Niantic's terms of service and is safe to use.
