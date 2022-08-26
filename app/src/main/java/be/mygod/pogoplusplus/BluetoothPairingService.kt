@@ -34,12 +34,13 @@ class BluetoothPairingService : AccessibilityService() {
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 val root = rootInActiveWindow ?: return
-                if (root.findAccessibilityNodeInfosByViewId(
-                        "$PACKAGE_SETTINGS:id/phonebook_sharing_message_confirm_pin").size != 1) return
                 val confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
                 if (confirm.size != 1) return
                 val title = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/alertTitle")
-                if (title.size != 1 || !title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) return
+                val message = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/message")
+                val titleHasDevice = title.size == 1 && title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)
+                val messageHasDevice = message.size == 1 && message[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)
+                if (!titleHasDevice && !messageHasDevice) return
                 confirm[0].performAction(AccessibilityNodeInfo.ACTION_CLICK)
             }
             else -> Timber.e(Exception("Unknown event ${event.eventType}"))
