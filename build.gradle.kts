@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.application") version "7.3.0-beta05" apply false
+    id("com.android.application") version "7.3.0-rc01" apply false
     id("com.github.ben-manes.versions") version "0.42.0"
     id("org.jetbrains.kotlin.android") version "1.7.10" apply false
 }
