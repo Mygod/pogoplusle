@@ -131,8 +131,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         if (!granted) Snackbar.make(requireView(), "Missing Nearby devices permission", Snackbar.LENGTH_LONG).show()
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         instance = this
         updateSwitches()
         permissionBluetooth.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
@@ -144,8 +144,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         serviceGameNotification.isChecked = GameNotificationService.isRunning
     }
 
-    override fun onPause() {
+    override fun onStop() {
         instance = null
-        super.onPause()
+        super.onStop()
     }
 }
