@@ -38,10 +38,9 @@ class BluetoothPairingService : AccessibilityService() {
                 if (confirm.size != 1) return
                 val title = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/alertTitle")
                 val message = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/message")
-                if (!(title.size == 1 && title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) &&
-                    !(message.size == 1 && message[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP))) {
-                    return
-                }
+                val titleHasDevice = title.size == 1 && title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)
+                val messageHasDevice = message.size == 1 && message[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)
+                if (!titleHasDevice && !messageHasDevice) return
                 confirm[0].performAction(AccessibilityNodeInfo.ACTION_CLICK)
             }
             else -> Timber.e(Exception("Unknown event ${event.eventType}"))
