@@ -34,15 +34,7 @@ class BluetoothPairingService : AccessibilityService() {
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 val root = rootInActiveWindow ?: return
-                val confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
-                if (confirm.size != 1) return
-                val title = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/alertTitle")
-                if (title.size != 1 || !title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) {
-                    // Some devices (eg Samsung) put device name in message (#6)
-                    val message = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/message")
-                    if (message.size != 1 || !message[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) return
-                }
-                confirm[0].performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                (tryLocateById(root) ?: tryLocateByText(root))?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
             }
             else -> Timber.e(Exception("Unknown event ${event.eventType}"))
         }
@@ -54,6 +46,31 @@ class BluetoothPairingService : AccessibilityService() {
             notification.actions[0].actionIntent.send()
             performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
         } catch (_: PendingIntent.CanceledException) { }
+    }
+
+    private fun tryLocateById(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
+        val confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
+        if (confirm.size != 1) return null
+        val title = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/alertTitle")
+        if (title.size != 1 || !title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) {
+            // Some devices (eg Samsung) put device name in message (#6)
+            val message = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/message")
+            if (message.size != 1 || !message[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) return null
+        }
+        return confirm[0]
+    }
+    private fun tryLocateByText(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
+        val resources = packageManager.getResourcesForApplication(PACKAGE_SETTINGS)
+        val confirmText = resources.getString(resources.getIdentifier(
+            "bluetooth_pairing_accept", "string", PACKAGE_SETTINGS))
+        val confirm = root.findAccessibilityNodeInfosByText(confirmText).filter { it.text == confirmText }
+        if (confirm.size != 1) return null
+        val prompt = root.findAccessibilityNodeInfosByText(resources.getString(resources.getIdentifier(
+            "bluetooth_pairing_request", "string", PACKAGE_SETTINGS), BluetoothReceiver.DEVICE_NAME_PGP))
+        Timber.w(Exception("Locate Pair via text success: ${confirm[0].viewIdResourceName}; " +
+                prompt.joinToString { it.viewIdResourceName }))
+        if (prompt.isEmpty()) return null
+        return confirm[0]
     }
 
     override fun onInterrupt() {
