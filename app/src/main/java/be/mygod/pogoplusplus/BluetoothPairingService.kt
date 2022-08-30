@@ -64,7 +64,7 @@ class BluetoothPairingService : AccessibilityService() {
         val confirmText = resources.getString(resources.getIdentifier(
             "bluetooth_pairing_accept", "string", PACKAGE_SETTINGS))
         val confirm = root.findAccessibilityNodeInfosByText(confirmText).filter {
-            confirmText.equals(it.text.toString(), true)
+            confirmText.equals(it.text?.toString(), true)
         }
         if (confirm.size != 1) return null
         val prompt = root.findAccessibilityNodeInfosByText(resources.getString(resources.getIdentifier(
