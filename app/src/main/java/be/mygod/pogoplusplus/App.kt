@@ -11,7 +11,11 @@ import android.widget.Toast
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import be.mygod.pogoplusplus.util.RootManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class App : Application() {
@@ -46,6 +50,14 @@ class App : Application() {
         })
         GameNotificationService.updateNotificationChannels()
         EBegFragment.init()
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level == TRIM_MEMORY_RUNNING_CRITICAL || level >= TRIM_MEMORY_BACKGROUND) GlobalScope.launch {
+            RootManager.closeExisting()
+        }
     }
 
     inline fun <reified T> componentName() = ComponentName(this, T::class.java)

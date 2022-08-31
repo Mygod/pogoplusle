@@ -29,6 +29,15 @@
         app:title="Launch game"
         app:summary="Take me back to teh gaem nau!" />
 
+    <PreferenceCategory app:title="Advanced">
+        <SwitchPreferenceCompat
+            app:key="service.pairingRoot"
+            app:icon="@drawable/ic_home_electric_bolt"
+            app:title="Pair Bluetooth with root"
+            app:summary="DO NOT ENABLE THIS unless you already happen to have rooted your device. This mode is quieter and has better compatibility, but is more resource intensive"
+            app:persistent="false" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="About">
         <Preference
             app:key="misc.source"

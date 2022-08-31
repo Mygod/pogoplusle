@@ -32,6 +32,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var servicePairing: TwoStatePreference
     private lateinit var serviceGameNotification: TwoStatePreference
     private lateinit var permissionBluetooth: TwoStatePreference
+    private lateinit var servicePairingRoot: TwoStatePreference
     private fun Preference.remove() = parent!!.removePreference(this)
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -43,21 +44,37 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             y == null || y > 2020 || y == 2020 && (m == null || m >= 11)
         } else false
         servicePairing = findPreference("service.pairing")!!
-        if (needsServicePairing) servicePairing.setOnPreferenceChangeListener { _, newValue ->
-            if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
-                setTitle("Grant control to this app?")
-                setMessage(R.string.bluetooth_pairing_service_disclosure)
-                setNegativeButton("Reject", null)
-                setPositiveButton("Accept") { _, _ ->
-                    startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    })
-                }
-            }.create().show() else startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            })
-            false
-        } else servicePairing.remove()
+        servicePairingRoot = findPreference("service.pairingRoot")!!
+        if (needsServicePairing) {
+            servicePairing.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
+                    setTitle("Grant control to this app?")
+                    setMessage(R.string.bluetooth_pairing_service_disclosure)
+                    setNegativeButton("Reject", null)
+                    setPositiveButton("Accept") { _, _ ->
+                        startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        })
+                    }
+                }.create().show() else startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+                false
+            }
+            servicePairingRoot.setOnPreferenceChangeListener { _, newValue ->
+                val shouldEnable = newValue as Boolean
+                app.setEnabled<BluetoothPairingReceiver>(shouldEnable)
+                if (shouldEnable && Build.VERSION.SDK_INT >= 31 && !hasBluetoothPermission) {
+                    requestBluetoothPermission.launch(if (Build.VERSION.SDK_INT >= 33) {
+                        arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.POST_NOTIFICATIONS)
+                    } else arrayOf(Manifest.permission.BLUETOOTH_CONNECT))
+                    false
+                } else true
+            }
+        } else {
+            servicePairing.remove()
+            servicePairingRoot.remove()
+        }
         serviceGameNotification = findPreference("service.gameNotification")!!
         serviceGameNotification.setOnPreferenceChangeListener { _, _ ->
             // https://stackoverflow.com/a/63914445/2245107
@@ -127,7 +144,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     private val requestBluetoothPermission = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val granted = permissions.getOrDefault(Manifest.permission.BLUETOOTH_CONNECT, false)
-        permissionBluetooth.isChecked = granted
+        permissionBluetooth.isChecked = granted && app.isEnabled<BluetoothReceiver>()
+        servicePairingRoot.isChecked = granted && app.isEnabled<BluetoothPairingReceiver>(false)
         if (!granted) Snackbar.make(requireView(), "Missing Nearby devices permission", Snackbar.LENGTH_LONG).show()
     }
 
@@ -137,6 +155,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         updateSwitches()
         permissionBluetooth.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
                 app.isEnabled<BluetoothReceiver>()
+        servicePairingRoot.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
+                app.isEnabled<BluetoothPairingReceiver>(false)
     }
 
     fun updateSwitches() {

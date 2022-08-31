@@ -4,6 +4,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     kotlin("android")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -14,8 +15,8 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 24
         targetSdk = 33
-        versionCode = 10
-        versionName = "0.1.3"
+        versionCode = 11
+        versionName = "0.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("boolean", "DONATIONS", "true")
     }
@@ -60,9 +61,10 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")    // TODO fix dependency
     implementation("androidx.preference:preference:1.2.0")
+    implementation("be.mygod.librootkotlinx:librootkotlinx:1.0.0")
     implementation("com.android.billingclient:billing-ktx:5.0.0")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
-    implementation("com.google.android.material:material:1.7.0-beta01")
+    implementation("com.google.android.material:material:1.7.0-rc01")
     implementation("com.google.firebase:firebase-analytics-ktx:21.1.0")
     implementation("com.google.firebase:firebase-crashlytics:18.2.12")
     implementation("com.jakewharton.timber:timber:5.0.1")
