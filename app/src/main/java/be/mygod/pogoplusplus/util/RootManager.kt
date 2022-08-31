@@ -9,6 +9,7 @@ import be.mygod.librootkotlinx.RootServer
 import be.mygod.librootkotlinx.RootSession
 import be.mygod.pogoplusplus.App.Companion.app
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 object RootManager : RootSession() {
@@ -18,7 +19,11 @@ object RootManager : RootSession() {
         @SuppressLint("BlockedPrivateApi", "PrivateApi")
         override suspend fun execute(): Parcelable? {
             // this is needed for later using BluetoothAdapter
-            Class.forName("android.app.ActivityThread").getDeclaredMethod("initializeMainlineModules").invoke(null)
+            try {
+                Class.forName("android.app.ActivityThread").getDeclaredMethod("initializeMainlineModules").invoke(null)
+            } catch (e: ReflectiveOperationException) {
+                Timber.w(e)
+            }
             return null
         }
     }
