@@ -73,7 +73,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             }
         } else {
             servicePairing.remove()
-            servicePairingRoot.remove()
+            // for now, this is the only entry in advanced
+            servicePairingRoot.parent!!.remove()
         }
         serviceGameNotification = findPreference("service.gameNotification")!!
         serviceGameNotification.setOnPreferenceChangeListener { _, _ ->
