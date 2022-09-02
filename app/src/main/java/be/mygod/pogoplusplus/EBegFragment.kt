@@ -22,28 +22,30 @@ import timber.log.Timber
  */
 class EBegFragment : AppCompatDialogFragment() {
     companion object : BillingClientStateListener, PurchasesUpdatedListener {
-        private lateinit var billingClient: BillingClient
-
-        fun init() {
-            billingClient = BillingClient.newBuilder(app).apply {
+        private val billingClient by lazy {
+            BillingClient.newBuilder(app).apply {
                 enablePendingPurchases()
-            }.setListener(this).build().also { it.startConnection(this) }
+            }.setListener(this).build()
         }
+        private var instance: EBegFragment? = null
 
         override fun onBillingSetupFinished(billingResult: BillingResult) {
             if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
                 Timber.e("onBillingSetupFinished: ${billingResult.responseCode}")
-            } else GlobalScope.launch(Dispatchers.Main.immediate) {
-                val result = billingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().apply {
-                    setProductType(BillingClient.ProductType.INAPP)
-                }.build())
-                onPurchasesUpdated(result.billingResult, result.purchasesList)
+            } else {
+                instance?.onBillingConnected()
+                GlobalScope.launch(Dispatchers.Main.immediate) {
+                    val result = billingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().apply {
+                        setProductType(BillingClient.ProductType.INAPP)
+                    }.build())
+                    onPurchasesUpdated(result.billingResult, result.purchasesList)
+                }
             }
         }
 
         override fun onBillingServiceDisconnected() {
             Timber.e("onBillingServiceDisconnected")
-            billingClient.startConnection(this)
+            if (instance != null) billingClient.startConnection(this)
         }
 
         override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
@@ -83,24 +85,6 @@ class EBegFragment : AppCompatDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog!!.setTitle(R.string.settings_misc_donate)
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            billingClient.queryProductDetails(QueryProductDetailsParams.newBuilder().apply {
-                setProductList(listOf(
-                    "donate001", "donate002", "donate005", "donate010", "donate020", "donate040", "donate100",
-                ).map {
-                    QueryProductDetailsParams.Product.newBuilder().apply {
-                        setProductId(it)
-                        setProductType(BillingClient.ProductType.INAPP)
-                    }.build()
-                })
-            }.build()).apply {
-                if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                    Timber.e("queryProductDetails: ${billingResult.responseCode}")
-                    Toast.makeText(app, R.string.donations__google_android_market_not_supported,
-                        Toast.LENGTH_SHORT).show()
-                } else productDetails = productDetailsList
-            }
-        }
         binding.donationsGoogleAndroidMarketDonateButton.setOnClickListener {
             val product = productDetails?.getOrNull(binding.donationsGoogleAndroidMarketSpinner.selectedItemPosition)
             if (product != null) {
@@ -117,5 +101,33 @@ class EBegFragment : AppCompatDialogFragment() {
         if (BuildConfig.DONATIONS) (binding.donationsMoreStub.inflate() as Button).setOnClickListener {
             app.launchUrl(requireContext(), "https://mygod.be/donate/")
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        instance = this
+        billingClient.startConnection(EBegFragment)
+    }
+
+    private fun onBillingConnected() = viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+        billingClient.queryProductDetails(QueryProductDetailsParams.newBuilder().apply {
+            setProductList(listOf("donate001", "donate005", "donate010", "donate020", "donate040", "donate100").map {
+                QueryProductDetailsParams.Product.newBuilder().apply {
+                    setProductId(it)
+                    setProductType(BillingClient.ProductType.INAPP)
+                }.build()
+            })
+        }.build()).apply {
+            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                Timber.e("queryProductDetails: ${billingResult.responseCode}")
+                Toast.makeText(context, R.string.donations__google_android_market_not_supported,
+                    Toast.LENGTH_SHORT).show()
+            } else productDetails = productDetailsList
+        }
+    }
+
+    override fun onStop() {
+        instance = null
+        super.onStop()
     }
 }

@@ -49,7 +49,6 @@ class App : Application() {
             }
         })
         GameNotificationService.updateNotificationChannels()
-        EBegFragment.init()
     }
 
     @OptIn(DelicateCoroutinesApi::class)
