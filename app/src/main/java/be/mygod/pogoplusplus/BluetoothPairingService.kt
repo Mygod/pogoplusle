@@ -25,6 +25,7 @@ class BluetoothPairingService : AccessibilityService() {
         super.onServiceConnected()
         Timber.d("BluetoothPairingService started")
         instance = this
+        tryConfirm()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -32,10 +33,7 @@ class BluetoothPairingService : AccessibilityService() {
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
                 onNotification(event.parcelableData as? Notification ?: return)
             }
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                val root = rootInActiveWindow ?: return
-                (tryLocateById(root) ?: tryLocateByText(root))?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            }
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> tryConfirm()
             else -> Timber.e(Exception("Unknown event ${event.eventType}"))
         }
     }
@@ -48,6 +46,10 @@ class BluetoothPairingService : AccessibilityService() {
         } catch (_: PendingIntent.CanceledException) { }
     }
 
+    private fun tryConfirm() {
+        val root = rootInActiveWindow ?: return
+        (tryLocateById(root) ?: tryLocateByText(root))?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+    }
     private fun tryLocateById(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
         val confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
         if (confirm.size != 1) return null
