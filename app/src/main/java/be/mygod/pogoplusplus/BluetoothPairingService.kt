@@ -41,7 +41,13 @@ class BluetoothPairingService : AccessibilityService() {
     fun onNotification(notification: Notification) {
         if (notification.channelId == "bluetooth_notification_channel" && notification.extras.getString(
                 Notification.EXTRA_TEXT)?.contains(BluetoothReceiver.DEVICE_NAME_PGP) == true) try {
-            notification.actions[0].actionIntent.send()
+            var intent = notification.actions?.firstOrNull()?.actionIntent
+            if (intent == null) {
+                intent = notification.contentIntent
+                Timber.w(Exception("${notification.actions?.joinToString()}; $intent"))
+                if (intent == null) return
+            }
+            intent.send()
             performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
         } catch (_: PendingIntent.CanceledException) { }
     }
