@@ -21,8 +21,8 @@ jobs:
             - ~/.android/build-cache
           key: jars-{{ checksum "build.gradle.kts" }}
       - store_artifacts:
-          path: mobile/build/outputs/apk
+          path: app/build/outputs/apk
           destination: apk
       - store_artifacts:
-          path: mobile/build/reports
+          path: app/build/reports
           destination: reports
