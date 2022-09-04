@@ -5,6 +5,7 @@ import android.annotation.TargetApi
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
+import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import timber.log.Timber
@@ -25,7 +26,10 @@ class BluetoothPairingService : AccessibilityService() {
         super.onServiceConnected()
         Timber.d("BluetoothPairingService started")
         instance = this
-        for (window in windows) if (tryConfirm(window.root ?: continue)) return
+        for (window in windows) {
+            val root = if (Build.VERSION.SDK_INT >= 33) window.getRoot(0) else window.root
+            if (tryConfirm(root ?: continue)) return
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -33,7 +37,10 @@ class BluetoothPairingService : AccessibilityService() {
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
                 onNotification(event.parcelableData as? Notification ?: return)
             }
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> tryConfirm(event.source ?: return)
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                val source = if (Build.VERSION.SDK_INT >= 33) event.getSource(0) else event.source
+                tryConfirm(source ?: return)
+            }
             else -> Timber.e(Exception("Unknown event ${event.eventType}"))
         }
     }
