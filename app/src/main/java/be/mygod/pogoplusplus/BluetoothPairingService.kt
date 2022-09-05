@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import kotlinx.coroutines.*
 import timber.log.Timber
 
 @TargetApi(26)
@@ -30,10 +31,7 @@ class BluetoothPairingService : AccessibilityService() {
         super.onServiceConnected()
         Timber.d("BluetoothPairingService started")
         instance = this
-        for (window in windows) {
-            val root = if (Build.VERSION.SDK_INT >= 33) window.getRoot(0) else window.root
-            if (tryConfirm(root ?: continue)) return
-        }
+        tryConfirm()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -70,14 +68,39 @@ class BluetoothPairingService : AccessibilityService() {
             }
             intent.send()
             performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
+            setTimeout()
         } catch (_: PendingIntent.CanceledException) { }
         return true
     }
 
-    private fun tryConfirm(root: AccessibilityNodeInfo): Boolean {
-        val node = tryLocateById(root) ?: tryLocateByText(root) ?: return false
+    // workaround for some devices not firing TYPE_WINDOW_STATE_CHANGED
+    private var job: Job? = null
+    private fun setTimeout() {
+        job?.cancel()
+        job = GlobalScope.launch(Dispatchers.Main.immediate) {
+            delay(1000)
+            val node = tryConfirm()
+            if (node != null) Timber.w(Exception("TYPE_WINDOW_STATE_CHANGED not fired: $node from ${node.packageName}"))
+            job = null
+        }
+    }
+    private fun resetTimeout() {
+        job?.cancel()
+        job = null
+    }
+
+    private fun tryConfirm(): AccessibilityNodeInfo? {
+        for (window in windows) {
+            val root = if (Build.VERSION.SDK_INT >= 33) window.getRoot(0) else window.root
+            tryConfirm(root ?: continue)?.let { return it }
+        }
+        return null
+    }
+    private fun tryConfirm(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
+        val node = tryLocateById(root) ?: tryLocateByText(root) ?: return null
         node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-        return true
+        resetTimeout()
+        return node
     }
     private fun tryLocateById(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
         val confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
@@ -126,6 +149,7 @@ class BluetoothPairingService : AccessibilityService() {
     override fun onUnbind(intent: Intent?): Boolean {
         instance = null
         Timber.d("BluetoothPairingService shutting down")
+        resetTimeout()
         return super.onUnbind(intent)
     }
 }
