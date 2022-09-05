@@ -28,7 +28,7 @@ class BluetoothPairingService : AccessibilityService() {
         instance = this
         for (window in windows) {
             val root = if (Build.VERSION.SDK_INT >= 33) window.getRoot(0) else window.root
-            if (tryConfirm(root ?: continue)) return
+            if (root?.packageName == PACKAGE_SETTINGS && tryConfirm(root)) return
         }
     }
 
