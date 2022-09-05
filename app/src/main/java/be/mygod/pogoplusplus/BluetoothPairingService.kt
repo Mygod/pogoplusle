@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import be.mygod.pogoplusplus.util.findString
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -121,14 +122,13 @@ class BluetoothPairingService : AccessibilityService() {
             return null
         }
         val resources = packageManager.getResourcesForApplication(packageName)
-        val confirmText = resources.getString(resources.getIdentifier(
-            "bluetooth_pairing_accept", "string", packageName))
+        val confirmText = resources.findString("bluetooth_pairing_accept", packageName) ?: return null
         val confirm = root.findAccessibilityNodeInfosByText(confirmText).filter {
             confirmText.equals(it.text?.toString(), true)
         }
         if (confirm.size != 1) return null
-        val promptText = resources.getString(resources.getIdentifier(
-            "bluetooth_pairing_request", "string", packageName), BluetoothReceiver.DEVICE_NAME_PGP)
+        val promptText = resources.findString(
+            "bluetooth_pairing_request", packageName, BluetoothReceiver.DEVICE_NAME_PGP)
         val prompt = root.findAccessibilityNodeInfosByText(promptText).filter { it.text == promptText }
         if (prompt.isEmpty()) {
             // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview

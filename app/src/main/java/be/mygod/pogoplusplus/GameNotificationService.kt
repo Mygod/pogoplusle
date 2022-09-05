@@ -13,6 +13,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
+import be.mygod.pogoplusplus.util.findString
 import timber.log.Timber
 
 class GameNotificationService : NotificationListenerService() {
@@ -116,35 +117,35 @@ class GameNotificationService : NotificationListenerService() {
         Timber.d("PGP notification updated: $text")
         if (text.isNullOrEmpty()) return
         val resources = packageManager.getResourcesForApplication(sbn.packageName)
-        fun getPogoString(name: String) = resources.getString(resources.getIdentifier(
-            name, "string", sbn.packageName))
-        if (text == getPogoString("Disconnecting_GO_Plus")) return onAuxiliaryDisconnected()
-        var str = getPogoString("Item_Inventory_Full")
+        if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
+        var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName)
-        str = getPogoString("Pokemon_Inventory_Full")
+        str = resources.findString("Pokemon_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_POKEMON_FULL, CHANNEL_POKEMON_FULL, str,
             R.drawable.ic_notification_disc_full, sbn.packageName)
-        str = getPogoString("Out_Of_Pokeballs")
+        str = resources.findString("Out_Of_Pokeballs", sbn.packageName)
         when (text) {
             str -> pushNotification(NOTIFICATION_NO_BALL, CHANNEL_NO_BALL, str,
                 R.drawable.ic_action_hide_source, sbn.packageName)
-            getPogoString("Captured_Pokemon"), getPogoString("Pokemon_Escaped") -> {
+            resources.findString("Captured_Pokemon", sbn.packageName),
+            resources.findString("Pokemon_Escaped", sbn.packageName) -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
             }
-            getPogoString("Retrieved_an_Item") -> {
+            resources.findString("Retrieved_an_Item", sbn.packageName) -> {
                 notificationManager.cancel(NOTIFICATION_ITEM_FULL)
                 notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
             }
-            getPogoString("Pokestop_Cooldown"), getPogoString("Pokestop_Out_Of_Range") -> { }
+            resources.findString("Pokestop_Cooldown", sbn.packageName),
+            resources.findString("Pokestop_Out_Of_Range", sbn.packageName) -> { }
             else -> {
-                val split = getPogoString("Retrieved_Items").split("%s", limit = 2)
-                val matches = if (split.size == 1) {
-                    Timber.e(Exception("Unrecognized Retrieved_Items ${split[0]}"))
-                    false
-                } else text.startsWith(split[0]) && text.endsWith(split[1])
-                if (matches) {
+                val split = resources.findString("Retrieved_Items", sbn.packageName)?.split("%s", limit = 2)
+                if (split?.size != 2) {
+                    Timber.e(Exception("Unrecognized Retrieved_Items ${split?.getOrNull(0)}"))
+                    return
+                }
+                if (text.startsWith(split[0]) && text.endsWith(split[1])) {
                     try {
                         val items = text.substring(split[0].length, text.length - split[1].length).toInt()
                         notificationManager.cancel(NOTIFICATION_ITEM_FULL)
