@@ -13,7 +13,11 @@ import timber.log.Timber
 @TargetApi(26)
 class BluetoothPairingService : AccessibilityService() {
     companion object {
-        const val PACKAGE_SETTINGS = "com.android.settings"
+        private const val PACKAGE_SETTINGS = "com.android.settings"
+        // found in Realme and potentially other ColorOS
+        private const val PACKAGE_SETTINGS_COLOROS = "com.coloros.wirelesssettings"
+        // found in Oppo and OnePlus
+        private const val PACKAGE_SETTINGS_OPPO = "com.oplus.wirelesssettings"
 
         var instance: BluetoothPairingService? = null
             private set(value) {
@@ -35,7 +39,7 @@ class BluetoothPairingService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         when (event.eventType) {
             AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {
-                onNotification(event.parcelableData as? Notification ?: return)
+                onNotification(event.parcelableData as? Notification ?: return, event.packageName)
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 val source = if (Build.VERSION.SDK_INT >= 33) event.getSource(0) else event.source
@@ -45,18 +49,29 @@ class BluetoothPairingService : AccessibilityService() {
         }
     }
 
-    fun onNotification(notification: Notification) {
-        if (notification.channelId == "bluetooth_notification_channel" && notification.extras.getString(
-                Notification.EXTRA_TEXT)?.contains(BluetoothReceiver.DEVICE_NAME_PGP) == true) try {
+    fun onNotification(notification: Notification, packageName: CharSequence): Boolean {
+        when (packageName) {
+            PACKAGE_SETTINGS, PACKAGE_SETTINGS_COLOROS, PACKAGE_SETTINGS_OPPO -> { }
+            else -> return false
+        }
+        when (notification.channelId) {
+            "bluetooth_notification_channel",
+            "Wireless_bt_channel",  // Found for PACKAGE_SETTINGS_COLOROS
+            -> { }
+            else -> return true
+        }
+        if (notification.extras.getString(Notification.EXTRA_TEXT)?.contains(
+                BluetoothReceiver.DEVICE_NAME_PGP) == true) try {
             var intent = notification.actions?.firstOrNull()?.actionIntent
             if (intent == null) {
                 intent = notification.contentIntent
                 Timber.w(Exception("${notification.actions?.joinToString()}; $intent"))
-                if (intent == null) return
+                if (intent == null) return true
             }
             intent.send()
             performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
         } catch (_: PendingIntent.CanceledException) { }
+        return true
     }
 
     private fun tryConfirm(root: AccessibilityNodeInfo): Boolean {
@@ -67,33 +82,39 @@ class BluetoothPairingService : AccessibilityService() {
     private fun tryLocateById(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
         val confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
         if (confirm.size != 1) return null
-        val title = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/alertTitle")
+        val title = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/alertTitle")
         if (title.size != 1 || !title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) {
             // Some devices (eg Samsung) put device name in message (#6)
-            val message = root.findAccessibilityNodeInfosByViewId("$PACKAGE_SETTINGS:id/message")
+            val message = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/message")
             if (message.size != 1 || !message[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) return null
+            else Timber.w("Locate message success: ${message[0].text}")
         }
         return confirm[0]
     }
     private fun tryLocateByText(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
-        val resources = packageManager.getResourcesForApplication(PACKAGE_SETTINGS)
+        val packageName = root.packageName?.toString()
+        if (packageName == null) {
+            Timber.w(NullPointerException("packageName is null: $root"))
+            return null
+        }
+        val resources = packageManager.getResourcesForApplication(packageName)
         val confirmText = resources.getString(resources.getIdentifier(
-            "bluetooth_pairing_accept", "string", PACKAGE_SETTINGS))
+            "bluetooth_pairing_accept", "string", packageName))
         val confirm = root.findAccessibilityNodeInfosByText(confirmText).filter {
             confirmText.equals(it.text?.toString(), true)
         }
         if (confirm.size != 1) return null
         val promptText = resources.getString(resources.getIdentifier(
-            "bluetooth_pairing_request", "string", PACKAGE_SETTINGS), BluetoothReceiver.DEVICE_NAME_PGP)
+            "bluetooth_pairing_request", "string", packageName), BluetoothReceiver.DEVICE_NAME_PGP)
         val prompt = root.findAccessibilityNodeInfosByText(promptText).filter { it.text == promptText }
         if (prompt.isEmpty()) {
             // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
             val deviceName = root.findAccessibilityNodeInfosByText(BluetoothReceiver.DEVICE_NAME_PGP)
                 .filter { it.text == BluetoothReceiver.DEVICE_NAME_PGP }
-            Timber.w(Exception("Locate device name via text success: ${confirm[0].viewIdResourceName}; " +
+            Timber.w(Exception("Locate device name via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
                     deviceName.joinToString { it.viewIdResourceName }))
             if (deviceName.isEmpty()) return null
-        } else Timber.w(Exception("Locate standard Pair via text success: ${confirm[0].viewIdResourceName}; " +
+        } else Timber.w(Exception("Locate standard via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
                 prompt.joinToString { it.viewIdResourceName }))
         return confirm[0]
     }

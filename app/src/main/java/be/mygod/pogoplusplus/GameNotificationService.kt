@@ -109,10 +109,8 @@ class GameNotificationService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        BluetoothPairingService.instance?.apply {
-            if (sbn.packageName == BluetoothPairingService.PACKAGE_SETTINGS) return onNotification(sbn.notification)
-        }
-        if (!isInterested(sbn)) return
+        if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
+            !isInterested(sbn)) return
         onAuxiliaryConnected()
         val text = sbn.notification.extras.getString(NotificationCompat.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
