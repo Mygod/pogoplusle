@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import be.mygod.librootkotlinx.NoShellException
 import be.mygod.pogoplusplus.util.RootManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -44,7 +45,9 @@ class App : Application() {
                         Log.println(priority, tag, message)
                         Log.w(tag, message, t)
                     }
-                    if (priority >= Log.INFO) FirebaseCrashlytics.getInstance().recordException(t)
+                    if (priority >= Log.INFO && t !is NoShellException) {
+                        FirebaseCrashlytics.getInstance().recordException(t)
+                    }
                 }
             }
         })
