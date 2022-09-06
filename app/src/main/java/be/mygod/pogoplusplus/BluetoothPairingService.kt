@@ -5,6 +5,7 @@ import android.annotation.TargetApi
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -81,7 +82,7 @@ class BluetoothPairingService : AccessibilityService() {
         job = GlobalScope.launch(Dispatchers.Main.immediate) {
             delay(1000)
             val node = tryConfirm()
-            if (node != null) Timber.w(Exception("TYPE_WINDOW_STATE_CHANGED not fired: $node from ${node.packageName}"))
+            if (node != null) Timber.w(Exception("TYPE_WINDOW_STATE_CHANGED not fired: $node"))
             job = null
         }
     }
@@ -121,7 +122,12 @@ class BluetoothPairingService : AccessibilityService() {
             Timber.w(NullPointerException("packageName is null: $root"))
             return null
         }
-        val resources = packageManager.getResourcesForApplication(packageName)
+        val resources = try {
+            packageManager.getResourcesForApplication(packageName)
+        } catch (_: PackageManager.NameNotFoundException) {
+            // ignore if the package is not found, or if Android prevents querying because it's not system app
+            return null
+        }
         val confirmText = resources.findString("bluetooth_pairing_accept", packageName) ?: return null
         val confirm = root.findAccessibilityNodeInfosByText(confirmText).filter {
             confirmText.equals(it.text?.toString(), true)
