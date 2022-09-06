@@ -24,3 +24,6 @@ A: Those would allow PoGo+LE to post a notification when your device is disconne
 
 Q: Is this app safe to use?  
 A: Yes. This app uses `AccessibilityService` API to help you skip the pairing dialog. Since this app only interacts with Android system interface and system Settings but not the game, PoGo+LE is fully compliant with Niantic's terms of service and is safe to use.
+
+Q: Not working?  
+A: Feel free to send the following information to me via GitHub issues or else: app version and configuration, device model, Android version, and a screenshot demonstrating the issue.
