@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.service.notification.NotificationListenerService
@@ -116,7 +117,11 @@ class GameNotificationService : NotificationListenerService() {
         val text = sbn.notification.extras.getString(NotificationCompat.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
         if (text.isNullOrEmpty()) return
-        val resources = packageManager.getResourcesForApplication(sbn.packageName)
+        val resources = try {
+            packageManager.getResourcesForApplication(sbn.packageName)
+        } catch (_: PackageManager.NameNotFoundException) {
+            return
+        }
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
