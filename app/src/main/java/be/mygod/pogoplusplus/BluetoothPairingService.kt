@@ -65,8 +65,10 @@ class BluetoothPairingService : AccessibilityService() {
             var intent = notification.actions?.firstOrNull()?.actionIntent
             if (intent == null) {
                 intent = notification.contentIntent
-                Timber.w(Exception("${notification.actions?.joinToString()}; $intent"))
-                if (intent == null) return true
+                if (intent == null) {
+                    Timber.w(Exception("Notification found but no actionable found"))
+                    return true
+                }
             }
             intent.send()
             performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
