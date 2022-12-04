@@ -142,9 +142,9 @@ class BluetoothPairingService : AccessibilityService() {
             // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
             val deviceName = root.findAccessibilityNodeInfosByText(BluetoothReceiver.DEVICE_NAME_PGP)
                 .filter { it.text == BluetoothReceiver.DEVICE_NAME_PGP }
+            if (deviceName.isEmpty()) return null
             Timber.w(Exception("Locate device name via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
                     deviceName.joinToString { it.viewIdResourceName }))
-            if (deviceName.isEmpty()) return null
         } else Timber.w(Exception("Locate standard via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
                 prompt.joinToString { it.viewIdResourceName }))
         return confirm[0]
