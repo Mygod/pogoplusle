@@ -167,11 +167,11 @@ class GameNotificationService : NotificationListenerService() {
     }
 
     @Deprecated("Could be dropped since API 26")
-    override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        if (isInterested(sbn)) onAuxiliaryDisconnected()
+    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
+        if (isInterested(sbn ?: return)) onAuxiliaryDisconnected()
     }
 
-    override fun onNotificationRemoved(sbn: StatusBarNotification, rankingMap: RankingMap?, reason: Int) {
+    override fun onNotificationRemoved(sbn: StatusBarNotification?, rankingMap: RankingMap?, reason: Int) {
         @Suppress("DEPRECATION")
         when (reason) {
             REASON_APP_CANCEL,
