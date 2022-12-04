@@ -82,7 +82,7 @@ class BluetoothPairingService : AccessibilityService() {
         job = GlobalScope.launch(Dispatchers.Main.immediate) {
             delay(1000)
             val node = tryConfirm()
-            if (node != null) Timber.w(Exception("TYPE_WINDOW_STATE_CHANGED not fired: $node"))
+            if (node != null) Timber.d(Exception("TYPE_WINDOW_STATE_CHANGED not fired: $node"))
             job = null
         }
     }
