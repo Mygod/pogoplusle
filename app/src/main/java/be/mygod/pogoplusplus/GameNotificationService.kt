@@ -68,6 +68,7 @@ class GameNotificationService : NotificationListenerService() {
             title: CharSequence,
             @DrawableRes icon: Int,
             packageName: String? = null,
+            onlyAlertOnce: Boolean = false,
         ) = notificationManager.notify(id, NotificationCompat.Builder(app, channel).apply {
             setCategory(NotificationCompat.CATEGORY_STATUS)
             setContentTitle(title)
@@ -77,7 +78,7 @@ class GameNotificationService : NotificationListenerService() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             setShowWhen(true)
             setAutoCancel(true)
-            setOnlyAlertOnce(id == NOTIFICATION_AUXILIARY_DISCONNECTED)
+            setOnlyAlertOnce(onlyAlertOnce)
             setLights(Color.RED, 500, 500)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             color = app.getColor(R.color.primaryColor)
@@ -94,7 +95,7 @@ class GameNotificationService : NotificationListenerService() {
         fun onAuxiliaryDisconnected(deviceName: String = BluetoothReceiver.DEVICE_NAME_PGP,
                                     packageName: String? = null) = pushNotification(
             NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED, "$deviceName disconnected",
-            R.drawable.ic_device_bluetooth_disabled, packageName)
+            R.drawable.ic_device_bluetooth_disabled, packageName, true)
 
         private fun isInterested(sbn: StatusBarNotification): Boolean {
             if (sbn.packageName != PACKAGE_POKEMON_GO && sbn.packageName != PACKAGE_POKEMON_GO_ARES) return false
@@ -125,7 +126,8 @@ class GameNotificationService : NotificationListenerService() {
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
-            R.drawable.ic_action_shopping_bag, sbn.packageName)
+            R.drawable.ic_action_shopping_bag, sbn.packageName,
+            Build.VERSION.SDK_INT < 26 || !notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
         str = resources.findString("Pokemon_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_POKEMON_FULL, CHANNEL_POKEMON_FULL, str,
             R.drawable.ic_notification_disc_full, sbn.packageName)
