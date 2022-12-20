@@ -72,6 +72,7 @@ class GameNotificationService : NotificationListenerService() {
         ) = notificationManager.notify(id, NotificationCompat.Builder(app, channel).apply {
             setCategory(NotificationCompat.CATEGORY_STATUS)
             setContentTitle(title)
+            setGroup(channel)
             setSmallIcon(icon)
             setContentIntent(PendingIntent.getActivity(app, 0,
                 if (packageName == null) gameIntent else gameIntent(packageName),
