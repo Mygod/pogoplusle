@@ -154,16 +154,16 @@ class GameNotificationService : NotificationListenerService() {
                     return
                 }
                 if (text.startsWith(split[0]) && text.endsWith(split[1])) {
-                    try {
-                        val items = text.substring(split[0].length, text.length - split[1].length).toInt()
-                        notificationManager.cancel(NOTIFICATION_ITEM_FULL)
-                        if (items == 0) {
-                            pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
-                                R.drawable.ic_alert_error_outline, sbn.packageName)
-                        } else notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
+                    val items = try {
+                        text.substring(split[0].length, text.length - split[1].length).toInt()
                     } catch (e: NumberFormatException) {
-                        Timber.e(Exception("Unrecognized notification text: $text", e))
+                        return Timber.e(Exception("Unrecognized notification text: $text", e))
                     }
+                    notificationManager.cancel(NOTIFICATION_ITEM_FULL)
+                    if (items == 0) {
+                        pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
+                            R.drawable.ic_alert_error_outline, sbn.packageName)
+                    } else notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
                 } else Timber.e(Exception("Unrecognized notification text: $text"))
             }
         }
