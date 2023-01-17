@@ -3,38 +3,38 @@
     <SwitchPreferenceCompat
         app:key="service.pairing"
         app:icon="@drawable/ic_action_touch_app"
-        app:title="Bluetooth pairing assistant"
-        app:summary="Click the pairing dialog for you"
+        app:title="@string/settings_service_pairing"
+        app:summary="@string/settings_service_pairing_summary"
         app:persistent="false" />
     <SwitchPreferenceCompat
         app:key="service.gameNotification"
         app:icon="@drawable/ic_device_monitor_heart"
         app:title="@string/game_notification_service_name"
-        app:summary="Receive alerts for disconnections, full bags, etc."
+        app:summary="@string/game_notification_service_summary"
         app:persistent="false" />
     <SwitchPreferenceCompat
         app:key="permission.bluetooth"
         app:icon="@drawable/ic_device_bluetooth_connected"
-        app:title="Monitor Bluetooth"
-        app:summary="Detect disconnections more reliably"
+        app:title="@string/settings_permission_bluetooth"
+        app:summary="@string/settings_permission_bluetooth_summary"
         app:persistent="false" />
     <Preference
         app:key="permission.notification"
         app:icon="@drawable/ic_social_notifications_active"
-        app:title="Manage notifications"
-        app:summary="Turn on your favorite notifications" />
+        app:title="@string/settings_permission_notification"
+        app:summary="@string/settings_permission_notification_summary" />
     <Preference
         app:key="game"
         app:icon="@drawable/ic_av_games"
-        app:title="Launch game"
-        app:summary="Take me back to teh gaem nau!" />
+        app:title="@string/settings_game"
+        app:summary="@string/settings_game_summary" />
 
     <PreferenceCategory app:title="Advanced">
         <SwitchPreferenceCompat
             app:key="service.pairingRoot"
             app:icon="@drawable/ic_home_electric_bolt"
-            app:title="Pair Bluetooth with root"
-            app:summary="DO NOT ENABLE THIS unless you already happen to have rooted your device. This mode is quieter and has better compatibility, but is more resource intensive"
+            app:title="@string/settings_service_pairing_root"
+            app:summary="@string/settings_service_pairing_root_summary"
             app:persistent="false" />
     </PreferenceCategory>
 

@@ -48,10 +48,10 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         if (needsServicePairing) {
             servicePairing.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
-                    setTitle("Grant control to this app?")
+                    setTitle(R.string.bluetooth_pairing_service_disclosure_title)
                     setMessage(R.string.bluetooth_pairing_service_disclosure)
-                    setNegativeButton("Reject", null)
-                    setPositiveButton("Accept") { _, _ ->
+                    setNegativeButton(resources.getIdentifier("decline", "string", "android"), null)
+                    setPositiveButton(resources.getIdentifier("accept", "string", "android")) { _, _ ->
                         startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         })
@@ -147,7 +147,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         val granted = permissions.getOrDefault(Manifest.permission.BLUETOOTH_CONNECT, false)
         permissionBluetooth.isChecked = granted && app.isEnabled<BluetoothReceiver>()
         servicePairingRoot.isChecked = granted && app.isEnabled<BluetoothPairingReceiver>(false)
-        if (!granted) Snackbar.make(requireView(), "Missing Nearby devices permission", Snackbar.LENGTH_LONG).show()
+        if (!granted) Snackbar.make(requireView(), R.string.settings_permission_bluetooth_missing,
+            Snackbar.LENGTH_LONG).show()
     }
 
     override fun onStart() {

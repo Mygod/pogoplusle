@@ -2,6 +2,7 @@
     <string name="app_name">PoGo+LE</string>
     <string name="bluetooth_pairing_service_description">Automagically skips pairing dialog when connecting
         Pokémon GO Plus</string>
+    <string name="bluetooth_pairing_service_disclosure_title">Grant control to this app?</string>
     <string name="bluetooth_pairing_service_disclosure">This feature needs to use Android Accessibility\u200bService API
         to read and control notifications and screen for system Settings in order to click the buttons
         <i>Pair &amp; connect</i> in the notification and <i>Pair</i> in the pairing dialog for you when connecting your
@@ -10,6 +11,27 @@
         \n\nTo grant the permission, click <i>Agree</i>, then click on this app and turn on the main switch that says
         <i>Use PoGo+LE Bluetooth pairing assistant</i>.</string>
     <string name="game_notification_service_name">Monitor game notifications</string>
+    <string name="game_notification_service_summary">Receive alerts for disconnections, full bags, etc.</string>
+
+    <string name="notification_channel_auxiliary_disconnected">Pokémon GO Plus session ended</string>
+    <string name="notification_channel_item_full">Bag is full</string>
+    <string name="notification_channel_pokemon_full">No more room for Pokémon</string>
+    <string name="notification_channel_no_ball">Out of Poké Balls</string>
+    <string name="notification_channel_spin_fail">PokéStop spin error</string>
+
+    <string name="settings_service_pairing">Bluetooth pairing assistant</string>
+    <string name="settings_service_pairing_summary">Click the pairing dialog for you</string>
+    <string name="settings_permission_bluetooth">Monitor Bluetooth</string>
+    <string name="settings_permission_bluetooth_summary">Detect disconnections more reliably</string>
+    <string name="settings_permission_bluetooth_missing">Missing Nearby devices permission</string>
+    <string name="settings_permission_notification">Manage notifications</string>
+    <string name="settings_permission_notification_summary">Turn on your favorite notifications</string>
+    <string name="settings_game">Launch game</string>
+    <string name="settings_game_summary">Take me back to teh gaem nau!</string>
+    <string name="settings_service_pairing_root">Pair Bluetooth with root</string>
+    <string name="settings_service_pairing_root_summary">DO NOT ENABLE THIS unless you already happen to have rooted
+        your device. This mode is quieter and has better compatibility, but is more resource intensive</string>
+
     <string name="settings_misc_source">Project homepage at GitHub</string>
     <string name="settings_misc_source_summary">Read manual, star, submit issues and contribute</string>
     <string name="settings_misc_donate">Donate</string>

@@ -11,6 +11,7 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
@@ -42,8 +43,8 @@ class GameNotificationService : NotificationListenerService() {
         }
 
         @RequiresApi(26)
-        private fun createNotificationChannel(id: String, name: CharSequence) = NotificationChannel(
-            id, name, NotificationManager.IMPORTANCE_HIGH
+        private fun createNotificationChannel(id: String, @StringRes name: Int) = NotificationChannel(
+            id, app.getText(name), NotificationManager.IMPORTANCE_HIGH
         ).apply {
             enableLights(true)
             lightColor = Color.RED
@@ -53,11 +54,12 @@ class GameNotificationService : NotificationListenerService() {
 
         fun updateNotificationChannels() {
             if (Build.VERSION.SDK_INT >= 26) {
-                createNotificationChannel(CHANNEL_AUXILIARY_DISCONNECTED, "Pokémon GO Plus session ended")
-                createNotificationChannel(CHANNEL_ITEM_FULL, "Bag is full")
-                createNotificationChannel(CHANNEL_POKEMON_FULL, "No more room for Pokémon")
-                createNotificationChannel(CHANNEL_NO_BALL, "Out of Poké Balls")
-                createNotificationChannel(CHANNEL_SPIN_FAIL, "PokéStop spin error")
+                createNotificationChannel(CHANNEL_AUXILIARY_DISCONNECTED,
+                    R.string.notification_channel_auxiliary_disconnected)
+                createNotificationChannel(CHANNEL_ITEM_FULL, R.string.notification_channel_item_full)
+                createNotificationChannel(CHANNEL_POKEMON_FULL, R.string.notification_channel_pokemon_full)
+                createNotificationChannel(CHANNEL_NO_BALL, R.string.notification_channel_no_ball)
+                createNotificationChannel(CHANNEL_SPIN_FAIL, R.string.notification_channel_spin_fail)
             }
         }
 
