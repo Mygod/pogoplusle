@@ -15,6 +15,7 @@ Automagically skips pairing dialog when connecting Pokémon GO Plus (Android 8+)
 Context: Pairing dialog were introduced in [November 2020 security patch](https://source.android.com/security/bulletin/2020-11-01), for [fixing](https://android.googlesource.com/platform/system/bt/+/b3f12befdc4def7d695b6f1049cd02238eb1e4a8) [CVE-2020-12856](https://github.com/alwentiu/COVIDSafe-CVE-2020-12856) as discovered by [/u/BlueMysticNA](https://www.reddit.com/r/TheSilphRoad/comments/jujfm4/comment/gcdk4eb/).
 
 This project is tested with [BrowserStack](https://email.browserstack.com/c/eJwljEtuwyAQQE9T77D4DeAFZ4mAGRyU2DSAZfX2Re36fcgLY0EIBSAW9BAB7VK8UeiU1hk0x_iQKsjItykZQkqKWy1sdmsvSK_yYbnR56JzsIzsu-LVKfQh2BHKqdjeiE6GYDeILm1MdgvjS3Oa-L3OtD-R-mtN9ViePrgtoI2UuBMpCjBSa0hWO4pamqyXt7_ve42t3p1aHyH9l80fP3vFPi4sdd73v_skv_bLR70).
+See a table of tested compatibility [here](https://github.com/Mygod/pogoplusle/wiki/Device-compatibility-table-for-Bluetooth-pairing-assistant).
 
 ## FAQ
 
