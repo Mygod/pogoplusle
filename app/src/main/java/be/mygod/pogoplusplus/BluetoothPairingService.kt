@@ -107,8 +107,16 @@ class BluetoothPairingService : AccessibilityService() {
         return node
     }
     private fun tryLocateById(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
-        val confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
-        if (confirm.size != 1) return null
+        var confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
+        when (confirm.size) {
+            0 -> {
+                // Some devices (eg Samsung) use AppCompat (?) AlertDialog and "OK" instead of "Pair"
+                confirm = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/button1")
+                if (confirm.size != 1) return null
+            }
+            1 -> { }
+            else -> return null
+        }
         val title = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/alertTitle")
         if (title.size != 1 || !title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) {
             // Some devices (eg Samsung) put device name in message (#6)
