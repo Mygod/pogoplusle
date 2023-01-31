@@ -16,7 +16,7 @@ class BluetoothReceiver : BroadcastReceiver() {
 
         @SuppressLint("MissingPermission")
         fun getDevice(intent: Intent): Pair<BluetoothDevice, String>? {
-            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)!!
+            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE) ?: return null
             val name = device.name
             val type = device.type
             val bluetoothClass = device.bluetoothClass
