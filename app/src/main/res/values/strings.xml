@@ -1,15 +1,15 @@
 <resources>
     <string name="app_name">PoGo+LE</string>
+    <string name="bluetooth_pairing_service_label">PoGo+LE Bluetooth pairing assistant</string>
     <string name="bluetooth_pairing_service_description">Automagically skips pairing dialog when connecting
         Pokémon GO Plus</string>
     <string name="bluetooth_pairing_service_disclosure_title">Grant control to this app?</string>
     <string name="bluetooth_pairing_service_disclosure">This feature needs to use Android Accessibility\u200bService API
         to read and control notifications and screen for system Settings in order to click the buttons
         <i>Pair &amp; connect</i> in the notification and <i>Pair</i> in the pairing dialog for you when connecting your
-        Pokémon GO Plus. No data is collected through this process except for crash logs.
-
-        \n\nTo grant the permission, click <i>Agree</i>, then click on this app and turn on the main switch that says
-        <i>Use PoGo+LE Bluetooth pairing assistant</i>.</string>
+        Pokémon GO Plus. No data is collected through this process except for crash logs.\n\nTo grant the permission,
+        click <i>Agree</i>, then click on this app and turn on the main switch that says <i>Use PoGo+LE Bluetooth
+            pairing assistant</i>.</string>
     <string name="game_notification_service_name">Monitor game notifications</string>
     <string name="game_notification_service_summary">Receive alerts for disconnections, full bags, etc.</string>
 
@@ -32,8 +32,10 @@
     <string name="settings_service_pairing_root_summary">DO NOT ENABLE THIS unless you already happen to have rooted
         your device. This mode is quieter and has better compatibility, but is more resource intensive</string>
 
+    <string name="settings_advanced">Advanced</string>
+    <string name="settings_about">About</string>
     <string name="settings_misc_source">Project homepage at GitHub</string>
-    <string name="settings_misc_source_summary">Read manual, star, submit issues and contribute</string>
+    <string name="settings_misc_source_summary">Read manual, star, submit issues, contribute and sponsor</string>
     <string name="settings_misc_donate">Donate</string>
     <string name="settings_misc_donate_summary">Plz send money so that I can afford more PokéCoins</string>
     <string name="settings_misc_donate_more">PayPal, Flattr, more…</string>

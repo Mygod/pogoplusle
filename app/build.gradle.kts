@@ -44,7 +44,7 @@ android {
     productFlavors {
         create("freedom") {
             dimension = "freedom"
-            resourceConfigurations.addAll(arrayOf("en"))
+            resourceConfigurations.addAll(arrayOf("en", "zh-rCN", "zh-rTW"))
         }
         create("google") {
             dimension = "freedom"

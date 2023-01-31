@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">宝够乐</string>
+    <string name="bluetooth_pairing_service_label">宝够乐蓝牙配对助手</string>
+    <string name="bluetooth_pairing_service_description">智能跳过连接 Pokémon GO Plus 时的配对对话框</string>
+    <string name="bluetooth_pairing_service_disclosure_title">为此应用授权？</string>
+    <string name="bluetooth_pairing_service_disclosure">该功能需要使用 Android Accessibility\u200bService API
+        来读取、控制系统设置的通知来点击“配对和连接”，并在弹出对话框时点击“配对”按钮来帮助你配对 Pokémon GO
+        Plus。此过程中除崩溃日志以外不会收集任何数据。\n\n执行以下步骤以授予权限：点击“同意”，在新页面中点击此应用，打开“使用宝够乐蓝牙配对助手”主开关。</string>
+    <string name="game_notification_service_name">监视游戏通知</string>
+    <string name="game_notification_service_summary">通知连接断开、满包等</string>
+
+    <string name="notification_channel_auxiliary_disconnected">Pokémon GO Plus 连接断开</string>
+    <string name="notification_channel_item_full">包包已满</string>
+    <string name="notification_channel_pokemon_full">盒子已满</string>
+    <string name="notification_channel_no_ball">无精灵球</string>
+    <string name="notification_channel_spin_fail">补给失败</string>
+
+    <string name="settings_service_pairing">蓝牙配对助手</string>
+    <string name="settings_service_pairing_summary">自动点击对话框配对</string>
+    <string name="settings_permission_bluetooth">监视蓝牙连接</string>
+    <string name="settings_permission_bluetooth_summary">更稳定地检测连接断开</string>
+    <string name="settings_permission_bluetooth_missing">无“附近的设备”权限</string>
+    <string name="settings_permission_notification">管理应用通知</string>
+    <string name="settings_permission_notification_summary">很好的通知多发</string>
+    <string name="settings_game">启动游戏</string>
+    <string name="settings_game_summary">快给老子开游戏！</string>
+    <string name="settings_service_pairing_root">用 root 配对蓝牙</string>
+    <string name="settings_service_pairing_root_summary">除非已有 root 权限，<b>不要打开此开关</b>！此模式相比更安静可靠，但占用资源更多</string>
+
+    <string name="settings_advanced">高级</string>
+    <string name="settings_about">关于</string>
+    <string name="settings_misc_source">项目首页 @ GitHub</string>
+    <string name="settings_misc_source_summary">查看使用手册、star、提交 issues、合作、赞助</string>
+    <string name="settings_misc_donate">捐款</string>
+    <string name="settings_misc_donate_summary">请给我钱帮我充值 PokéCoins</string>
+    <string name="settings_misc_donate_more">PayPal, Flattr 等其他方式…</string>
+
+    <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values-zh/donations__strings.xml -->
+    <string name="donations__button_close">关闭</string>
+    <string name="donations__google_android_market">Google Play 商店</string>
+    <string name="donations__google_android_market_not_supported">不支持 In-App 捐赠。你的 Google Play 商店是否安装正确了呢？</string>
+    <string name="donations__google_android_market_donate_button">捐赠！</string>
+    <string name="donations__google_android_market_text">捐赠多少？</string>
+    <string name="donations__thanks_dialog">谢谢捐赠！\n非常感谢您！</string>
+
+    <string name="donations__description">觉得此应用很有用？\n捐赠给该开发者以支持此应用的开发！</string>
+    <string name="donations__google_android_market_description">Google 收取 30% 的费用</string>
+</resources>

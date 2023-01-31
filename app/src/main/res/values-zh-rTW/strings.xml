@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">寶夠樂</string>
+    <string name="bluetooth_pairing_service_label">寶夠樂藍牙配對助手</string>
+    <string name="bluetooth_pairing_service_description">自動略過 Pokémon GO Plus 藍牙配對視窗</string>
+    <string name="bluetooth_pairing_service_disclosure_title">授予此應用程序控制權？</string>
+    <string name="bluetooth_pairing_service_disclosure">此功能需要使用安卓的無障礙服務來讀取和控制系統設置的通知與屏幕，以便點擊通知當中的「配對並連線」按鈕，以及配對視窗中的「配對」以連接
+        Pokémon GO Plus。除了當機日誌之外，並不會透過此功能蒐集任何數據。\n\n授與此應用權限，請點擊「同意」，然後選取此應用程式並且打開「使用寶夠樂藍牙配對助手」的按鈕。</string>
+    <string name="game_notification_service_name">監控遊戲通知</string>
+    <string name="game_notification_service_summary">接收斷線、背包已滿等警報</string>
+
+    <string name="notification_channel_auxiliary_disconnected">Pokémon GO Plus 連接已結束</string>
+    <string name="notification_channel_item_full">背包已滿</string>
+    <string name="notification_channel_pokemon_full">寶可夢盒子已滿</string>
+    <string name="notification_channel_no_ball">沒有寶貝球了</string>
+    <string name="notification_channel_spin_fail">轉補錯誤</string>
+
+    <string name="settings_service_pairing">藍牙配對助手</string>
+    <string name="settings_service_pairing_summary">協助點擊配對視窗</string>
+    <string name="settings_permission_bluetooth">監控藍牙連接狀況</string>
+    <string name="settings_permission_bluetooth_summary">更可靠地監測斷線問題</string>
+    <string name="settings_permission_bluetooth_missing">缺少「鄰近裝置」權限</string>
+    <string name="settings_permission_notification">通知管理</string>
+    <string name="settings_permission_notification_summary">打開您最喜愛的通知</string>
+    <string name="settings_game">開啟遊戲</string>
+    <string name="settings_game_summary">立即回到遊戲！</string>
+    <string name="settings_service_pairing_root">以 root 權限進行藍牙配對</string>
+    <string name="settings_service_pairing_root_summary"><b>請勿啟動此功能</b>，除非您已授權 root
+        此裝置。此模式較為安靜並具有更好的相容性，但是相對更為耗能</string>
+
+    <string name="settings_advanced">進階</string>
+    <string name="settings_about">關於</string>
+    <string name="settings_misc_source">在 GitHub 上打開專案首頁</string>
+    <string name="settings_misc_source_summary">閱讀使用說明，標註星標，回報問題，提供意見與贊助</string>
+    <string name="settings_misc_donate">抖內</string>
+    <string name="settings_misc_donate_summary">請贊助我，讓我有更多寶可夢金幣</string>
+    <string name="settings_misc_donate_more">PayPal、Flattr 或其他贊助平台</string>
+
+    <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values-zh/donations__strings.xml -->
+    <string name="donations__button_close">關閉</string>
+    <string name="donations__google_android_market">Google Play 商店</string>
+    <string name="donations__google_android_market_not_supported">不支援應用程式內購，Play 商店是否正確安裝？</string>
+    <string name="donations__google_android_market_donate_button">抖內！</string>
+    <string name="donations__google_android_market_text">抖內多少錢</string>
+    <string name="donations__thanks_dialog">感謝抖內！\n十分感謝您！</string>
+    <string name="donations__description">這個應用程式有用嗎？\n小額的抖內給開發人員用來支援此應用程式的開發</string>
+    <string name="donations__google_android_market_description">Google 將收取 30% 的費用</string>
+</resources>

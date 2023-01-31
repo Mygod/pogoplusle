@@ -29,7 +29,7 @@
         app:title="@string/settings_game"
         app:summary="@string/settings_game_summary" />
 
-    <PreferenceCategory app:title="Advanced">
+    <PreferenceCategory app:title="@string/settings_advanced">
         <SwitchPreferenceCompat
             app:key="service.pairingRoot"
             app:icon="@drawable/ic_home_electric_bolt"
@@ -38,7 +38,7 @@
             app:persistent="false" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="About">
+    <PreferenceCategory app:title="@string/settings_about">
         <Preference
             app:key="misc.source"
             app:icon="@drawable/ic_toggle_star"
