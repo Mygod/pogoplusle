@@ -117,16 +117,16 @@ class GameNotificationService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
             !isInterested(sbn)) return
-        onAuxiliaryConnected()
         val text = sbn.notification.extras.getString(NotificationCompat.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
-        if (text.isNullOrEmpty()) return
+        if (text.isNullOrEmpty()) return onAuxiliaryConnected()
         val resources = try {
             packageManager.getResourcesForApplication(sbn.packageName)
         } catch (_: PackageManager.NameNotFoundException) {
             return
         }
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
+        onAuxiliaryConnected()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName,
