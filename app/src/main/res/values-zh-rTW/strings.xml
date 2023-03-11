@@ -38,7 +38,6 @@
     <string name="settings_misc_donate_more">PayPal、Flattr 或其他贊助平台</string>
 
     <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values-zh/donations__strings.xml -->
-    <string name="donations__button_close">關閉</string>
     <string name="donations__google_android_market">Google Play 商店</string>
     <string name="donations__google_android_market_not_supported">不支援應用程式內購，Play 商店是否正確安裝？</string>
     <string name="donations__google_android_market_donate_button">抖內！</string>

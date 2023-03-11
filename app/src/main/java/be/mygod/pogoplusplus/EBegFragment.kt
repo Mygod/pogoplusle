@@ -97,7 +97,6 @@ class EBegFragment : AppCompatDialogFragment() {
                 Toast.makeText(app, R.string.donations__google_android_market_not_supported, Toast.LENGTH_SHORT).show()
             }
         }
-        @Suppress("ConstantConditionIf")
         if (BuildConfig.DONATIONS) (binding.donationsMoreStub.inflate() as Button).setOnClickListener {
             app.launchUrl(requireContext(), "https://mygod.be/donate/")
         }
@@ -109,7 +108,7 @@ class EBegFragment : AppCompatDialogFragment() {
         billingClient.startConnection(EBegFragment)
     }
 
-    private fun onBillingConnected() = viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+    private fun onBillingConnected() = viewLifecycleOwner.lifecycleScope.launch {
         billingClient.queryProductDetails(QueryProductDetailsParams.newBuilder().apply {
             setProductList(listOf("donate001", "donate005", "donate010", "donate020", "donate040", "donate100").map {
                 QueryProductDetailsParams.Product.newBuilder().apply {

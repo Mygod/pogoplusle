@@ -37,7 +37,6 @@
     <string name="settings_misc_donate_more">PayPal, Flattr 等其他方式…</string>
 
     <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values-zh/donations__strings.xml -->
-    <string name="donations__button_close">关闭</string>
     <string name="donations__google_android_market">Google Play 商店</string>
     <string name="donations__google_android_market_not_supported">不支持 In-App 捐赠。你的 Google Play 商店是否安装正确了呢？</string>
     <string name="donations__google_android_market_donate_button">捐赠！</string>
