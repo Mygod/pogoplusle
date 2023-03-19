@@ -15,8 +15,7 @@ class BluetoothReceiver : BroadcastReceiver() {
         const val DEVICE_NAME_PGP = "Pokemon GO Plus"
 
         @SuppressLint("MissingPermission")
-        fun getDevice(intent: Intent): Pair<BluetoothDevice, String>? {
-            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE) ?: return null
+        fun getDeviceName(device: BluetoothDevice, action: String? = null): String? {
             val name = device.name
             val type = device.type
             val bluetoothClass = device.bluetoothClass
@@ -26,8 +25,14 @@ class BluetoothReceiver : BroadcastReceiver() {
                     !device.address.startsWith("7C:BB:8A:", true) &&
                     !device.address.startsWith("98:B6:E9:", true) ||
                     name != DEVICE_NAME_PBP && name != DEVICE_NAME_PGP
-            Timber.d("${intent.action}: ${device.address}, $name, $type, $bluetoothClass, $uuids, $shouldSkip")
-            return if (shouldSkip) null else device to name
+            if (action != null) Timber.d(
+                "$action: ${device.address}, $name, $type, $bluetoothClass, $uuids, $shouldSkip")
+            return if (shouldSkip) null else name
+        }
+        fun getDevice(intent: Intent): Pair<BluetoothDevice, String>? {
+            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE) ?: return null
+            val name = getDeviceName(device, intent.action) ?: return null
+            return device to name
         }
     }
 

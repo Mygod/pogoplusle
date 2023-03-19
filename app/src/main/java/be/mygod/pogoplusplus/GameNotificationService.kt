@@ -3,6 +3,7 @@ package be.mygod.pogoplusplus
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -114,6 +115,8 @@ class GameNotificationService : NotificationListenerService() {
         isRunning = false
     }
 
+    private val adapter by lazy { getSystemService<BluetoothManager>()!!.adapter }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
             !isInterested(sbn)) return
@@ -126,7 +129,12 @@ class GameNotificationService : NotificationListenerService() {
             return
         }
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
-        onAuxiliaryConnected()
+        val isConnected = try {
+            adapter.bondedDevices.any { BluetoothReceiver.getDeviceName(it) != null }
+        } catch (_: SecurityException) {
+            true
+        }
+        if (isConnected) onAuxiliaryConnected()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName,
