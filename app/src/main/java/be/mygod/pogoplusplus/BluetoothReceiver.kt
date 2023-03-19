@@ -19,14 +19,12 @@ class BluetoothReceiver : BroadcastReceiver() {
             val name = device.name
             val type = device.type
             val bluetoothClass = device.bluetoothClass
-            val uuids = device.uuids
-            val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_LE || uuids != null ||
+            val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_LE ||
                     bluetoothClass?.hashCode() != BluetoothClass.Device.Major.UNCATEGORIZED ||
+                    name != DEVICE_NAME_PBP && name != DEVICE_NAME_PGP ||
                     !device.address.startsWith("7C:BB:8A:", true) &&
-                    !device.address.startsWith("98:B6:E9:", true) ||
-                    name != DEVICE_NAME_PBP && name != DEVICE_NAME_PGP
-            if (action != null) Timber.d(
-                "$action: ${device.address}, $name, $type, $bluetoothClass, $uuids, $shouldSkip")
+                    !device.address.startsWith("98:B6:E9:", true)
+            if (action != null) Timber.d("$action: ${device.address}, $name, $type, $bluetoothClass, $shouldSkip")
             return if (shouldSkip) null else name
         }
         fun getDevice(intent: Intent): Pair<BluetoothDevice, String>? {
