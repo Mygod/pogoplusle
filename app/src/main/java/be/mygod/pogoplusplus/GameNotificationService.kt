@@ -151,7 +151,7 @@ class GameNotificationService : NotificationListenerService() {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
             }
-            resources.findString("Retrieved_an_Item", sbn.packageName) -> {
+            resources.findString("Retrieved_an_Item", sbn.packageName, "") -> { // remove %s if present
                 notificationManager.cancel(NOTIFICATION_ITEM_FULL)
                 notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
             }
