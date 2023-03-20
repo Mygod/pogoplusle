@@ -40,6 +40,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    packagingOptions.resources.excludes.add("**/*.kotlin_*")
     flavorDimensions.add("freedom")
     productFlavors {
         create("freedom") {

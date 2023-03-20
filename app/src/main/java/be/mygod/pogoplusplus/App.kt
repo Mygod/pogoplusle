@@ -14,6 +14,8 @@ import androidx.core.net.toUri
 import be.mygod.librootkotlinx.NoShellException
 import be.mygod.pogoplusplus.util.RootManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import kotlinx.coroutines.DEBUG_PROPERTY_NAME
+import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,6 +29,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         app = this
+        // overhead of debug mode is minimal: https://github.com/Kotlin/kotlinx.coroutines/blob/f528898/docs/debugging.md#debug-mode
+        System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
         when (val codename = Build.VERSION.CODENAME) {
             "REL" -> { }
             else -> FirebaseCrashlytics.getInstance().apply {
