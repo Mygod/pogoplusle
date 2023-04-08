@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.core.content.IntentCompat
 import timber.log.Timber
 
 class BluetoothReceiver : BroadcastReceiver() {
@@ -28,7 +29,8 @@ class BluetoothReceiver : BroadcastReceiver() {
             return if (shouldSkip) null else name
         }
         fun getDevice(intent: Intent): Pair<BluetoothDevice, String>? {
-            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE) ?: return null
+            val device = IntentCompat.getParcelableExtra(intent, BluetoothDevice.EXTRA_DEVICE,
+                BluetoothDevice::class.java) ?: return null
             val name = getDeviceName(device, intent.action) ?: return null
             return device to name
         }
