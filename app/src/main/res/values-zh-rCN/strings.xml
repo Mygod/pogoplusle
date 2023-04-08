@@ -34,7 +34,7 @@
     <string name="settings_misc_source_summary">查看使用手册、star、提交 issues、合作、赞助</string>
     <string name="settings_misc_donate">捐款</string>
     <string name="settings_misc_donate_summary">请给我钱帮我充值 PokéCoins</string>
-    <string name="settings_misc_donate_more">PayPal, Flattr 等其他方式…</string>
+    <string name="settings_misc_donate_more">GitHub sponsors, PayPal 等其他方式…</string>
 
     <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values-zh/donations__strings.xml -->
     <string name="donations__google_android_market">Google Play 商店</string>

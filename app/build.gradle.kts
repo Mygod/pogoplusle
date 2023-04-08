@@ -18,7 +18,6 @@ android {
         versionCode = 17
         versionName = "1.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("boolean", "DONATIONS", "true")
     }
     buildTypes {
         getByName("debug") {
@@ -50,7 +49,6 @@ android {
         create("google") {
             dimension = "freedom"
             versionNameSuffix = "-g"
-            buildConfigField("boolean", "DONATIONS", "false")
         }
     }
 }

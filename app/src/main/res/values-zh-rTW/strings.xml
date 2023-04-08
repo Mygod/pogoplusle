@@ -35,7 +35,7 @@
     <string name="settings_misc_source_summary">閱讀使用說明，標註星標，回報問題，提供意見與贊助</string>
     <string name="settings_misc_donate">抖內</string>
     <string name="settings_misc_donate_summary">請贊助我，讓我有更多寶可夢金幣</string>
-    <string name="settings_misc_donate_more">PayPal、Flattr 或其他贊助平台</string>
+    <string name="settings_misc_donate_more">GitHub sponsors, PayPal 或其他贊助平台</string>
 
     <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values-zh/donations__strings.xml -->
     <string name="donations__google_android_market">Google Play 商店</string>
