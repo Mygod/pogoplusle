@@ -130,10 +130,10 @@ class GameNotificationService : NotificationListenerService() {
         }
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
         val isConnected = try {
-            adapter.bondedDevices.any { BluetoothReceiver.getDeviceName(it) != null }
+            adapter.bondedDevices?.any { BluetoothReceiver.getDeviceName(it) != null }
         } catch (_: SecurityException) {
-            true
-        }
+            null
+        } != false
         if (isConnected) onAuxiliaryConnected()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
