@@ -28,6 +28,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val CHANNEL_NO_BALL = "out_of_pokeballs"
         private const val CHANNEL_SPIN_FAIL = "spin_fail"
         private const val CHANNEL_CONNECTION_PENDING = "connection_pending"
+        private const val CHANNEL_INACTIVE_TIMEOUT = "inactive_timeout"
         private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
         private const val PACKAGE_POKEMON_GO_ARES = "com.nianticlabs.pokemongo.ares"
 
@@ -37,6 +38,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val NOTIFICATION_NO_BALL = 4
         private const val NOTIFICATION_SPIN_FAIL = 5
         private const val NOTIFICATION_CONNECTION_PENDING = 6
+        private const val NOTIFICATION_INACTIVE_TIMEOUT = 7
 
         private fun gameIntent(packageName: String) = Intent(Intent.ACTION_MAIN).apply {
             setClassName(packageName, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
@@ -66,6 +68,7 @@ class GameNotificationService : NotificationListenerService() {
                     R.string.notification_channel_connection_pending), NotificationManager.IMPORTANCE_DEFAULT).apply {
                     lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
                 },
+                makeNotificationChannel(CHANNEL_INACTIVE_TIMEOUT, R.string.notification_channel_inactive_timeout),
             ))
         }
 
@@ -76,7 +79,7 @@ class GameNotificationService : NotificationListenerService() {
             title: CharSequence,
             @DrawableRes icon: Int,
             packageName: String? = null,
-            onlyAlertOnce: Boolean = false,
+            block: (NotificationCompat.Builder.() -> Unit)? = null,
         ) = notificationManager.notify(id, NotificationCompat.Builder(app, channel).apply {
             setCategory(NotificationCompat.CATEGORY_STATUS)
             setContentTitle(title)
@@ -87,11 +90,11 @@ class GameNotificationService : NotificationListenerService() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             setShowWhen(true)
             setAutoCancel(true)
-            setOnlyAlertOnce(onlyAlertOnce)
             setLights(Color.RED, 500, 500)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             color = app.getColor(R.color.primaryColor)
             priority = NotificationCompat.PRIORITY_MAX
+            block?.invoke(this)
         }.build())
 
         var isRunning = false
@@ -102,19 +105,20 @@ class GameNotificationService : NotificationListenerService() {
 
         fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String) {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
+            notificationManager.cancel(NOTIFICATION_INACTIVE_TIMEOUT)
             notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, NotificationCompat.Builder(app,
                 CHANNEL_CONNECTION_PENDING).apply {
                 setCategory(NotificationCompat.CATEGORY_STATUS)
                 setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, deviceName))
                 setGroup(CHANNEL_CONNECTION_PENDING)
-                setSmallIcon(R.drawable.ic_device_bluetooth_connected)
+                setSmallIcon(R.drawable.ic_maps_mode_of_travel)
                 setContentIntent(PendingIntent.getActivity(app, 0, gameIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                 setShowWhen(true)
                 setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
                     app.getText(R.string.notification_action_disconnect),
-                    PendingIntent.getBroadcast(app, 0, Intent(app, BluetoothDisconnectReceiver::class.java).apply {
+                    PendingIntent.getBroadcast(app, 0, Intent(app, SfidaDisconnectReceiver::class.java).apply {
                         data = Uri.fromParts("mac", device.address, null)   // to differentiate as ID
                         putExtra(BluetoothDevice.EXTRA_DEVICE, device)
                     }, PendingIntent.FLAG_IMMUTABLE))
@@ -123,9 +127,22 @@ class GameNotificationService : NotificationListenerService() {
         }
         fun onAuxiliaryDisconnected(deviceName: String = SfidaManager.DEVICE_NAME_PGP, packageName: String? = null) {
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
+            notificationManager.cancel(NOTIFICATION_INACTIVE_TIMEOUT)
             pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED,
                 app.getString(R.string.notification_title_auxiliary_disconnected, deviceName),
-                R.drawable.ic_device_bluetooth_disabled, packageName, true)
+                R.drawable.ic_device_bluetooth_disabled, packageName) {
+                setOnlyAlertOnce(true)
+            }
+            SfidaManager.reportDisconnection()
+        }
+        fun onAuxiliaryTimeout() {
+            if (SfidaManager.isConnected == false) return
+            pushNotification(NOTIFICATION_INACTIVE_TIMEOUT, CHANNEL_INACTIVE_TIMEOUT,
+                app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
+                addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
+                    app.getText(R.string.notification_action_disconnect), PendingIntent.getBroadcast(app, 0,
+                        Intent(app, SfidaDisconnectReceiver::class.java), PendingIntent.FLAG_IMMUTABLE))
+            }
         }
 
         private fun isInterested(sbn: StatusBarNotification): Boolean {
@@ -133,9 +150,11 @@ class GameNotificationService : NotificationListenerService() {
             // com.nianticlabs.pokemongoplus.service.BackgroundService.notificationId
             return if (Build.VERSION.SDK_INT < 26) sbn.id == 2000 else sbn.notification.channelId == sbn.packageName
         }
-        private fun cancelDisconnectionNotifications() {
+        private fun onConnect() {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
+            notificationManager.cancel(NOTIFICATION_INACTIVE_TIMEOUT)
+            SfidaManager.reportConnection()
         }
     }
 
@@ -151,18 +170,20 @@ class GameNotificationService : NotificationListenerService() {
             !isInterested(sbn)) return
         val text = sbn.notification.extras.getString(NotificationCompat.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
-        if (text.isNullOrEmpty()) return cancelDisconnectionNotifications()
+        if (text.isNullOrEmpty()) return onConnect()
         val resources = try {
             packageManager.getResourcesForApplication(sbn.packageName)
         } catch (_: PackageManager.NameNotFoundException) {
             return
         }
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
-        if (SfidaManager.isConnected != false) cancelDisconnectionNotifications()
+        if (SfidaManager.isConnected != false) onConnect()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
-            R.drawable.ic_action_shopping_bag, sbn.packageName,
-            Build.VERSION.SDK_INT < 26 || !notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
+            R.drawable.ic_action_shopping_bag, sbn.packageName) {
+            setOnlyAlertOnce(Build.VERSION.SDK_INT < 26 ||
+                    !notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
+        }
         str = resources.findString("Pokemon_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_POKEMON_FULL, CHANNEL_POKEMON_FULL, str,
             R.drawable.ic_notification_disc_full, sbn.packageName)

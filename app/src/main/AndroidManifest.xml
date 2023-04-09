@@ -74,9 +74,6 @@
             </meta-data>
         </service>
         <receiver
-            android:name=".BluetoothDisconnectReceiver"
-            android:exported="false"/>
-        <receiver
             android:name=".BluetoothReceiver"
             android:exported="true">
             <intent-filter>
@@ -92,6 +89,12 @@
                 <action android:name="android.bluetooth.device.action.PAIRING_REQUEST" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".SfidaDisconnectReceiver"
+            android:exported="false"/>
+        <receiver
+            android:name=".SfidaTimeoutReceiver"
+            android:exported="false"/>
 
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"

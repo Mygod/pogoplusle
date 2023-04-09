@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.IntentCompat
 
-class BluetoothDisconnectReceiver : BroadcastReceiver() {
+class SfidaDisconnectReceiver : BroadcastReceiver() {
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent) {
         val device = IntentCompat.getParcelableExtra(intent, BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)

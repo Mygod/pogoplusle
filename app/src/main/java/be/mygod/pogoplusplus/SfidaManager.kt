@@ -1,5 +1,7 @@
 package be.mygod.pogoplusplus
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
@@ -7,6 +9,7 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Intent
+import android.os.SystemClock
 import androidx.annotation.RequiresPermission
 import androidx.core.content.IntentCompat
 import androidx.core.content.getSystemService
@@ -30,6 +33,7 @@ object SfidaManager : BluetoothGattCallback() {
         BluetoothGatt::class.java.getDeclaredField("mClientIf").apply { isAccessible = true }
     }
 
+    private val alarm by lazy { app.getSystemService<AlarmManager>()!! }
     private val bluetooth by lazy { app.getSystemService<BluetoothManager>()!! }
 
     val isConnected get() = try {
@@ -60,8 +64,16 @@ object SfidaManager : BluetoothGattCallback() {
         return device to name
     }
 
+    private val timeoutIntent by lazy {
+        PendingIntent.getBroadcast(app, 0, Intent(app, SfidaTimeoutReceiver::class.java), PendingIntent.FLAG_MUTABLE)
+    }
+    // 1h 12.457s - 1h 11m 6.778s
+    fun reportConnection() = alarm.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+        SystemClock.elapsedRealtime() + 3612457, 654321, timeoutIntent)
+    fun reportDisconnection() = alarm.cancel(timeoutIntent)
+
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
-    private fun disconnectInternal(device: BluetoothDevice) {
+    private fun disconnectGatt(device: BluetoothDevice) {
         val gatt = device.connectGatt(app, false, SfidaManager)
         try {
             for (i in 1..32) {  // https://cs.android.com/android/platform/superproject/+/master:packages/modules/Bluetooth/system/internal_include/bt_target.h;l=525;drc=a786e24777988f3207b90fdb5eb00bc68b540691
@@ -78,7 +90,7 @@ object SfidaManager : BluetoothGattCallback() {
     fun disconnect(device: BluetoothDevice) {
         if (bluetooth.getConnectionState(device, BluetoothProfile.GATT) != BluetoothProfile.STATE_CONNECTED ||
             bluetooth.adapter.bondedDevices?.contains(device) != false && removeBond(device) as Boolean) return
-        disconnectInternal(device)
+        disconnectGatt(device)
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     fun disconnectAll() {
@@ -86,7 +98,7 @@ object SfidaManager : BluetoothGattCallback() {
         for (device in bluetooth.getConnectedDevices(BluetoothProfile.GATT)) {
             if (getDeviceName(device) == null ||
                 bonded?.contains(device) != false && removeBond(device) as Boolean) continue
-            disconnect(device)
+            disconnectGatt(device)
         }
     }
 }
