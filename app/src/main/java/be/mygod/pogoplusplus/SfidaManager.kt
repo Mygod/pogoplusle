@@ -48,11 +48,13 @@ object SfidaManager : BluetoothGattCallback() {
         val type = device.type
         val bluetoothClass = device.bluetoothClass
         val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_LE ||
-                bluetoothClass?.hashCode() != BluetoothClass.Device.Major.UNCATEGORIZED ||
-                name != DEVICE_NAME_PBP && name != DEVICE_NAME_PGP ||
-                !device.address.startsWith("7C:BB:8A:", true) &&
-                !device.address.startsWith("98:B6:E9:", true) &&
-                !device.address.startsWith("B8:78:26:", true)
+                bluetoothClass?.hashCode() != BluetoothClass.Device.Major.UNCATEGORIZED || when (name) {
+            DEVICE_NAME_PGP, DEVICE_NAME_PBP -> false
+            null -> !device.address.startsWith("7C:BB:8A:", true) &&
+                    !device.address.startsWith("98:B6:E9:", true) &&
+                    !device.address.startsWith("B8:78:26:", true)
+            else -> true
+        }
         if (action != null) Timber.d("$action: ${device.address}, $name, $type, $bluetoothClass, $shouldSkip")
         return if (shouldSkip) null else name
     }
