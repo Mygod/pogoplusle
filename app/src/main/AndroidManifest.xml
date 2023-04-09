@@ -74,6 +74,9 @@
             </meta-data>
         </service>
         <receiver
+            android:name=".BluetoothDisconnectReceiver"
+            android:exported="false"/>
+        <receiver
             android:name=".BluetoothReceiver"
             android:exported="true">
             <intent-filter>

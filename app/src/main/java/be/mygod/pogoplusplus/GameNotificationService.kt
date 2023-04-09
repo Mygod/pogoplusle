@@ -3,6 +3,7 @@ package be.mygod.pogoplusplus
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -26,6 +27,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val CHANNEL_POKEMON_FULL = "pokemon_full"
         private const val CHANNEL_NO_BALL = "out_of_pokeballs"
         private const val CHANNEL_SPIN_FAIL = "spin_fail"
+        private const val CHANNEL_CONNECTION_PENDING = "connection_pending"
         private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
         private const val PACKAGE_POKEMON_GO_ARES = "com.nianticlabs.pokemongo.ares"
 
@@ -34,6 +36,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val NOTIFICATION_POKEMON_FULL = 3
         private const val NOTIFICATION_NO_BALL = 4
         private const val NOTIFICATION_SPIN_FAIL = 5
+        private const val NOTIFICATION_CONNECTION_PENDING = 6
 
         private fun gameIntent(packageName: String) = Intent(Intent.ACTION_MAIN).apply {
             setClassName(packageName, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
@@ -44,24 +47,26 @@ class GameNotificationService : NotificationListenerService() {
         }
 
         @RequiresApi(26)
-        private fun createNotificationChannel(id: String, @StringRes name: Int) = NotificationChannel(
+        private fun makeNotificationChannel(id: String, @StringRes name: Int) = NotificationChannel(
             id, app.getText(name), NotificationManager.IMPORTANCE_HIGH
         ).apply {
             enableLights(true)
             lightColor = Color.RED
             lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
-            notificationManager.createNotificationChannel(this)
         }
-
         fun updateNotificationChannels() {
-            if (Build.VERSION.SDK_INT >= 26) {
-                createNotificationChannel(CHANNEL_AUXILIARY_DISCONNECTED,
-                    R.string.notification_channel_auxiliary_disconnected)
-                createNotificationChannel(CHANNEL_ITEM_FULL, R.string.notification_channel_item_full)
-                createNotificationChannel(CHANNEL_POKEMON_FULL, R.string.notification_channel_pokemon_full)
-                createNotificationChannel(CHANNEL_NO_BALL, R.string.notification_channel_no_ball)
-                createNotificationChannel(CHANNEL_SPIN_FAIL, R.string.notification_channel_spin_fail)
-            }
+            if (Build.VERSION.SDK_INT >= 26) notificationManager.createNotificationChannels(listOf(
+                makeNotificationChannel(CHANNEL_AUXILIARY_DISCONNECTED,
+                    R.string.notification_channel_auxiliary_disconnected),
+                makeNotificationChannel(CHANNEL_ITEM_FULL, R.string.notification_channel_item_full),
+                makeNotificationChannel(CHANNEL_POKEMON_FULL, R.string.notification_channel_pokemon_full),
+                makeNotificationChannel(CHANNEL_NO_BALL, R.string.notification_channel_no_ball),
+                makeNotificationChannel(CHANNEL_SPIN_FAIL, R.string.notification_channel_spin_fail),
+                NotificationChannel(CHANNEL_CONNECTION_PENDING, app.getText(
+                    R.string.notification_channel_connection_pending), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                    lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+                },
+            ))
         }
 
         private val notificationManager by lazy { app.getSystemService<NotificationManager>()!! }
@@ -95,16 +100,42 @@ class GameNotificationService : NotificationListenerService() {
                 MainPreferenceFragment.instance?.updateSwitches()
             }
 
-        fun onAuxiliaryConnected() = notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
+        fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String) {
+            notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
+            notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, NotificationCompat.Builder(app,
+                CHANNEL_CONNECTION_PENDING).apply {
+                setCategory(NotificationCompat.CATEGORY_STATUS)
+                setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, deviceName))
+                setGroup(CHANNEL_CONNECTION_PENDING)
+                setSmallIcon(R.drawable.ic_device_bluetooth_connected)
+                setContentIntent(PendingIntent.getActivity(app, 0, gameIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+                setShowWhen(true)
+                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
+                    app.getText(R.string.notification_action_disconnect),
+                    PendingIntent.getBroadcast(app, 0, Intent(app, BluetoothDisconnectReceiver::class.java).apply {
+                        putExtra(BluetoothDevice.EXTRA_DEVICE, device)
+                    }, PendingIntent.FLAG_IMMUTABLE))
+                color = app.getColor(R.color.primaryColor)
+            }.build())
+        }
         fun onAuxiliaryDisconnected(deviceName: String = BluetoothReceiver.DEVICE_NAME_PGP,
-                                    packageName: String? = null) = pushNotification(
-            NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED, "$deviceName disconnected",
-            R.drawable.ic_device_bluetooth_disabled, packageName, true)
+                                    packageName: String? = null) {
+            notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
+            pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED,
+                app.getString(R.string.notification_title_auxiliary_disconnected, deviceName),
+                R.drawable.ic_device_bluetooth_disabled, packageName, true)
+        }
 
         private fun isInterested(sbn: StatusBarNotification): Boolean {
             if (sbn.packageName != PACKAGE_POKEMON_GO && sbn.packageName != PACKAGE_POKEMON_GO_ARES) return false
             // com.nianticlabs.pokemongoplus.service.BackgroundService.notificationId
             return if (Build.VERSION.SDK_INT < 26) sbn.id == 2000 else sbn.notification.channelId == sbn.packageName
+        }
+        private fun cancelDisconnectionNotifications() {
+            notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
+            notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
         }
     }
 
@@ -122,7 +153,7 @@ class GameNotificationService : NotificationListenerService() {
             !isInterested(sbn)) return
         val text = sbn.notification.extras.getString(NotificationCompat.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
-        if (text.isNullOrEmpty()) return onAuxiliaryConnected()
+        if (text.isNullOrEmpty()) return cancelDisconnectionNotifications()
         val resources = try {
             packageManager.getResourcesForApplication(sbn.packageName)
         } catch (_: PackageManager.NameNotFoundException) {
@@ -134,7 +165,7 @@ class GameNotificationService : NotificationListenerService() {
         } catch (_: SecurityException) {
             null
         } != false
-        if (isConnected) onAuxiliaryConnected()
+        if (isConnected) cancelDisconnectionNotifications()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName,
