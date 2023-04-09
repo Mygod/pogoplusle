@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -116,6 +117,7 @@ class GameNotificationService : NotificationListenerService() {
                 addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
                     app.getText(R.string.notification_action_disconnect),
                     PendingIntent.getBroadcast(app, 0, Intent(app, BluetoothDisconnectReceiver::class.java).apply {
+                        data = Uri.fromParts("mac", device.address, null)   // to differentiate as ID
                         putExtra(BluetoothDevice.EXTRA_DEVICE, device)
                     }, PendingIntent.FLAG_IMMUTABLE))
                 color = app.getColor(R.color.primaryColor)
@@ -147,8 +149,6 @@ class GameNotificationService : NotificationListenerService() {
         isRunning = false
     }
 
-    private val bluetooth by lazy { getSystemService<BluetoothManager>()!! }
-
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
             !isInterested(sbn)) return
@@ -162,7 +162,7 @@ class GameNotificationService : NotificationListenerService() {
         }
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
         val isConnected = try {
-            bluetooth.getConnectedDevices(BluetoothProfile.GATT).any { BluetoothReceiver.getDeviceName(it) != null }
+            app.bluetooth.getConnectedDevices(BluetoothProfile.GATT).any { BluetoothReceiver.getDeviceName(it) != null }
         } catch (_: SecurityException) {
             null
         } != false
