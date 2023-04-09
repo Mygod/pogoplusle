@@ -2,7 +2,6 @@ package be.mygod.pogoplusplus
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.bluetooth.BluetoothManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
@@ -11,7 +10,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import be.mygod.librootkotlinx.NoShellException
 import be.mygod.pogoplusplus.util.RootManager
@@ -27,8 +25,6 @@ class App : Application() {
     companion object {
         lateinit var app: App
     }
-
-    val bluetooth by lazy { getSystemService<BluetoothManager>()!! }
 
     override fun onCreate() {
         super.onCreate()

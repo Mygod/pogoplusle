@@ -61,7 +61,7 @@ class BluetoothPairingService : AccessibilityService() {
             else -> return true
         }
         if (notification.extras.getString(Notification.EXTRA_TEXT)?.contains(
-                BluetoothReceiver.DEVICE_NAME_PGP) == true) try {
+                SfidaManager.DEVICE_NAME_PGP) == true) try {
             var intent = notification.actions?.firstOrNull()?.actionIntent
             if (intent == null) {
                 intent = notification.contentIntent
@@ -118,10 +118,10 @@ class BluetoothPairingService : AccessibilityService() {
             else -> return null
         }
         val title = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/alertTitle")
-        if (title.size != 1 || !title[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) {
+        if (title.size != 1 || !title[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) {
             // Some devices (eg Samsung) put device name in message (#6)
             val message = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/message")
-            if (message.size != 1 || !message[0].text.contains(BluetoothReceiver.DEVICE_NAME_PGP)) return null
+            if (message.size != 1 || !message[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) return null
             else Timber.w("Locate message success: ${message[0].text}")
         }
         return confirm[0]
@@ -144,12 +144,12 @@ class BluetoothPairingService : AccessibilityService() {
         }
         if (confirm.size != 1) return null
         val promptText = resources.findString(
-            "bluetooth_pairing_request", packageName, BluetoothReceiver.DEVICE_NAME_PGP)
+            "bluetooth_pairing_request", packageName, SfidaManager.DEVICE_NAME_PGP)
         val prompt = root.findAccessibilityNodeInfosByText(promptText).filter { it.text == promptText }
         if (prompt.isEmpty()) {
             // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
-            val deviceName = root.findAccessibilityNodeInfosByText(BluetoothReceiver.DEVICE_NAME_PGP)
-            if (deviceName.none { it.text == BluetoothReceiver.DEVICE_NAME_PGP }) {
+            val deviceName = root.findAccessibilityNodeInfosByText(SfidaManager.DEVICE_NAME_PGP)
+            if (deviceName.none { it.text == SfidaManager.DEVICE_NAME_PGP }) {
                 if (deviceName.isNotEmpty()) Timber.w(Exception("Locate device name suspect: $packageName; " +
                         confirm[0].viewIdResourceName + "; " +
                         deviceName.joinToString { "${it.viewIdResourceName}: ${it.text}" }))

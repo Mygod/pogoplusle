@@ -4,8 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothProfile
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -123,8 +121,7 @@ class GameNotificationService : NotificationListenerService() {
                 color = app.getColor(R.color.primaryColor)
             }.build())
         }
-        fun onAuxiliaryDisconnected(deviceName: String = BluetoothReceiver.DEVICE_NAME_PGP,
-                                    packageName: String? = null) {
+        fun onAuxiliaryDisconnected(deviceName: String = SfidaManager.DEVICE_NAME_PGP, packageName: String? = null) {
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
             pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED,
                 app.getString(R.string.notification_title_auxiliary_disconnected, deviceName),
@@ -161,12 +158,7 @@ class GameNotificationService : NotificationListenerService() {
             return
         }
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
-        val isConnected = try {
-            app.bluetooth.getConnectedDevices(BluetoothProfile.GATT).any { BluetoothReceiver.getDeviceName(it) != null }
-        } catch (_: SecurityException) {
-            null
-        } != false
-        if (isConnected) cancelDisconnectionNotifications()
+        if (SfidaManager.isConnected != false) cancelDisconnectionNotifications()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName,

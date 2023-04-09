@@ -28,7 +28,7 @@ class BluetoothPairingReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         // check for PAIRING_VARIANT_CONSENT
         if (intent?.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, BluetoothDevice.ERROR) != 3) return
-        val device = BluetoothReceiver.getDevice(intent) ?: return
+        val device = SfidaManager.getDevice(intent) ?: return
         abortBroadcast()    // stop system notification/popup
         try {
             device.first.setPairingConfirmation(true)
