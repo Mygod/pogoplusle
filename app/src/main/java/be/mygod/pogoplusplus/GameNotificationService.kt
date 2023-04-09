@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -146,7 +147,7 @@ class GameNotificationService : NotificationListenerService() {
         isRunning = false
     }
 
-    private val adapter by lazy { getSystemService<BluetoothManager>()!!.adapter }
+    private val bluetooth by lazy { getSystemService<BluetoothManager>()!! }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
@@ -161,7 +162,7 @@ class GameNotificationService : NotificationListenerService() {
         }
         if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
         val isConnected = try {
-            adapter.bondedDevices?.any { BluetoothReceiver.getDeviceName(it) != null }
+            bluetooth.getConnectedDevices(BluetoothProfile.GATT).any { BluetoothReceiver.getDeviceName(it) != null }
         } catch (_: SecurityException) {
             null
         } != false
