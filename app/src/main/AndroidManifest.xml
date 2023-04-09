@@ -66,12 +66,10 @@
             </intent-filter>
             <meta-data
                 android:name="android.service.notification.default_filter_types"
-                android:value="alerting|silent|ongoing">
-            </meta-data>
+                android:value="alerting|silent|ongoing" />
             <meta-data
                 android:name="android.service.notification.disabled_filter_types"
-                android:value="conversations">
-            </meta-data>
+                android:value="conversations" />
         </service>
         <receiver
             android:name=".BluetoothReceiver"

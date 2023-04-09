@@ -15,6 +15,11 @@
     <string name="notification_channel_pokemon_full">盒子已满</string>
     <string name="notification_channel_no_ball">无精灵球</string>
     <string name="notification_channel_spin_fail">补给失败</string>
+    <string name="notification_channel_connection_pending">连接就绪</string>
+    <string name="notification_channel_inactive_timeout">Pokémon GO Plus 连接失效</string>
+    <string name="notification_action_disconnect">断开连接</string>
+    <string name="notification_title_auxiliary_connected">“%1$s”已连接</string>
+    <string name="notification_title_auxiliary_disconnected">“%1$s”已断开连接</string>
 
     <string name="settings_service_pairing">蓝牙配对助手</string>
     <string name="settings_service_pairing_summary">自动点击对话框配对</string>

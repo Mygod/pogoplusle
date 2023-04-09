@@ -10,11 +10,16 @@
     <string name="game_notification_service_name">監控遊戲通知</string>
     <string name="game_notification_service_summary">接收斷線、背包已滿等警報</string>
 
-    <string name="notification_channel_auxiliary_disconnected">Pokémon GO Plus 連接已結束</string>
+    <string name="notification_channel_auxiliary_disconnected">Pokémon GO Plus 連線已結束</string>
     <string name="notification_channel_item_full">背包已滿</string>
     <string name="notification_channel_pokemon_full">寶可夢盒子已滿</string>
     <string name="notification_channel_no_ball">沒有寶貝球了</string>
     <string name="notification_channel_spin_fail">轉補錯誤</string>
+    <string name="notification_channel_connection_pending">連線就緒</string>
+    <string name="notification_channel_inactive_timeout">Pokémon GO Plus 連線失效</string>
+    <string name="notification_action_disconnect">中斷連線</string>
+    <string name="notification_title_auxiliary_connected">已與「%1$s」連線</string>
+    <string name="notification_title_auxiliary_disconnected">已中斷與「%1$s」的連線</string>
 
     <string name="settings_service_pairing">藍牙配對助手</string>
     <string name="settings_service_pairing_summary">協助點擊配對視窗</string>
