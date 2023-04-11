@@ -1,7 +1,5 @@
 package be.mygod.pogoplusplus
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
@@ -9,7 +7,6 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Intent
-import android.os.SystemClock
 import androidx.annotation.RequiresPermission
 import androidx.core.content.IntentCompat
 import androidx.core.content.getSystemService
@@ -33,7 +30,6 @@ object SfidaManager : BluetoothGattCallback() {
         BluetoothGatt::class.java.getDeclaredField("mClientIf").apply { isAccessible = true }
     }
 
-    private val alarm by lazy { app.getSystemService<AlarmManager>()!! }
     private val bluetooth by lazy { app.getSystemService<BluetoothManager>()!! }
 
     val isConnected get() = try {
@@ -65,14 +61,6 @@ object SfidaManager : BluetoothGattCallback() {
         val name = getDeviceName(device, intent.action) ?: return null
         return device to name
     }
-
-    private val timeoutIntent by lazy {
-        PendingIntent.getBroadcast(app, 0, Intent(app, SfidaTimeoutReceiver::class.java), PendingIntent.FLAG_MUTABLE)
-    }
-    // 1h 12.457s - 1h 11m 6.778s
-    fun reportConnection() = alarm.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-        SystemClock.elapsedRealtime() + 3612457, 654321, timeoutIntent)
-    fun reportDisconnection() = alarm.cancel(timeoutIntent)
 
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     private fun disconnectGatt(device: BluetoothDevice) {

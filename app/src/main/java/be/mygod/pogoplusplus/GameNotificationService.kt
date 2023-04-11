@@ -133,7 +133,7 @@ class GameNotificationService : NotificationListenerService() {
                 R.drawable.ic_device_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
             }
-            SfidaManager.reportDisconnection()
+            SfidaTimeoutReceiver.reportDisconnection()
         }
         fun onAuxiliaryTimeout() {
             if (SfidaManager.isConnected == false) return
@@ -154,7 +154,7 @@ class GameNotificationService : NotificationListenerService() {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
             notificationManager.cancel(NOTIFICATION_INACTIVE_TIMEOUT)
-            SfidaManager.reportConnection()
+            SfidaTimeoutReceiver.reportConnection()
         }
     }
 
