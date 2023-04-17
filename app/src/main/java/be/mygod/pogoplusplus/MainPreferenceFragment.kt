@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -33,6 +34,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var serviceGameNotification: TwoStatePreference
     private lateinit var permissionBluetooth: TwoStatePreference
     private lateinit var servicePairingRoot: TwoStatePreference
+    private lateinit var gameBatteryOptimizations: Preference
     private fun Preference.remove() = parent!!.removePreference(this)
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -119,6 +121,20 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             startActivity(GameNotificationService.gameIntent)
             true
         }
+        gameBatteryOptimizations = findPreference("game.batteryOptimized")!!
+        gameBatteryOptimizations.setOnPreferenceClickListener @TargetApi(31) {
+            val packageName = GameNotificationService.foregroundServiceStartNotAllowedPackage
+            if (packageName != null) {
+                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", packageName, null)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+                true
+            } else {
+                gameBatteryOptimizations.isVisible = false
+                false
+            }
+        }
         findPreference<Preference>("misc.source")!!.setOnPreferenceClickListener {
             app.launchUrl(requireContext(), "https://github.com/Mygod/pogoplusle")
             true
@@ -163,6 +179,8 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 app.isEnabled<BluetoothReceiver>()
         servicePairingRoot.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
                 app.isEnabled<BluetoothPairingReceiver>(false)
+        gameBatteryOptimizations.isVisible = Build.VERSION.SDK_INT >= 31 &&
+                GameNotificationService.foregroundServiceStartNotAllowedPackage != null
     }
 
     fun updateSwitches() {

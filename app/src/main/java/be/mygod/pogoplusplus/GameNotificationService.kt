@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.annotation.DrawableRes
@@ -46,6 +47,16 @@ class GameNotificationService : NotificationListenerService() {
         val gameIntent = Intent(Intent.ACTION_CHOOSER).apply {
             putExtra(Intent.EXTRA_INTENT, gameIntent(PACKAGE_POKEMON_GO))
             putExtra(Intent.EXTRA_ALTERNATE_INTENTS, arrayOf(gameIntent(PACKAGE_POKEMON_GO_ARES)))
+        }
+
+        private val powerManager by lazy { app.getSystemService<PowerManager>()!! }
+        @get:RequiresApi(31)
+        val foregroundServiceStartNotAllowedPackage get() = when {
+            app.packageManager.resolveActivity(gameIntent(PACKAGE_POKEMON_GO), 0) != null &&
+                    !powerManager.isIgnoringBatteryOptimizations(PACKAGE_POKEMON_GO) -> PACKAGE_POKEMON_GO
+            app.packageManager.resolveActivity(gameIntent(PACKAGE_POKEMON_GO_ARES), 0) != null &&
+                    !powerManager.isIgnoringBatteryOptimizations(PACKAGE_POKEMON_GO_ARES) -> PACKAGE_POKEMON_GO_ARES
+            else -> null
         }
 
         @RequiresApi(26)
