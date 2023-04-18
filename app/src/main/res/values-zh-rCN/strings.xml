@@ -30,6 +30,8 @@
     <string name="settings_permission_notification_summary">很好的通知多发</string>
     <string name="settings_game">启动游戏</string>
     <string name="settings_game_summary">快给老子开游戏！</string>
+    <string name="settings_game_battery_optimized">已为游戏优化电池用量</string>
+    <string name="settings_game_battery_optimized_summary">游戏在后台运行时连接可能会崩溃。在“应用的电池电量”中为游戏设置为“无限制”可绕过这个问题</string>
     <string name="settings_service_pairing_root">用 root 配对蓝牙</string>
     <string name="settings_service_pairing_root_summary">除非已有 root 权限，<b>不要打开此开关</b>！此模式相比更安静可靠，但占用资源更多</string>
 
