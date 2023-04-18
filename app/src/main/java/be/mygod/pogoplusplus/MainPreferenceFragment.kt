@@ -51,6 +51,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         }
         servicePairing = findPreference("service.pairing")!!
         servicePairingRoot = findPreference("service.pairingRoot")!!
+        gameBatteryOptimizations = findPreference("game.batteryOptimized")!!
         if (needsServicePairing) {
             servicePairing.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
@@ -77,9 +78,22 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                     false
                 } else true
             }
+            gameBatteryOptimizations.setOnPreferenceClickListener @TargetApi(31) {
+                val packageName = GameNotificationService.foregroundServiceStartNotAllowedPackage
+                if (packageName != null) {
+                    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", packageName, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+                    true
+                } else {
+                    gameBatteryOptimizations.isVisible = false
+                    false
+                }
+            }
         } else {
             servicePairing.remove()
-            // for now, this is the only entry in advanced
+            // we only hit here if API < 31, in which case neither entries would be needed
             servicePairingRoot.parent!!.remove()
         }
         serviceGameNotification = findPreference("service.gameNotification")!!
@@ -120,20 +134,6 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("game")!!.setOnPreferenceClickListener {
             startActivity(GameNotificationService.gameIntent)
             true
-        }
-        gameBatteryOptimizations = findPreference("game.batteryOptimized")!!
-        gameBatteryOptimizations.setOnPreferenceClickListener @TargetApi(31) {
-            val packageName = GameNotificationService.foregroundServiceStartNotAllowedPackage
-            if (packageName != null) {
-                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.fromParts("package", packageName, null)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                })
-                true
-            } else {
-                gameBatteryOptimizations.isVisible = false
-                false
-            }
         }
         findPreference<Preference>("misc.source")!!.setOnPreferenceClickListener {
             app.launchUrl(requireContext(), "https://github.com/Mygod/pogoplusle")
