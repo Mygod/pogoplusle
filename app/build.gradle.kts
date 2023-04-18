@@ -75,7 +75,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")    // TODO fix dependency
     implementation("androidx.preference:preference:1.2.0")
-    implementation("be.mygod.librootkotlinx:librootkotlinx:1.0.3")
+    implementation("be.mygod.librootkotlinx:librootkotlinx:1.0.2")
     implementation("com.android.billingclient:billing-ktx:5.2.0")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
     implementation("com.google.android.material:material:1.9.0-rc01")
