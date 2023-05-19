@@ -32,6 +32,7 @@
     <PreferenceCategory app:title="@string/settings_advanced">
         <Preference
             app:key="game.batteryOptimized"
+            app:isPreferenceVisible="false"
             app:icon="@drawable/ic_device_battery_alert"
             app:title="@string/settings_game_battery_optimized"
             app:summary="@string/settings_game_battery_optimized_summary" />
