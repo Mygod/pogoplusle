@@ -146,14 +146,11 @@ class GameNotificationService : NotificationListenerService() {
             }
             SfidaTimeoutReceiver.reportDisconnection()
         }
-        fun onAuxiliaryTimeout() {
-            if (SfidaManager.isConnected == false) return
-            pushNotification(NOTIFICATION_INACTIVE_TIMEOUT, CHANNEL_INACTIVE_TIMEOUT,
-                app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
-                addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
-                    app.getText(R.string.notification_action_disconnect), PendingIntent.getBroadcast(app, 0,
-                        Intent(app, SfidaDisconnectReceiver::class.java), PendingIntent.FLAG_IMMUTABLE))
-            }
+        fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_INACTIVE_TIMEOUT, CHANNEL_INACTIVE_TIMEOUT,
+            app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
+            addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
+                app.getText(R.string.notification_action_disconnect), PendingIntent.getBroadcast(app, 0,
+                    Intent(app, SfidaDisconnectReceiver::class.java), PendingIntent.FLAG_IMMUTABLE))
         }
 
         private fun isInterested(sbn: StatusBarNotification): Boolean {
