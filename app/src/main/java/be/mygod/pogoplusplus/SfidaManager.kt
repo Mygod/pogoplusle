@@ -78,8 +78,8 @@ object SfidaManager : BluetoothGattCallback() {
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     fun disconnect(device: BluetoothDevice) {
-        if (bluetooth.getConnectionState(device, BluetoothProfile.GATT) != BluetoothProfile.STATE_CONNECTED ||
-            bluetooth.adapter.bondedDevices?.contains(device) != false && removeBond(device) as Boolean) return
+        if (bluetooth.adapter.bondedDevices?.contains(device) != false && removeBond(device) as Boolean ||
+            bluetooth.getConnectionState(device, BluetoothProfile.GATT) != BluetoothProfile.STATE_CONNECTED) return
         disconnectGatt(device)
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
