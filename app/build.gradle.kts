@@ -17,8 +17,8 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 24
         targetSdk = 33
-        versionCode = 20
-        versionName = "1.1.1"
+        versionCode = 21
+        versionName = "1.1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -71,16 +71,16 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
     implementation("androidx.browser:browser:1.5.0")
-    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")    // TODO fix dependency
     implementation("androidx.preference:preference:1.2.0")
-    implementation("be.mygod.librootkotlinx:librootkotlinx:1.0.2")
-    implementation("com.android.billingclient:billing-ktx:5.2.0")
-    implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
-    implementation("com.google.android.material:material:1.9.0-rc01")
+    implementation("be.mygod.librootkotlinx:librootkotlinx:1.0.4")
+    implementation("com.android.billingclient:billing-ktx:6.0.0")
+    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
+    implementation("com.google.android.material:material:1.9.0")
     implementation("com.google.firebase:firebase-analytics-ktx:21.2.2")
-    implementation("com.google.firebase:firebase-crashlytics:18.3.6")
+    implementation("com.google.firebase:firebase-crashlytics:18.3.7")
     implementation("com.jakewharton.timber:timber:5.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:runner:1.5.2")
