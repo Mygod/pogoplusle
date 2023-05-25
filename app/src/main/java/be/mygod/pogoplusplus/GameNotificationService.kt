@@ -39,7 +39,6 @@ class GameNotificationService : NotificationListenerService() {
         private const val NOTIFICATION_NO_BALL = 4
         private const val NOTIFICATION_SPIN_FAIL = 5
         private const val NOTIFICATION_CONNECTION_PENDING = 6
-        private const val NOTIFICATION_INACTIVE_TIMEOUT = 7
 
         private fun gameIntent(packageName: String) = Intent(Intent.ACTION_MAIN).apply {
             setClassName(packageName, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
@@ -116,7 +115,6 @@ class GameNotificationService : NotificationListenerService() {
 
         fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String) {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
-            notificationManager.cancel(NOTIFICATION_INACTIVE_TIMEOUT)
             notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, NotificationCompat.Builder(app,
                 CHANNEL_CONNECTION_PENDING).apply {
                 setCategory(NotificationCompat.CATEGORY_STATUS)
@@ -138,7 +136,6 @@ class GameNotificationService : NotificationListenerService() {
         }
         fun onAuxiliaryDisconnected(deviceName: String = SfidaManager.DEVICE_NAME_PGP, packageName: String? = null) {
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
-            notificationManager.cancel(NOTIFICATION_INACTIVE_TIMEOUT)
             pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED,
                 app.getString(R.string.notification_title_auxiliary_disconnected, deviceName),
                 R.drawable.ic_device_bluetooth_disabled, packageName) {
@@ -146,7 +143,7 @@ class GameNotificationService : NotificationListenerService() {
             }
             SfidaTimeoutReceiver.reportDisconnection()
         }
-        fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_INACTIVE_TIMEOUT, CHANNEL_INACTIVE_TIMEOUT,
+        fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_CONNECTION_PENDING, CHANNEL_INACTIVE_TIMEOUT,
             app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
             addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
                 app.getText(R.string.notification_action_disconnect), PendingIntent.getBroadcast(app, 0,
@@ -161,7 +158,6 @@ class GameNotificationService : NotificationListenerService() {
         private fun onConnect() {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
-            notificationManager.cancel(NOTIFICATION_INACTIVE_TIMEOUT)
             SfidaTimeoutReceiver.reportConnection()
         }
     }
