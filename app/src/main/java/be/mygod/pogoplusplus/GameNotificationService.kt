@@ -113,6 +113,10 @@ class GameNotificationService : NotificationListenerService() {
                 MainPreferenceFragment.instance?.updateSwitches()
             }
 
+        private fun setTimeoutIfEnabled() {
+            if (Build.VERSION.SDK_INT < 26 || notificationManager.getNotificationChannel(CHANNEL_INACTIVE_TIMEOUT)
+                .importance != NotificationManager.IMPORTANCE_NONE) SfidaTimeoutReceiver.reportConnection()
+        }
         fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String) {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
             notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, NotificationCompat.Builder(app,
@@ -133,6 +137,7 @@ class GameNotificationService : NotificationListenerService() {
                     }, PendingIntent.FLAG_IMMUTABLE))
                 color = app.getColor(R.color.primaryColor)
             }.build())
+            setTimeoutIfEnabled()
         }
         fun onAuxiliaryDisconnected(deviceName: String = SfidaManager.DEVICE_NAME_PGP, packageName: String? = null) {
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
@@ -158,7 +163,7 @@ class GameNotificationService : NotificationListenerService() {
         private fun onConnect() {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
-            SfidaTimeoutReceiver.reportConnection()
+            setTimeoutIfEnabled()
         }
     }
 

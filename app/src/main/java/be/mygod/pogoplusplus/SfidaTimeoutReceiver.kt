@@ -16,9 +16,9 @@ class SfidaTimeoutReceiver : BroadcastReceiver() {
             PendingIntent.getBroadcast(app, 0, Intent(app, SfidaTimeoutReceiver::class.java),
                 PendingIntent.FLAG_MUTABLE)
         }
-        // 1h 12.457s - 1h 11m 6.778s
-        fun reportConnection() = alarm.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            SystemClock.elapsedRealtime() + 3612457, 654321, timeoutIntent)
+        // 35m 9.876s - 1h 1m 32.283s (1.75x)
+        fun reportConnection() = alarm.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            SystemClock.elapsedRealtime() + 2109876, timeoutIntent)
         fun reportDisconnection() = alarm.cancel(timeoutIntent)
     }
 

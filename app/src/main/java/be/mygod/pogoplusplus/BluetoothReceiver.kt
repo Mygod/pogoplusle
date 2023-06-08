@@ -14,10 +14,7 @@ class BluetoothReceiver : BroadcastReceiver() {
                 BluetoothDevice.ERROR) != BluetoothDevice.TRANSPORT_LE) return
         val (device, deviceName) = SfidaManager.getDevice(intent) ?: return
         when (intent.action) {
-            BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                GameNotificationService.onAuxiliaryConnected(device, deviceName)
-                SfidaTimeoutReceiver.reportConnection()
-            }
+            BluetoothDevice.ACTION_ACL_CONNECTED -> GameNotificationService.onAuxiliaryConnected(device, deviceName)
             BluetoothDevice.ACTION_ACL_DISCONNECTED -> GameNotificationService.onAuxiliaryDisconnected(deviceName)
         }
     }
