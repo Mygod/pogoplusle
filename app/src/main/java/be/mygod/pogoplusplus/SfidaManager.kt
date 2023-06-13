@@ -22,6 +22,7 @@ object SfidaManager : BluetoothGattCallback() {
      * This private API is also called by the game so we are fine.
      */
     private val removeBond by lazy { BluetoothDevice::class.java.getDeclaredMethod("removeBond") }
+    private fun removeBond(device: BluetoothDevice) = removeBond.invoke(device) as Boolean
 
     /**
      * Landroid/bluetooth/BluetoothGatt;->mClientIf:I,unsupported
@@ -78,17 +79,15 @@ object SfidaManager : BluetoothGattCallback() {
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     fun disconnect(device: BluetoothDevice) {
-        if (bluetooth.adapter.bondedDevices?.contains(device) != false && removeBond(device) as Boolean ||
+        if (bluetooth.adapter.bondedDevices?.contains(device) != false && removeBond(device) ||
             bluetooth.getConnectionState(device, BluetoothProfile.GATT) != BluetoothProfile.STATE_CONNECTED) return
         disconnectGatt(device)
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     fun disconnectAll() {
-        val bonded by lazy { bluetooth.adapter.bondedDevices?.toSet() }
+        bluetooth.adapter.bondedDevices?.forEach { device -> getDeviceName(device) == null || removeBond(device) }
         for (device in bluetooth.getConnectedDevices(BluetoothProfile.GATT)) {
-            if (getDeviceName(device) == null ||
-                bonded?.contains(device) != false && removeBond(device) as Boolean) continue
-            disconnectGatt(device)
+            if (getDeviceName(device) != null) disconnectGatt(device)
         }
     }
 }
