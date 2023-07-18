@@ -10,16 +10,18 @@
     <string name="game_notification_service_name">监视游戏通知</string>
     <string name="game_notification_service_summary">通知连接断开、满包等</string>
 
-    <string name="notification_channel_auxiliary_disconnected">Pokémon GO Plus 连接断开</string>
+    <string name="notification_channel_auxiliary_disconnected">外部裝置连接断开</string>
     <string name="notification_channel_item_full">包包已满</string>
     <string name="notification_channel_pokemon_full">盒子已满</string>
     <string name="notification_channel_no_ball">无精灵球</string>
     <string name="notification_channel_spin_fail">补给失败</string>
     <string name="notification_channel_connection_pending">连接就绪</string>
-    <string name="notification_channel_inactive_timeout">Pokémon GO Plus 连接失效</string>
+    <string name="notification_channel_inactive_timeout">外部裝置连接失效</string>
     <string name="notification_action_disconnect">断开连接</string>
     <string name="notification_title_auxiliary_connected">“%1$s”已连接</string>
+    <string name="notification_title_auxiliary_connected_default">外部裝置已连接</string>
     <string name="notification_title_auxiliary_disconnected">“%1$s”已断开连接</string>
+    <string name="notification_title_auxiliary_disconnected_default">外部裝置已断开连接</string>
 
     <string name="settings_service_pairing">蓝牙配对助手</string>
     <string name="settings_service_pairing_summary">自动点击对话框配对</string>

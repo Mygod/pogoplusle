@@ -122,7 +122,7 @@ class GameNotificationService : NotificationListenerService() {
             notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, NotificationCompat.Builder(app,
                 CHANNEL_CONNECTION_PENDING).apply {
                 setCategory(NotificationCompat.CATEGORY_STATUS)
-                setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, deviceName))
+                setContentTitle(app.getText(R.string.notification_title_auxiliary_connected_default))
                 setGroup(CHANNEL_CONNECTION_PENDING)
                 setSmallIcon(R.drawable.ic_maps_mode_of_travel)
                 setContentIntent(PendingIntent.getActivity(app, 0, gameIntent,
@@ -136,15 +136,23 @@ class GameNotificationService : NotificationListenerService() {
                         putExtra(BluetoothDevice.EXTRA_DEVICE, device)
                     }, PendingIntent.FLAG_IMMUTABLE))
                 color = app.getColor(R.color.primaryColor)
+                setPublicVersion(build())
+                setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, deviceName))
             }.build())
             setTimeoutIfEnabled()
         }
-        fun onAuxiliaryDisconnected(deviceName: String = SfidaManager.DEVICE_NAME_PGP, packageName: String? = null) {
+        fun onAuxiliaryDisconnected(deviceName: String? = null, packageName: String? = null) {
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
             pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED,
-                app.getString(R.string.notification_title_auxiliary_disconnected, deviceName),
+                app.getText(R.string.notification_title_auxiliary_disconnected_default),
                 R.drawable.ic_device_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
+                if (deviceName != null) {
+                    setPublicVersion(build())
+                    setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                    setContentTitle(app.getString(R.string.notification_title_auxiliary_disconnected, deviceName))
+                }
             }
             SfidaTimeoutReceiver.reportDisconnection()
         }

@@ -13,16 +13,18 @@
     <string name="game_notification_service_name">Monitor game notifications</string>
     <string name="game_notification_service_summary">Receive alerts for disconnections, full bags, etc.</string>
 
-    <string name="notification_channel_auxiliary_disconnected">Pokémon GO Plus session ended</string>
+    <string name="notification_channel_auxiliary_disconnected">Accessory device session ended</string>
     <string name="notification_channel_item_full">Bag is full</string>
     <string name="notification_channel_pokemon_full">No more room for Pokémon</string>
     <string name="notification_channel_no_ball">Out of Poké Balls</string>
     <string name="notification_channel_spin_fail">PokéStop spin error</string>
     <string name="notification_channel_connection_pending">Connection ready</string>
-    <string name="notification_channel_inactive_timeout">Pokémon GO Plus inactive</string>
+    <string name="notification_channel_inactive_timeout">Accessory device inactive</string>
     <string name="notification_action_disconnect">Disconnect</string>
     <string name="notification_title_auxiliary_connected">%1$s connected</string>
+    <string name="notification_title_auxiliary_connected_default">Accessory device connected</string>
     <string name="notification_title_auxiliary_disconnected">%1$s disconnected</string>
+    <string name="notification_title_auxiliary_disconnected_default">Accessory device disconnected</string>
 
     <string name="settings_service_pairing">Bluetooth pairing assistant</string>
     <string name="settings_service_pairing_summary">Click the pairing dialog for you</string>
