@@ -17,11 +17,11 @@
     <string name="notification_channel_spin_fail">轉補錯誤</string>
     <string name="notification_channel_connection_pending">連線就緒</string>
     <string name="notification_channel_inactive_timeout">外部裝置連線失效</string>
-    <string name="notification_action_disconnect">中斷連線</string>
-    <string name="notification_title_auxiliary_connected">已與「%1$s」連線</string>
-    <string name="notification_title_auxiliary_connected_default">已與外部裝置連線</string>
-    <string name="notification_title_auxiliary_disconnected">已中斷與「%1$s」的連線</string>
-    <string name="notification_title_auxiliary_disconnected_default">已中斷與外部裝置的連線</string>
+    <string name="notification_action_disconnect">關閉連線</string>
+    <string name="notification_title_auxiliary_connected">已連線至「%1$s」</string>
+    <string name="notification_title_auxiliary_connected_default">已連線至外部裝置</string>
+    <string name="notification_title_auxiliary_disconnected">已關閉與「%1$s」的連線</string>
+    <string name="notification_title_auxiliary_disconnected_default">已關閉與外部裝置的連線</string>
 
     <string name="settings_service_pairing">藍牙配對助手</string>
     <string name="settings_service_pairing_summary">協助點擊配對視窗</string>
