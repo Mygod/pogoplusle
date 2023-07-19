@@ -17,8 +17,8 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 24
         targetSdk = 34
-        versionCode = 22
-        versionName = "1.1.3"
+        versionCode = 23
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -76,11 +76,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")    // TODO fix dependency
     implementation("androidx.preference:preference:1.2.0")
     implementation("be.mygod.librootkotlinx:librootkotlinx:1.0.5")
-    implementation("com.android.billingclient:billing-ktx:6.0.0")
+    implementation("com.android.billingclient:billing-ktx:6.0.1")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
-    implementation("com.google.firebase:firebase-crashlytics:18.3.7")
+    implementation("com.google.firebase:firebase-crashlytics:18.4.0")
     implementation("com.jakewharton.timber:timber:5.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:runner:1.5.2")
