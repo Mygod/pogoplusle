@@ -193,7 +193,9 @@ class GameNotificationService : NotificationListenerService() {
         } catch (_: PackageManager.NameNotFoundException) {
             return
         }
-        if (text == resources.findString("Disconnecting_GO_Plus", sbn.packageName)) return onAuxiliaryDisconnected()
+        if (text == resources.findString("Disconnecting_Companion_Device", sbn.packageName)) {
+            return onAuxiliaryDisconnected()
+        }
         if (SfidaManager.isConnected != false) onConnect()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
