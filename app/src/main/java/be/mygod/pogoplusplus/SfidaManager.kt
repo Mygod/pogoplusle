@@ -45,7 +45,7 @@ object SfidaManager : BluetoothGattCallback() {
         val bluetoothClass = device.bluetoothClass
         val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_LE ||
                 bluetoothClass?.hashCode() != BluetoothClass.Device.Major.UNCATEGORIZED || when (name) {
-            DEVICE_NAME_PGP, "Pokemon PBP", "Pokemon GO Plus +" -> false
+            DEVICE_NAME_PGP, "Pokemon PBP", "Pokemon GO Plus +", "EbisuEbisu test" -> false
             null -> !device.address.startsWith("7C:BB:8A:", true) &&
                     !device.address.startsWith("98:B6:E9:", true) &&
                     !device.address.startsWith("B8:78:26:", true)
