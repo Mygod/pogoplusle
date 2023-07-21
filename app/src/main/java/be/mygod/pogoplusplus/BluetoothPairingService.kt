@@ -117,13 +117,22 @@ class BluetoothPairingService : AccessibilityService() {
             1 -> { }
             else -> return null
         }
-        val title = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/alertTitle")
-        if (title.size != 1 || !title[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) {
-            // Some devices (eg Samsung) put device name in message (#6)
-            val message = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/message")
-            if (message.size != 1 || !message[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) return null
-            else Timber.w("Locate message success: ${message[0].text}")
+        var title = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/alertTitle")
+        when (title.size) {
+            0 -> {
+                title = root.findAccessibilityNodeInfosByViewId("android:id/alertTitle")
+                if (title.size == 1 && title[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) {
+                    // Some devices (eg Huawei) use Android AlertDialog instead of AppCompat
+                    Timber.w("Locate title success: ${title[0].text}")
+                    return confirm[0]
+                }
+            }
+            1 -> if (title[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) return confirm[0]
         }
+        // Some devices (eg Samsung) put device name in message (#6)
+        val message = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/message")
+        if (message.size != 1 || !message[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) return null
+        else Timber.w("Locate message success: ${message[0].text}")
         return confirm[0]
     }
     private fun tryLocateByText(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
