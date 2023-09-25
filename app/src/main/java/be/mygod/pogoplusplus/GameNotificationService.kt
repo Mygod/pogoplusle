@@ -119,7 +119,9 @@ class GameNotificationService : NotificationListenerService() {
 
         private fun setTimeoutIfEnabled() {
             if (Build.VERSION.SDK_INT < 26 || notificationManager.getNotificationChannel(CHANNEL_INACTIVE_TIMEOUT)
-                .importance != NotificationManager.IMPORTANCE_NONE) SfidaTimeoutReceiver.reportConnection()
+                ?.run { importance != NotificationManager.IMPORTANCE_NONE } == true) {
+                SfidaTimeoutReceiver.reportConnection()
+            }
         }
         fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String) {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
