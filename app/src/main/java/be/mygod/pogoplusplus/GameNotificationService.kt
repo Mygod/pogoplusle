@@ -40,20 +40,24 @@ class GameNotificationService : NotificationListenerService() {
         private const val NOTIFICATION_SPIN_FAIL = 5
         private const val NOTIFICATION_CONNECTION_PENDING = 6
 
-        private fun gameIntent(packageName: String) = Intent(Intent.ACTION_MAIN).apply {
-            setClassName(packageName, "com.nianticproject.holoholo.libholoholo.unity.UnityMainActivity")
-        }
-        val gameIntent = Intent(Intent.ACTION_CHOOSER).apply {
-            putExtra(Intent.EXTRA_INTENT, gameIntent(PACKAGE_POKEMON_GO))
-            putExtra(Intent.EXTRA_ALTERNATE_INTENTS, arrayOf(gameIntent(PACKAGE_POKEMON_GO_ARES)))
-        }
+        val gameIntent get() = listOf(PACKAGE_POKEMON_GO, PACKAGE_POKEMON_GO_ARES)
+            .mapNotNull(app.packageManager::getLaunchIntentForPackage).let { list ->
+                when (list.size) {
+                    0 -> Intent(Intent.ACTION_CHOOSER).putExtra(Intent.EXTRA_INTENT, Intent())
+                    1 -> list.first()
+                    else -> Intent(Intent.ACTION_CHOOSER).apply {
+                        putExtra(Intent.EXTRA_INTENT, list.first())
+                        putExtra(Intent.EXTRA_ALTERNATE_INTENTS, list.drop(1).toTypedArray())
+                    }
+                }
+            }
 
         private val powerManager by lazy { app.getSystemService<PowerManager>()!! }
         @get:RequiresApi(31)
         val foregroundServiceStartNotAllowedPackage get() = when {
-            app.packageManager.resolveActivity(gameIntent(PACKAGE_POKEMON_GO), 0) != null &&
+            app.packageManager.getLaunchIntentForPackage(PACKAGE_POKEMON_GO) != null &&
                     !powerManager.isIgnoringBatteryOptimizations(PACKAGE_POKEMON_GO) -> PACKAGE_POKEMON_GO
-            app.packageManager.resolveActivity(gameIntent(PACKAGE_POKEMON_GO_ARES), 0) != null &&
+            app.packageManager.getLaunchIntentForPackage(PACKAGE_POKEMON_GO_ARES) != null &&
                     !powerManager.isIgnoringBatteryOptimizations(PACKAGE_POKEMON_GO_ARES) -> PACKAGE_POKEMON_GO_ARES
             else -> null
         }
@@ -96,7 +100,7 @@ class GameNotificationService : NotificationListenerService() {
             setGroup(channel)
             setSmallIcon(icon)
             setContentIntent(PendingIntent.getActivity(app, 0,
-                if (packageName == null) gameIntent else gameIntent(packageName),
+                if (packageName == null) gameIntent else app.packageManager.getLaunchIntentForPackage(packageName),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             setShowWhen(true)
             setAutoCancel(true)
