@@ -77,7 +77,7 @@ dependencies {
     implementation("be.mygod.librootkotlinx:librootkotlinx:1.1.0")
     implementation("com.android.billingclient:billing-ktx:6.0.1")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0-rc01")
     implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
     implementation("com.google.firebase:firebase-crashlytics:18.4.3")
     implementation("com.jakewharton.timber:timber:5.0.1")
