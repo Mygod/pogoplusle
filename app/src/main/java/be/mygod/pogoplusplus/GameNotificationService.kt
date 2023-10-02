@@ -81,6 +81,7 @@ class GameNotificationService : NotificationListenerService() {
                 NotificationChannel(CHANNEL_CONNECTION_PENDING, app.getText(
                     R.string.notification_channel_connection_pending), NotificationManager.IMPORTANCE_DEFAULT).apply {
                     lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+                    setShowBadge(false)
                 },
                 makeNotificationChannel(CHANNEL_INACTIVE_TIMEOUT, R.string.notification_channel_inactive_timeout),
             ))
