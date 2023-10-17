@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 
-@RequiresApi(26)
 class BluetoothPairingReceiver : BroadcastReceiver() {
     @Parcelize
     class PairingConfirmationCommand(private val device: BluetoothDevice) : RootCommand<ParcelableBoolean> {

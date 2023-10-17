@@ -23,6 +23,7 @@
 
     <application
         android:name=".App"
+        android:appCategory="accessibility"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/no_backup"
         android:icon="@mipmap/ic_launcher"
@@ -48,7 +49,6 @@
             android:name=".BluetoothPairingService"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:enabled="@bool/api_ge_26"
             android:label="@string/bluetooth_pairing_service_label">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />

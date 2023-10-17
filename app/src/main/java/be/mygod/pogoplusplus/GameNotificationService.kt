@@ -1,5 +1,6 @@
 package be.mygod.pogoplusplus
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -7,15 +8,14 @@ import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.Icon
 import android.net.Uri
-import android.os.Build
 import android.os.PowerManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
 import be.mygod.pogoplusplus.util.findString
@@ -62,30 +62,27 @@ class GameNotificationService : NotificationListenerService() {
             else -> null
         }
 
-        @RequiresApi(26)
         private fun makeNotificationChannel(id: String, @StringRes name: Int) = NotificationChannel(
             id, app.getText(name), NotificationManager.IMPORTANCE_HIGH
         ).apply {
             enableLights(true)
             lightColor = Color.RED
-            lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
-        fun updateNotificationChannels() {
-            if (Build.VERSION.SDK_INT >= 26) notificationManager.createNotificationChannels(listOf(
-                makeNotificationChannel(CHANNEL_AUXILIARY_DISCONNECTED,
-                    R.string.notification_channel_auxiliary_disconnected),
-                makeNotificationChannel(CHANNEL_ITEM_FULL, R.string.notification_channel_item_full),
-                makeNotificationChannel(CHANNEL_POKEMON_FULL, R.string.notification_channel_pokemon_full),
-                makeNotificationChannel(CHANNEL_NO_BALL, R.string.notification_channel_no_ball),
-                makeNotificationChannel(CHANNEL_SPIN_FAIL, R.string.notification_channel_spin_fail),
-                NotificationChannel(CHANNEL_CONNECTION_PENDING, app.getText(
-                    R.string.notification_channel_connection_pending), NotificationManager.IMPORTANCE_DEFAULT).apply {
-                    lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
-                    setShowBadge(false)
-                },
-                makeNotificationChannel(CHANNEL_INACTIVE_TIMEOUT, R.string.notification_channel_inactive_timeout),
-            ))
-        }
+        fun updateNotificationChannels() = notificationManager.createNotificationChannels(listOf(
+            makeNotificationChannel(CHANNEL_AUXILIARY_DISCONNECTED,
+                R.string.notification_channel_auxiliary_disconnected),
+            makeNotificationChannel(CHANNEL_ITEM_FULL, R.string.notification_channel_item_full),
+            makeNotificationChannel(CHANNEL_POKEMON_FULL, R.string.notification_channel_pokemon_full),
+            makeNotificationChannel(CHANNEL_NO_BALL, R.string.notification_channel_no_ball),
+            makeNotificationChannel(CHANNEL_SPIN_FAIL, R.string.notification_channel_spin_fail),
+            NotificationChannel(CHANNEL_CONNECTION_PENDING, app.getText(
+                R.string.notification_channel_connection_pending), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                setShowBadge(false)
+            },
+            makeNotificationChannel(CHANNEL_INACTIVE_TIMEOUT, R.string.notification_channel_inactive_timeout),
+        ))
 
         private val notificationManager by lazy { app.getSystemService<NotificationManager>()!! }
         private fun pushNotification(
@@ -94,9 +91,9 @@ class GameNotificationService : NotificationListenerService() {
             title: CharSequence,
             @DrawableRes icon: Int,
             packageName: String? = null,
-            block: (NotificationCompat.Builder.() -> Unit)? = null,
-        ) = notificationManager.notify(id, NotificationCompat.Builder(app, channel).apply {
-            setCategory(NotificationCompat.CATEGORY_STATUS)
+            block: (Notification.Builder.() -> Unit)? = null,
+        ) = notificationManager.notify(id, Notification.Builder(app, channel).apply {
+            setCategory(Notification.CATEGORY_STATUS)
             setContentTitle(title)
             setGroup(channel)
             setSmallIcon(icon)
@@ -105,10 +102,8 @@ class GameNotificationService : NotificationListenerService() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             setShowWhen(true)
             setAutoCancel(true)
-            setLights(Color.RED, 500, 500)
-            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            color = app.getColor(R.color.primaryColor)
-            priority = NotificationCompat.PRIORITY_MAX
+            setVisibility(Notification.VISIBILITY_PUBLIC)
+            setColor(app.getColor(R.color.primaryColor))
             block?.invoke(this)
         }.build())
 
@@ -119,32 +114,33 @@ class GameNotificationService : NotificationListenerService() {
             }
 
         private fun setTimeoutIfEnabled() {
-            if (Build.VERSION.SDK_INT < 26 || notificationManager.getNotificationChannel(CHANNEL_INACTIVE_TIMEOUT)
+            if (notificationManager.getNotificationChannel(CHANNEL_INACTIVE_TIMEOUT)
                 ?.run { importance != NotificationManager.IMPORTANCE_NONE } == true) {
                 SfidaTimeoutReceiver.reportConnection()
             }
         }
         fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String) {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
-            notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, NotificationCompat.Builder(app,
+            notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, Notification.Builder(app,
                 CHANNEL_CONNECTION_PENDING).apply {
-                setCategory(NotificationCompat.CATEGORY_STATUS)
+                setCategory(Notification.CATEGORY_STATUS)
                 setContentTitle(app.getText(R.string.notification_title_auxiliary_connected_default))
                 setGroup(CHANNEL_CONNECTION_PENDING)
                 setSmallIcon(R.drawable.ic_maps_mode_of_travel)
                 setContentIntent(PendingIntent.getActivity(app, 0, gameIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                 setShowWhen(true)
-                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
+                setVisibility(Notification.VISIBILITY_PUBLIC)
+                addAction(Notification.Action.Builder(
+                    Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
                     app.getText(R.string.notification_action_disconnect),
                     PendingIntent.getBroadcast(app, 0, Intent(app, SfidaDisconnectReceiver::class.java).apply {
                         data = Uri.fromParts("mac", device.address, null)   // to differentiate as ID
                         putExtra(BluetoothDevice.EXTRA_DEVICE, device)
-                    }, PendingIntent.FLAG_IMMUTABLE))
-                color = app.getColor(R.color.primaryColor)
-                setPublicVersion(build())
-                setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                    }, PendingIntent.FLAG_IMMUTABLE)).build())
+                setColor(app.getColor(R.color.primaryColor))
+                setPublicVersion(build().clone())
+                setVisibility(Notification.VISIBILITY_PRIVATE)
                 setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, deviceName))
             }.build())
             setTimeoutIfEnabled()
@@ -156,8 +152,8 @@ class GameNotificationService : NotificationListenerService() {
                 R.drawable.ic_device_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
                 if (deviceName != null) {
-                    setPublicVersion(build())
-                    setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                    setPublicVersion(build().clone())
+                    setVisibility(Notification.VISIBILITY_PRIVATE)
                     setContentTitle(app.getString(R.string.notification_title_auxiliary_disconnected, deviceName))
                 }
             }
@@ -165,16 +161,14 @@ class GameNotificationService : NotificationListenerService() {
         }
         fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_CONNECTION_PENDING, CHANNEL_INACTIVE_TIMEOUT,
             app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
-            addAction(com.google.android.material.R.drawable.ic_m3_chip_close,
+            addAction(Notification.Action.Builder(
+                Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
                 app.getText(R.string.notification_action_disconnect), PendingIntent.getBroadcast(app, 0,
-                    Intent(app, SfidaDisconnectReceiver::class.java), PendingIntent.FLAG_IMMUTABLE))
+                    Intent(app, SfidaDisconnectReceiver::class.java), PendingIntent.FLAG_IMMUTABLE)).build())
         }
 
-        private fun isInterested(sbn: StatusBarNotification): Boolean {
-            if (sbn.packageName != PACKAGE_POKEMON_GO && sbn.packageName != PACKAGE_POKEMON_GO_ARES) return false
-            // com.nianticlabs.pokemongoplus.service.BackgroundService.notificationId
-            return if (Build.VERSION.SDK_INT < 26) sbn.id == 2000 else sbn.notification.channelId == sbn.packageName
-        }
+        private fun isInterested(sbn: StatusBarNotification) = sbn.notification.channelId == sbn.packageName &&
+                (sbn.packageName == PACKAGE_POKEMON_GO || sbn.packageName == PACKAGE_POKEMON_GO_ARES)
         private fun onConnect() {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
             notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
@@ -192,7 +186,7 @@ class GameNotificationService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
             !isInterested(sbn)) return
-        val text = sbn.notification.extras.getString(NotificationCompat.EXTRA_TEXT)
+        val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
         if (text.isNullOrEmpty()) return onConnect()
         val resources = try {
@@ -207,8 +201,7 @@ class GameNotificationService : NotificationListenerService() {
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName) {
-            setOnlyAlertOnce(Build.VERSION.SDK_INT < 26 ||
-                    !notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
+            setOnlyAlertOnce(!notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
         }
         str = resources.findString("Pokemon_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_POKEMON_FULL, CHANNEL_POKEMON_FULL, str,
@@ -250,20 +243,14 @@ class GameNotificationService : NotificationListenerService() {
         }
     }
 
-    @Deprecated("Could be dropped since API 26")
-    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
-        if (isInterested(sbn ?: return)) onAuxiliaryDisconnected()
-    }
-
     override fun onNotificationRemoved(sbn: StatusBarNotification?, rankingMap: RankingMap?, reason: Int) {
-        @Suppress("DEPRECATION")
         when (reason) {
             REASON_APP_CANCEL,
             REASON_CLEAR_DATA,
             REASON_PACKAGE_CHANGED,
             REASON_PACKAGE_SUSPENDED,
             REASON_USER_STOPPED,
-            -> onNotificationRemoved(sbn)
+            -> if (isInterested(sbn ?: return)) onAuxiliaryDisconnected()
         }
     }
 }

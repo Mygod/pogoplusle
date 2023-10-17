@@ -39,15 +39,11 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_main)
-        val needsServicePairing = when (Build.VERSION.SDK_INT) {
-            in 31..Int.MAX_VALUE -> true
-            in 26 until 31 -> {
-                val array = Build.VERSION.SECURITY_PATCH.split('-', limit = 3)
-                val y = array.getOrNull(0)?.toIntOrNull()
-                val m = array.getOrNull(1)?.toIntOrNull()
-                y == null || y > 2020 || y == 2020 && (m == null || m >= 11)
-            }
-            else -> false
+        val needsServicePairing = if (Build.VERSION.SDK_INT >= 31) true else {
+            val array = Build.VERSION.SECURITY_PATCH.split('-', limit = 3)
+            val y = array.getOrNull(0)?.toIntOrNull()
+            val m = array.getOrNull(1)?.toIntOrNull()
+            y == null || y > 2020 || y == 2020 && (m == null || m >= 11)
         }
         servicePairing = findPreference("service.pairing")!!
         servicePairingRoot = findPreference("service.pairingRoot")!!

@@ -1,7 +1,6 @@
 package be.mygod.pogoplusplus
 
 import android.accessibilityservice.AccessibilityService
-import android.annotation.TargetApi
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
@@ -10,10 +9,13 @@ import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import be.mygod.pogoplusplus.util.findString
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@TargetApi(26)
 class BluetoothPairingService : AccessibilityService() {
     companion object {
         private const val PACKAGE_SETTINGS = "com.android.settings"
