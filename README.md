@@ -11,7 +11,7 @@
 ([beta](https://play.google.com/apps/testing/be.mygod.pogoplusplus))
 SHA-256 fingerprint of the [code transparency](https://developer.android.com/guide/app-bundle/code-transparency#verify_code_transparency) key certificate (must be compared with the developer's public key manually): `C8 70 92 46 B3 32 22 6F 33 57 05 B4 5C 37 83 81 65 67 42 44 1B DC CC B2 96 1B 66 4D CF 4C 74 BC`
 
-Automagically skips pairing dialog when connecting Pokémon GO Plus (Android 8+), and alerts you when things go wrong.
+Automagically skips pairing dialog when connecting Pokémon GO Plus, and alerts you when things go wrong.
 
 Context: Pairing dialog were introduced in [November 2020 security patch](https://source.android.com/security/bulletin/2020-11-01), for [fixing](https://android.googlesource.com/platform/system/bt/+/b3f12befdc4def7d695b6f1049cd02238eb1e4a8) [CVE-2020-12856](https://github.com/alwentiu/COVIDSafe-CVE-2020-12856) as discovered by [/u/BlueMysticNA](https://www.reddit.com/r/TheSilphRoad/comments/jujfm4/comment/gcdk4eb/).
 
