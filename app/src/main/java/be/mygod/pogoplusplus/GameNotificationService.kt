@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -12,6 +13,7 @@ import android.graphics.drawable.Icon
 import android.net.Uri
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
@@ -26,17 +28,16 @@ class GameNotificationService : NotificationListenerService() {
         private const val CHANNEL_POKEMON_FULL = "pokemon_full"
         private const val CHANNEL_NO_BALL = "out_of_pokeballs"
         private const val CHANNEL_SPIN_FAIL = "spin_fail"
-        private const val CHANNEL_CONNECTION_PENDING = "connection_pending"
+        private const val CHANNEL_CONNECTION_STATUS = "connection_pending"
         private const val CHANNEL_INACTIVE_TIMEOUT = "inactive_timeout"
         private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
         private const val PACKAGE_POKEMON_GO_ARES = "com.nianticlabs.pokemongo.ares"
 
-        private const val NOTIFICATION_AUXILIARY_DISCONNECTED = 1
+        private const val NOTIFICATION_CONNECTION_STATUS = 1
         private const val NOTIFICATION_ITEM_FULL = 2
         private const val NOTIFICATION_POKEMON_FULL = 3
         private const val NOTIFICATION_NO_BALL = 4
         private const val NOTIFICATION_SPIN_FAIL = 5
-        private const val NOTIFICATION_CONNECTION_PENDING = 6
 
         val gameIntent get() = listOf(PACKAGE_POKEMON_GO, PACKAGE_POKEMON_GO_ARES)
             .mapNotNull(app.packageManager::getLaunchIntentForPackage).let { list ->
@@ -65,14 +66,15 @@ class GameNotificationService : NotificationListenerService() {
             makeNotificationChannel(CHANNEL_POKEMON_FULL, R.string.notification_channel_pokemon_full),
             makeNotificationChannel(CHANNEL_NO_BALL, R.string.notification_channel_no_ball),
             makeNotificationChannel(CHANNEL_SPIN_FAIL, R.string.notification_channel_spin_fail),
-            NotificationChannel(CHANNEL_CONNECTION_PENDING, app.getText(
-                R.string.notification_channel_connection_pending), NotificationManager.IMPORTANCE_DEFAULT).apply {
+            NotificationChannel(CHANNEL_CONNECTION_STATUS, app.getText(
+                R.string.notification_channel_connection_status), NotificationManager.IMPORTANCE_LOW).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 setShowBadge(false)
             },
             makeNotificationChannel(CHANNEL_INACTIVE_TIMEOUT, R.string.notification_channel_inactive_timeout),
         ))
 
+        private val bluetoothAdapter by lazy { app.getSystemService<BluetoothManager>()!!.adapter }
         private val notificationManager by lazy { app.getSystemService<NotificationManager>()!! }
         private fun pushNotification(
             id: Int,
@@ -108,47 +110,54 @@ class GameNotificationService : NotificationListenerService() {
                 SfidaTimeoutReceiver.reportConnection()
             }
         }
-        fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String?) {
-            notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
-            notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, Notification.Builder(app,
-                CHANNEL_CONNECTION_PENDING).apply {
+        private fun updateConnectionStatus(stats: SfidaSessionManager.Stats) {
+            notificationManager.notify(NOTIFICATION_CONNECTION_STATUS, Notification.Builder(app,
+                CHANNEL_CONNECTION_STATUS).apply {
                 setCategory(Notification.CATEGORY_STATUS)
                 setContentTitle(app.getText(R.string.notification_title_auxiliary_connected_default))
-                setGroup(CHANNEL_CONNECTION_PENDING)
+                setGroup(CHANNEL_CONNECTION_STATUS)
                 setSmallIcon(R.drawable.ic_maps_mode_of_travel)
                 setContentIntent(PendingIntent.getActivity(app, 0, gameIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                 setShowWhen(true)
+                setWhen(stats.startTime)
+                setUsesChronometer(true)
                 setVisibility(Notification.VISIBILITY_PUBLIC)
-                addAction(Notification.Action.Builder(
+                if (stats.deviceAddress.isNotEmpty()) addAction(Notification.Action.Builder(
                     Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
                     app.getText(R.string.notification_action_disconnect),
                     PendingIntent.getBroadcast(app, 0, Intent(app, SfidaDisconnectReceiver::class.java).apply {
-                        data = Uri.fromParts("mac", device.address, null)   // to differentiate as ID
-                        putExtra(BluetoothDevice.EXTRA_DEVICE, device)
+                        data = Uri.fromParts("mac", stats.deviceAddress, null)  // to differentiate as ID
+                        putExtra(BluetoothDevice.EXTRA_DEVICE, bluetoothAdapter.getRemoteDevice(stats.deviceAddress))
                     }, PendingIntent.FLAG_IMMUTABLE)).build())
                 setColor(app.getColor(R.color.primaryColor))
                 setPublicVersion(build().clone())
                 setVisibility(Notification.VISIBILITY_PRIVATE)
-                setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, deviceName ?: "❓"))
+                setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, stats.deviceName ?: "❓"))
+                setContentText(stats.stats)
             }.build())
+        }
+        fun onAuxiliaryConnected(device: Pair<BluetoothDevice, String?>) {
+            updateConnectionStatus(SfidaSessionManager.onConnect(device))
             setTimeoutIfEnabled()
         }
-        fun onAuxiliaryDisconnected(deviceName: String? = null, packageName: String? = null) {
-            notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
-            pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED,
+        fun onAuxiliaryDisconnected(device: Pair<BluetoothDevice, String?>? = null, packageName: String? = null) {
+            val stats = SfidaSessionManager.onDisconnect(device)
+            pushNotification(NOTIFICATION_CONNECTION_STATUS, CHANNEL_AUXILIARY_DISCONNECTED,
                 app.getText(R.string.notification_title_auxiliary_disconnected_default),
                 R.drawable.ic_device_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
-                if (deviceName != null) {
-                    setPublicVersion(build().clone())
-                    setVisibility(Notification.VISIBILITY_PRIVATE)
-                    setContentTitle(app.getString(R.string.notification_title_auxiliary_disconnected, deviceName))
+                setPublicVersion(build().clone())
+                setVisibility(Notification.VISIBILITY_PRIVATE)
+                stats.deviceName?.let {
+                    setContentTitle(app.getString(R.string.notification_title_auxiliary_disconnected, it))
                 }
+                setContentText(stats.stats)
+                setSubText(DateUtils.formatElapsedTime((System.currentTimeMillis() - stats.startTime) / 1000))
             }
             SfidaTimeoutReceiver.reportDisconnection()
         }
-        fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_CONNECTION_PENDING, CHANNEL_INACTIVE_TIMEOUT,
+        fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_CONNECTION_STATUS, CHANNEL_INACTIVE_TIMEOUT,
             app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
             addAction(Notification.Action.Builder(
                 Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
@@ -158,11 +167,6 @@ class GameNotificationService : NotificationListenerService() {
 
         private fun isInterested(sbn: StatusBarNotification) = sbn.notification.channelId == sbn.packageName &&
                 (sbn.packageName == PACKAGE_POKEMON_GO || sbn.packageName == PACKAGE_POKEMON_GO_ARES)
-        private fun onConnect() {
-            notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
-            notificationManager.cancel(NOTIFICATION_CONNECTION_PENDING)
-            setTimeoutIfEnabled()
-        }
     }
 
     override fun onListenerConnected() {
@@ -177,7 +181,7 @@ class GameNotificationService : NotificationListenerService() {
             !isInterested(sbn)) return
         val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
-        if (text.isNullOrEmpty()) return onConnect()
+        if (text.isNullOrEmpty()) return setTimeoutIfEnabled()
         val resources = try {
             packageManager.getResourcesForApplication(sbn.packageName)
         } catch (_: PackageManager.NameNotFoundException) {
@@ -186,7 +190,7 @@ class GameNotificationService : NotificationListenerService() {
         if (text == resources.findString("Disconnecting_Companion_Device", sbn.packageName)) {
             return onAuxiliaryDisconnected()
         }
-        if (SfidaManager.isConnected != false) onConnect()
+        if (SfidaManager.isConnected != false) setTimeoutIfEnabled()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName) {
@@ -199,14 +203,20 @@ class GameNotificationService : NotificationListenerService() {
         when (text) {
             str -> pushNotification(NOTIFICATION_NO_BALL, CHANNEL_NO_BALL, str,
                 R.drawable.ic_action_hide_source, sbn.packageName)
-            resources.findString("Captured_Pokemon", sbn.packageName),
+            resources.findString("Captured_Pokemon", sbn.packageName) -> {
+                notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
+                notificationManager.cancel(NOTIFICATION_NO_BALL)
+                updateConnectionStatus(SfidaSessionManager.onCaptured())
+            }
             resources.findString("Pokemon_Escaped", sbn.packageName) -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
+                updateConnectionStatus(SfidaSessionManager.onEscaped())
             }
             resources.findString("Retrieved_an_Item", sbn.packageName, "") -> { // remove %s if present
                 notificationManager.cancel(NOTIFICATION_ITEM_FULL)
                 notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
+                updateConnectionStatus(SfidaSessionManager.onSpin(1))
             }
             resources.findString("Pokestop_Cooldown", sbn.packageName),
             resources.findString("Pokestop_Out_Of_Range", sbn.packageName) -> { }
@@ -218,15 +228,16 @@ class GameNotificationService : NotificationListenerService() {
                 }
                 if (text.startsWith(split[0]) && text.endsWith(split[1])) {
                     val items = try {
-                        text.substring(split[0].length, text.length - split[1].length).toInt()
+                        text.substring(split[0].length, text.length - split[1].length).toLong()
                     } catch (e: NumberFormatException) {
                         return Timber.e(Exception("Unrecognized notification text: $text", e))
                     }
                     notificationManager.cancel(NOTIFICATION_ITEM_FULL)
-                    if (items == 0) {
-                        pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
-                            R.drawable.ic_alert_error_outline, sbn.packageName)
-                    } else notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
+                    if (items != 0L) {
+                        notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
+                        updateConnectionStatus(SfidaSessionManager.onSpin(items))
+                    } else pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
+                        R.drawable.ic_alert_error_outline, sbn.packageName)
                 } else Timber.e(Exception("Unrecognized notification text: $text"))
             }
         }

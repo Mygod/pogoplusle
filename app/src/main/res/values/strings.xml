@@ -18,7 +18,7 @@
     <string name="notification_channel_pokemon_full">No more room for Pokémon</string>
     <string name="notification_channel_no_ball">Out of Poké Balls</string>
     <string name="notification_channel_spin_fail">PokéStop spin error</string>
-    <string name="notification_channel_connection_pending">Connection ready</string>
+    <string name="notification_channel_connection_status">Connection status</string>
     <string name="notification_channel_inactive_timeout">Accessory device inactive</string>
     <string name="notification_action_disconnect">Disconnect</string>
     <string name="notification_title_auxiliary_connected">%1$s connected</string>

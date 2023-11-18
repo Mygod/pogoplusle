@@ -12,10 +12,10 @@ class BluetoothReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
         if (Build.VERSION.SDK_INT >= 33 && intent.getIntExtra(BluetoothDevice.EXTRA_TRANSPORT,
                 BluetoothDevice.ERROR) != BluetoothDevice.TRANSPORT_LE) return
-        val (device, deviceName) = SfidaManager.getDevice(intent) ?: return
+        val device = SfidaManager.getDevice(intent) ?: return
         when (intent.action) {
-            BluetoothDevice.ACTION_ACL_CONNECTED -> GameNotificationService.onAuxiliaryConnected(device, deviceName)
-            BluetoothDevice.ACTION_ACL_DISCONNECTED -> GameNotificationService.onAuxiliaryDisconnected(deviceName)
+            BluetoothDevice.ACTION_ACL_CONNECTED -> GameNotificationService.onAuxiliaryConnected(device)
+            BluetoothDevice.ACTION_ACL_DISCONNECTED -> GameNotificationService.onAuxiliaryDisconnected(device)
         }
     }
 }

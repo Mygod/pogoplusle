@@ -15,7 +15,7 @@
     <string name="notification_channel_pokemon_full">寶可夢盒子已滿</string>
     <string name="notification_channel_no_ball">沒有寶貝球了</string>
     <string name="notification_channel_spin_fail">轉補錯誤</string>
-    <string name="notification_channel_connection_pending">連線就緒</string>
+    <string name="notification_channel_connection_status">連線就緒</string>
     <string name="notification_channel_inactive_timeout">外部裝置連線失效</string>
     <string name="notification_action_disconnect">關閉連線</string>
     <string name="notification_title_auxiliary_connected">已連線至「%1$s」</string>

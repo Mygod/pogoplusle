@@ -15,7 +15,7 @@
     <string name="notification_channel_pokemon_full">盒子已满</string>
     <string name="notification_channel_no_ball">无精灵球</string>
     <string name="notification_channel_spin_fail">补给失败</string>
-    <string name="notification_channel_connection_pending">连接就绪</string>
+    <string name="notification_channel_connection_status">连接状态</string>
     <string name="notification_channel_inactive_timeout">外部裝置连接失效</string>
     <string name="notification_action_disconnect">断开连接</string>
     <string name="notification_title_auxiliary_connected">“%1$s”已连接</string>
