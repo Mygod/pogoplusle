@@ -33,7 +33,7 @@ object SfidaSessionManager {
         deviceName: String? = pref.getString(KEY_DEVICE_NAME, null),
         startTime: Long = pref.getLong(KEY_START_TIME, 0),
     ) = Stats(deviceAddress, deviceName, startTime,
-        "\uD83D\uDCAB $spinCount　\uD83C\uDF92 $itemCount　\uD83D\uDD2E $capturedCount　\uD83E\uDD3E ${capturedCount + escapedCount}")
+        "\uD83D\uDD2E $capturedCount　\uD83E\uDD3E ${capturedCount + escapedCount}　\uD83D\uDCAB $spinCount　\uD83C\uDF92 $itemCount")
 
     fun onConnect(device: Pair<BluetoothDevice, String?>): Stats {
         var name = device.second
