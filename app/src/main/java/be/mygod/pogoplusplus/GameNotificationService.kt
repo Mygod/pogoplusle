@@ -131,6 +131,7 @@ class GameNotificationService : NotificationListenerService() {
                         putExtra(BluetoothDevice.EXTRA_DEVICE, bluetoothAdapter.getRemoteDevice(stats.deviceAddress))
                     }, PendingIntent.FLAG_IMMUTABLE)).build())
                 setColor(app.getColor(R.color.primaryColor))
+                setOnlyAlertOnce(true)
                 setPublicVersion(build().clone())
                 setVisibility(Notification.VISIBILITY_PRIVATE)
                 setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, stats.deviceName ?: "❓"))
