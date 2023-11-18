@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -34,7 +33,6 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var serviceGameNotification: TwoStatePreference
     private lateinit var permissionBluetooth: TwoStatePreference
     private lateinit var servicePairingRoot: TwoStatePreference
-    private lateinit var gameBatteryOptimizations: Preference
     private fun Preference.remove() = parent!!.removePreference(this)
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -47,7 +45,6 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         }
         servicePairing = findPreference("service.pairing")!!
         servicePairingRoot = findPreference("service.pairingRoot")!!
-        gameBatteryOptimizations = findPreference("game.batteryOptimized")!!
         if (needsServicePairing) {
             servicePairing.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
@@ -73,19 +70,6 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                     } else arrayOf(Manifest.permission.BLUETOOTH_CONNECT))
                     false
                 } else true
-            }
-            gameBatteryOptimizations.setOnPreferenceClickListener @TargetApi(31) {
-                val packageName = GameNotificationService.foregroundServiceStartNotAllowedPackage
-                if (packageName != null) {
-                    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.fromParts("package", packageName, null)
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    })
-                    true
-                } else {
-                    gameBatteryOptimizations.isVisible = false
-                    false
-                }
             }
         } else {
             servicePairing.remove()
@@ -175,8 +159,6 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 app.isEnabled<BluetoothReceiver>()
         servicePairingRoot.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
                 app.isEnabled<BluetoothPairingReceiver>(false)
-        gameBatteryOptimizations.isVisible = Build.VERSION.SDK_INT >= 31 &&
-                GameNotificationService.foregroundServiceStartNotAllowedPackage != null
     }
 
     fun updateSwitches() {

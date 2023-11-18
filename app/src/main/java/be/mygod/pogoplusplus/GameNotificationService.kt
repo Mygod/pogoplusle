@@ -10,11 +10,9 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Icon
 import android.net.Uri
-import android.os.PowerManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.annotation.DrawableRes
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
@@ -52,15 +50,6 @@ class GameNotificationService : NotificationListenerService() {
                 }
             }
 
-        private val powerManager by lazy { app.getSystemService<PowerManager>()!! }
-        @get:RequiresApi(31)
-        val foregroundServiceStartNotAllowedPackage get() = when {
-            app.packageManager.getLaunchIntentForPackage(PACKAGE_POKEMON_GO) != null &&
-                    !powerManager.isIgnoringBatteryOptimizations(PACKAGE_POKEMON_GO) -> PACKAGE_POKEMON_GO
-            app.packageManager.getLaunchIntentForPackage(PACKAGE_POKEMON_GO_ARES) != null &&
-                    !powerManager.isIgnoringBatteryOptimizations(PACKAGE_POKEMON_GO_ARES) -> PACKAGE_POKEMON_GO_ARES
-            else -> null
-        }
 
         private fun makeNotificationChannel(id: String, @StringRes name: Int) = NotificationChannel(
             id, app.getText(name), NotificationManager.IMPORTANCE_HIGH

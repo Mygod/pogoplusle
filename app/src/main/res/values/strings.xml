@@ -35,9 +35,11 @@
     <string name="settings_permission_notification_summary">Turn on your favorite notifications</string>
     <string name="settings_game">Launch game</string>
     <string name="settings_game_summary">Take me back to teh gaem nau!</string>
+    <!--
     <string name="settings_game_battery_optimized">Game battery usage optimized</string>
     <string name="settings_game_battery_optimized_summary">Game may crash when put in the background. Get around this
         bug by checking <i>Unrestricted</i> in <i>App battery usage</i> for the game app</string>
+    -->
     <string name="settings_service_pairing_root">Pair Bluetooth with root</string>
     <string name="settings_service_pairing_root_summary">DO NOT ENABLE THIS unless you already happen to have rooted
         your device. This mode is quieter and has better compatibility, but is more resource intensive</string>

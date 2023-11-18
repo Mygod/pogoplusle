@@ -32,8 +32,10 @@
     <string name="settings_permission_notification_summary">打開您最喜愛的通知</string>
     <string name="settings_game">開啟遊戲</string>
     <string name="settings_game_summary">立即回到遊戲！</string>
+    <!--
     <string name="settings_game_battery_optimized">已優化遊戲電池用量</string>
     <string name="settings_game_battery_optimized_summary">遊戲置於背景運行時可能會崩潰，請至「電池與電量」中為遊戲設置「無限制」以解決此問題</string>
+    -->
     <string name="settings_service_pairing_root">以 root 權限進行藍牙配對</string>
     <string name="settings_service_pairing_root_summary"><b>請勿啟動此功能</b>，除非您已授權 root
         此裝置。此模式較為安靜並具有更好的相容性，但是相對更為耗能</string>
