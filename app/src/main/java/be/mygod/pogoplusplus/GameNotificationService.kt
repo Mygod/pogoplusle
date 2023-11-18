@@ -33,11 +33,12 @@ class GameNotificationService : NotificationListenerService() {
         private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
         private const val PACKAGE_POKEMON_GO_ARES = "com.nianticlabs.pokemongo.ares"
 
-        private const val NOTIFICATION_CONNECTION_STATUS = 1
+        private const val NOTIFICATION_AUXILIARY_DISCONNECTED = 1
         private const val NOTIFICATION_ITEM_FULL = 2
         private const val NOTIFICATION_POKEMON_FULL = 3
         private const val NOTIFICATION_NO_BALL = 4
         private const val NOTIFICATION_SPIN_FAIL = 5
+        private const val NOTIFICATION_CONNECTION_STATUS = 6
 
         val gameIntent get() = listOf(PACKAGE_POKEMON_GO, PACKAGE_POKEMON_GO_ARES)
             .mapNotNull(app.packageManager::getLaunchIntentForPackage).let { list ->
@@ -111,6 +112,7 @@ class GameNotificationService : NotificationListenerService() {
             }
         }
         private fun updateConnectionStatus(stats: SfidaSessionManager.Stats) {
+            notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
             notificationManager.notify(NOTIFICATION_CONNECTION_STATUS, Notification.Builder(app,
                 CHANNEL_CONNECTION_STATUS).apply {
                 setCategory(Notification.CATEGORY_STATUS)
@@ -144,7 +146,8 @@ class GameNotificationService : NotificationListenerService() {
         }
         fun onAuxiliaryDisconnected(device: Pair<BluetoothDevice, String?>? = null, packageName: String? = null) {
             val stats = SfidaSessionManager.onDisconnect(device)
-            pushNotification(NOTIFICATION_CONNECTION_STATUS, CHANNEL_AUXILIARY_DISCONNECTED,
+            notificationManager.cancel(NOTIFICATION_CONNECTION_STATUS)
+            pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED,
                 app.getText(R.string.notification_title_auxiliary_disconnected_default),
                 R.drawable.ic_device_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
@@ -158,7 +161,7 @@ class GameNotificationService : NotificationListenerService() {
             }
             SfidaTimeoutReceiver.reportDisconnection()
         }
-        fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_CONNECTION_STATUS, CHANNEL_INACTIVE_TIMEOUT,
+        fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_INACTIVE_TIMEOUT,
             app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
             addAction(Notification.Action.Builder(
                 Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
@@ -182,7 +185,10 @@ class GameNotificationService : NotificationListenerService() {
             !isInterested(sbn)) return
         val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
-        if (text.isNullOrEmpty()) return setTimeoutIfEnabled()
+        if (text.isNullOrEmpty()) {
+            notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
+            return setTimeoutIfEnabled()
+        }
         val resources = try {
             packageManager.getResourcesForApplication(sbn.packageName)
         } catch (_: PackageManager.NameNotFoundException) {
