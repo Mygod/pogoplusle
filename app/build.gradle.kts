@@ -17,17 +17,18 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 26
         targetSdk = 34
-        versionCode = 25
-        versionName = "1.2.2"
+        versionCode = 26
+        versionName = "1.2.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        getByName("debug") {
+        debug {
             isPseudoLocalesEnabled = true
         }
-        getByName("release") {
+        release {
             isShrinkResources = true
             isMinifyEnabled = true
+            vcsInfo.include = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -69,17 +70,17 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-    implementation("androidx.browser:browser:1.6.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    implementation("androidx.browser:browser:1.7.0")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.preference:preference:1.2.1")
-    implementation("be.mygod.librootkotlinx:librootkotlinx:1.1.0")
-    implementation("com.android.billingclient:billing-ktx:6.0.1")
+    implementation("be.mygod.librootkotlinx:librootkotlinx:1.1.1")
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
-    implementation("com.google.android.material:material:1.10.0-rc01")
-    implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
-    implementation("com.google.firebase:firebase-crashlytics:18.4.3")
+    implementation("com.google.android.material:material:1.11.0-beta01")
+    implementation("com.google.firebase:firebase-analytics:21.5.0")
+    implementation("com.google.firebase:firebase-crashlytics:18.6.0")
     implementation("com.jakewharton.timber:timber:5.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:runner:1.5.2")
