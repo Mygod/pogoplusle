@@ -108,7 +108,7 @@ class GameNotificationService : NotificationListenerService() {
                 SfidaTimeoutReceiver.reportConnection()
             }
         }
-        fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String) {
+        fun onAuxiliaryConnected(device: BluetoothDevice, deviceName: String?) {
             notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
             notificationManager.notify(NOTIFICATION_CONNECTION_PENDING, Notification.Builder(app,
                 CHANNEL_CONNECTION_PENDING).apply {
@@ -130,7 +130,7 @@ class GameNotificationService : NotificationListenerService() {
                 setColor(app.getColor(R.color.primaryColor))
                 setPublicVersion(build().clone())
                 setVisibility(Notification.VISIBILITY_PRIVATE)
-                setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, deviceName))
+                setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, deviceName ?: "❓"))
             }.build())
             setTimeoutIfEnabled()
         }

@@ -12,6 +12,8 @@ import androidx.core.content.IntentCompat
 import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
 import timber.log.Timber
+import java.util.Optional
+import kotlin.jvm.optionals.getOrNull
 
 object SfidaManager : BluetoothGattCallback() {
     const val DEVICE_NAME_PGP = "Pokemon GO Plus"
@@ -39,7 +41,7 @@ object SfidaManager : BluetoothGattCallback() {
     }
 
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
-    private fun getDeviceName(device: BluetoothDevice, action: String? = null): String? {
+    private fun getDeviceName(device: BluetoothDevice, action: String? = null): Optional<String>? {
         val name = device.name
         val type = device.type
         val bluetoothClass = device.bluetoothClass
@@ -52,14 +54,14 @@ object SfidaManager : BluetoothGattCallback() {
             else -> true
         }
         if (action != null) Timber.d("$action: ${device.address}, $name, $type, $bluetoothClass, $shouldSkip")
-        return if (shouldSkip) null else name
+        return if (shouldSkip) null else Optional.ofNullable(name)
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
-    fun getDevice(intent: Intent): Pair<BluetoothDevice, String>? {
+    fun getDevice(intent: Intent): Pair<BluetoothDevice, String?>? {
         val device = IntentCompat.getParcelableExtra(intent, BluetoothDevice.EXTRA_DEVICE,
             BluetoothDevice::class.java) ?: return null
         val name = getDeviceName(device, intent.action) ?: return null
-        return device to name
+        return device to name.getOrNull()
     }
 
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
