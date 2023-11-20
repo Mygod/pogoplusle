@@ -11,7 +11,8 @@
         click <i>Agree</i>, then click on this app and turn on the main switch that says <i>Use PoGo+LE Bluetooth
             pairing assistant</i>.</string>
     <string name="game_notification_service_name">Monitor game notifications</string>
-    <string name="game_notification_service_summary">Receive alerts for disconnections, full bags, etc.</string>
+    <string name="game_notification_service_summary">Get useful statistics and receive alerts for disconnections, full
+        bags, etc.</string>
 
     <string name="notification_channel_auxiliary_disconnected">Accessory device session ended</string>
     <string name="notification_channel_item_full">Bag is full</string>

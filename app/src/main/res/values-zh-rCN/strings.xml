@@ -8,7 +8,7 @@
         来读取、控制系统设置的通知来点击“配对和连接”，并在弹出对话框时点击“配对”按钮来帮助你配对 Pokémon GO
         Plus。此过程中除崩溃日志以外不会收集任何数据。\n\n执行以下步骤以授予权限：点击“同意”，在新页面中点击此应用，打开“使用宝够乐蓝牙配对助手”主开关。</string>
     <string name="game_notification_service_name">监视游戏通知</string>
-    <string name="game_notification_service_summary">通知连接断开、满包等</string>
+    <string name="game_notification_service_summary">统计使用数据并通知连接断开、满包等</string>
 
     <string name="notification_channel_auxiliary_disconnected">外部裝置连接断开</string>
     <string name="notification_channel_item_full">包包已满</string>
