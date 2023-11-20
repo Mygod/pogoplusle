@@ -35,6 +35,16 @@ object SfidaSessionManager {
     ) = Stats(deviceAddress, deviceName, startTime,
         "\uD83D\uDD2E $capturedCount　\uD83E\uDD3E ${capturedCount + escapedCount}　\uD83D\uDCAB $spinCount　\uD83C\uDF92 $itemCount")
 
+    fun onConnect() = System.currentTimeMillis().let { time ->
+        pref.edit {
+            putLong(KEY_START_TIME, time)
+            putLong(KEY_SPIN_COUNT, 0)
+            putLong(KEY_ITEM_COUNT, 0)
+            putLong(KEY_CAPTURED_COUNT, 0)
+            putLong(KEY_ESCAPED_COUNT, 0)
+        }
+        makeStats(0, 0, 0, 0, startTime = time)
+    }
     fun onConnect(device: Pair<BluetoothDevice, String?>): Stats {
         var name = device.second
         val time = System.currentTimeMillis()

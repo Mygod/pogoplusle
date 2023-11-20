@@ -186,7 +186,7 @@ class GameNotificationService : NotificationListenerService() {
         val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
         Timber.d("PGP notification updated: $text")
         if (text.isNullOrEmpty()) {
-            notificationManager.cancel(NOTIFICATION_AUXILIARY_DISCONNECTED)
+            updateConnectionStatus(SfidaSessionManager.onConnect())
             return setTimeoutIfEnabled()
         }
         val resources = try {
