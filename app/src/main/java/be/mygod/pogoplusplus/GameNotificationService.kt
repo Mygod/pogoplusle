@@ -124,6 +124,7 @@ class GameNotificationService : NotificationListenerService() {
                 setShowWhen(true)
                 setWhen(stats.startTime)
                 setUsesChronometer(true)
+                setLocalOnly(true)
                 setVisibility(Notification.VISIBILITY_PUBLIC)
                 if (stats.deviceAddress.isNotEmpty()) addAction(Notification.Action.Builder(
                     Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
