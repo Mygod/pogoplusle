@@ -253,11 +253,13 @@ class GameNotificationService : NotificationListenerService() {
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?, rankingMap: RankingMap?, reason: Int) {
         when (reason) {
-            REASON_APP_CANCEL,
-            REASON_CLEAR_DATA,
             REASON_PACKAGE_CHANGED,
-            REASON_PACKAGE_SUSPENDED,
             REASON_USER_STOPPED,
+            REASON_APP_CANCEL,
+            REASON_APP_CANCEL_ALL,
+            REASON_PACKAGE_SUSPENDED,
+            REASON_PROFILE_TURNED_OFF,
+            REASON_CLEAR_DATA,
             -> if (isInterested(sbn ?: return)) onAuxiliaryDisconnected()
         }
     }
