@@ -227,7 +227,9 @@ class GameNotificationService : NotificationListenerService() {
                 updateConnectionStatus(SfidaSessionManager.onSpin(1))
             }
             resources.findString("Pokestop_Cooldown", sbn.packageName),
-            resources.findString("Pokestop_Out_Of_Range", sbn.packageName) -> { }
+            resources.findString("Pokestop_Out_Of_Range", sbn.packageName),
+            // Ignore Samsung stupid shit: https://github.com/GrifoDev/SuperMan-ModdedFiles/blob/550336c9064afeed087ab09744ab6b6ec077bfd0/framework-res/res/values/strings.xml#L1555
+            resources.findString("noti_template_public_text", "android")-> { }
             else -> {
                 val split = resources.findString("Retrieved_Items", sbn.packageName)?.split("%s", limit = 2)
                 if (split?.size != 2) {
