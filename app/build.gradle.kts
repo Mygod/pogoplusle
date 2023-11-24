@@ -17,8 +17,8 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 26
         targetSdk = 34
-        versionCode = 27
-        versionName = "1.3.0"
+        versionCode = 28
+        versionName = "1.3.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -28,6 +28,7 @@ android {
         release {
             isShrinkResources = true
             isMinifyEnabled = true
+            vcsInfo.include = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
