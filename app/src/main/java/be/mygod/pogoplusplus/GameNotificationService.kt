@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Icon
 import android.net.Uri
+import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.text.format.DateUtils
@@ -135,6 +136,7 @@ class GameNotificationService : NotificationListenerService() {
                     }, PendingIntent.FLAG_IMMUTABLE)).build())
                 setColor(app.getColor(R.color.primaryColor))
                 setOnlyAlertOnce(true)
+                if (Build.VERSION.SDK_INT >= 34) setOngoing(true)
                 setPublicVersion(build().clone())
                 setVisibility(Notification.VISIBILITY_PRIVATE)
                 setContentTitle(app.getString(R.string.notification_title_auxiliary_connected, stats.deviceName ?: "❓"))
