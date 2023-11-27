@@ -260,7 +260,6 @@ class GameNotificationService : NotificationListenerService() {
             REASON_PACKAGE_CHANGED,
             REASON_USER_STOPPED,
             REASON_APP_CANCEL,
-            REASON_APP_CANCEL_ALL,
             REASON_PACKAGE_SUSPENDED,
             REASON_PROFILE_TURNED_OFF,
             REASON_CLEAR_DATA,
