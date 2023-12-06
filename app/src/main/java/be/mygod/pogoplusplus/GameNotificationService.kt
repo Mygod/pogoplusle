@@ -229,9 +229,7 @@ class GameNotificationService : NotificationListenerService() {
                 updateConnectionStatus(SfidaSessionManager.onSpin(1))
             }
             resources.findString("Pokestop_Cooldown", sbn.packageName),
-            resources.findString("Pokestop_Out_Of_Range", sbn.packageName),
-            // Ignore Samsung stupid shit: https://github.com/GrifoDev/SuperMan-ModdedFiles/blob/550336c9064afeed087ab09744ab6b6ec077bfd0/framework-res/res/values/strings.xml#L1555
-            resources.findString("noti_template_public_text", "android")-> { }
+            resources.findString("Pokestop_Out_Of_Range", sbn.packageName) -> { }
             else -> {
                 val split = resources.findString("Retrieved_Items", sbn.packageName)?.split("%s", limit = 2)
                 if (split?.size != 2) {
@@ -250,7 +248,9 @@ class GameNotificationService : NotificationListenerService() {
                         updateConnectionStatus(SfidaSessionManager.onSpin(items))
                     } else pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
                         R.drawable.ic_alert_error_outline, sbn.packageName)
-                } else Timber.e(Exception("Unrecognized notification text: $text"))
+                    // Ignore Samsung stupid shit: https://github.com/universal9611-dev/framework-res/blob/4645162b385057fb77ee91565c802cdf528613da/res/values/strings.xml#L2895
+                } else if (Build.VERSION.SDK_INT < 33 || text != resources.findString("sanitized_content_text_sf",
+                        "android")) Timber.e(Exception("Unrecognized notification text: $text"))
             }
         }
     }
