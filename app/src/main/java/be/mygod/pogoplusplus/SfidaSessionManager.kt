@@ -32,8 +32,22 @@ object SfidaSessionManager {
         deviceAddress: String = pref.getString(KEY_DEVICE_ADDRESS, null) ?: "",
         deviceName: String? = pref.getString(KEY_DEVICE_NAME, null),
         startTime: Long = pref.getLong(KEY_START_TIME, 0),
-    ) = Stats(deviceAddress, deviceName, startTime,
-        "\uD83D\uDD2E $capturedCount　\uD83E\uDD3E ${capturedCount + escapedCount}　\uD83D\uDCAB $spinCount　\uD83C\uDF92 $itemCount")
+        delta: Long = 0,
+    ) = Stats(deviceAddress, deviceName, startTime, StringBuilder("🔮 ").apply {
+        append(capturedCount)
+        if (delta == -1L) append('⁺')
+        append("　🤾 ")
+        append(capturedCount + escapedCount)
+        if (delta == -2L) append('⁺')
+        append("　💫 ")
+        append(spinCount)
+        append("　🎒 ")
+        append(itemCount)
+        if (delta > 0) {
+            append('⁺')
+            for (char in delta.toString()) append("⁰¹²³⁴⁵⁶⁷⁸⁹"[char.digitToInt()])
+        }
+    }.toString())
 
     fun onConnect() = System.currentTimeMillis().let { time ->
         pref.edit {
@@ -77,7 +91,7 @@ object SfidaSessionManager {
             putLong(KEY_ITEM_COUNT, itemCount)
             putLong(KEY_ITEM_STATS, pref.getLong(KEY_ITEM_STATS, 0) + items)
         }
-        return makeStats(spinCount, itemCount)
+        return makeStats(spinCount, itemCount, delta = items)
     }
     private fun increment(countKey: String, statsKey: String) = (pref.getLong(countKey, 0) + 1).also {
         pref.edit {
@@ -85,6 +99,6 @@ object SfidaSessionManager {
             putLong(statsKey, pref.getLong(statsKey, 0) + 1)
         }
     }
-    fun onCaptured() = makeStats(capturedCount = increment(KEY_CAPTURED_COUNT, KEY_CAPTURED_STATS))
-    fun onEscaped() = makeStats(escapedCount = increment(KEY_ESCAPED_COUNT, KEY_ESCAPED_STATS))
+    fun onCaptured() = makeStats(capturedCount = increment(KEY_CAPTURED_COUNT, KEY_CAPTURED_STATS), delta = -1)
+    fun onEscaped() = makeStats(escapedCount = increment(KEY_ESCAPED_COUNT, KEY_ESCAPED_STATS), delta = -2)
 }
