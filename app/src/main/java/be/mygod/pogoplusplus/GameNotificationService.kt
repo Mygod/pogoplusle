@@ -187,7 +187,7 @@ class GameNotificationService : NotificationListenerService() {
         if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
             !isInterested(sbn)) return
         val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
-        Timber.d("PGP notification updated: $text")
+        Timber.d("PGP notification updated @ ${sbn.postTime}: $text")
         if (text.isNullOrEmpty()) {
             updateConnectionStatus(SfidaSessionManager.onConnect())
             return setTimeoutIfEnabled()
