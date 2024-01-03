@@ -200,7 +200,8 @@ class GameNotificationService : NotificationListenerService() {
         if (text == resources.findString("Disconnecting_Companion_Device", sbn.packageName)) {
             return onAuxiliaryDisconnected()
         }
-        if (SfidaManager.isConnected != false) setTimeoutIfEnabled()
+        val shouldUpdate = SfidaManager.isConnected != false
+        if (shouldUpdate) setTimeoutIfEnabled()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName) {
@@ -216,17 +217,20 @@ class GameNotificationService : NotificationListenerService() {
             resources.findString("Captured_Pokemon", sbn.packageName) -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
-                updateConnectionStatus(SfidaSessionManager.onCaptured())
+                val stats = SfidaSessionManager.onCaptured()
+                if (shouldUpdate) updateConnectionStatus(stats)
             }
             resources.findString("Pokemon_Escaped", sbn.packageName) -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
-                updateConnectionStatus(SfidaSessionManager.onEscaped())
+                val stats = SfidaSessionManager.onEscaped()
+                if (shouldUpdate) updateConnectionStatus(stats)
             }
             resources.findString("Retrieved_an_Item", sbn.packageName, "") -> { // remove %s if present
                 notificationManager.cancel(NOTIFICATION_ITEM_FULL)
                 notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
-                updateConnectionStatus(SfidaSessionManager.onSpin(1))
+                val stats = SfidaSessionManager.onSpin(1)
+                if (shouldUpdate) updateConnectionStatus(stats)
             }
             resources.findString("Pokestop_Cooldown", sbn.packageName),
             resources.findString("Pokestop_Out_Of_Range", sbn.packageName) -> { }
@@ -245,7 +249,8 @@ class GameNotificationService : NotificationListenerService() {
                     notificationManager.cancel(NOTIFICATION_ITEM_FULL)
                     if (items != 0L) {
                         notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
-                        updateConnectionStatus(SfidaSessionManager.onSpin(items))
+                        val stats = SfidaSessionManager.onSpin(items)
+                        if (shouldUpdate) updateConnectionStatus(stats)
                     } else pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
                         R.drawable.ic_alert_error_outline, sbn.packageName)
                     // Ignore Samsung stupid shit: https://github.com/universal9611-dev/framework-res/blob/4645162b385057fb77ee91565c802cdf528613da/res/values/strings.xml#L2895
