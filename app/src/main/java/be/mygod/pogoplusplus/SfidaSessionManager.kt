@@ -56,6 +56,7 @@ object SfidaSessionManager {
             putLong(KEY_ITEM_COUNT, 0)
             putLong(KEY_CAPTURED_COUNT, 0)
             putLong(KEY_ESCAPED_COUNT, 0)
+            putLong(KEY_CONNECTION_STATS, pref.getLong(KEY_CONNECTION_STATS, 0) + 1)
         }
         makeStats(0, 0, 0, 0, startTime = time)
     }
@@ -72,7 +73,6 @@ object SfidaSessionManager {
             putLong(KEY_ITEM_COUNT, 0)
             putLong(KEY_CAPTURED_COUNT, 0)
             putLong(KEY_ESCAPED_COUNT, 0)
-            putLong(KEY_CONNECTION_STATS, pref.getLong(KEY_CONNECTION_STATS, 0) + 1)
         }
         return makeStats(0, 0, 0, 0, device.first.address, name, time)
     }
