@@ -272,6 +272,7 @@ class GameNotificationService : NotificationListenerService() {
             REASON_APP_CANCEL_ALL -> if (Build.VERSION.SDK_INT < 31) return
             else -> return
         }
-        if (isInterested(sbn ?: return)) onAuxiliaryDisconnected()
+        if (isInterested(sbn ?: return) && sbn.notification.flags and Notification.FLAG_FOREGROUND_SERVICE ==
+            Notification.FLAG_FOREGROUND_SERVICE) onAuxiliaryDisconnected()
     }
 }
