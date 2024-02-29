@@ -15,7 +15,8 @@ class BluetoothReceiver : BroadcastReceiver() {
         val device = SfidaManager.getDevice(intent) ?: return
         when (intent.action) {
             BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                if (SfidaManager.isConnected(device.first)) GameNotificationService.onAuxiliaryConnected(device)
+                if (SfidaManager.isConnected(device.first, device.second ==
+                            SfidaManager.DEVICE_NAME_PGP)) GameNotificationService.onAuxiliaryConnected(device)
             }
             BluetoothDevice.ACTION_ACL_DISCONNECTED -> GameNotificationService.onAuxiliaryDisconnected(device)
         }
