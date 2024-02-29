@@ -154,23 +154,23 @@ class BluetoothPairingService : AccessibilityService() {
             confirmText.equals(it.text?.toString(), true)
         }
         if (confirm.size != 1) return null
-        val promptText = resources.findString(
+        var promptText = resources.findString(
             "bluetooth_pairing_request", packageName, SfidaManager.DEVICE_NAME_PGP)
-        val prompt = root.findAccessibilityNodeInfosByText(promptText).filter { it.text == promptText }
-        if (prompt.isEmpty()) {
-            // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
-            val deviceName = root.findAccessibilityNodeInfosByText(SfidaManager.DEVICE_NAME_PGP)
-            if (deviceName.none { it.text == SfidaManager.DEVICE_NAME_PGP }) {
-                if (deviceName.isNotEmpty()) Timber.w(Exception("Locate device name suspect: $packageName; " +
-                        confirm[0].viewIdResourceName + "; " +
-                        deviceName.joinToString { "${it.viewIdResourceName}: ${it.text}" }))
-                return null
-            }
-            Timber.w(Exception("Locate device name via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
-                    deviceName.joinToString { it.viewIdResourceName }))
-        } else Timber.w(Exception("Locate standard via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
-                prompt.joinToString { it.viewIdResourceName }))
-        return confirm[0]
+        if (root.findAccessibilityNodeInfosByText(promptText).any { it.text == promptText }) return confirm[0]
+        // OxygenOS 14+
+        promptText = resources.findString("bluetooth_pair_message_2", packageName, SfidaManager.DEVICE_NAME_PGP)
+        if (root.findAccessibilityNodeInfosByText(promptText).any { it.text == promptText }) return confirm[0]
+        // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
+        val deviceName = root.findAccessibilityNodeInfosByText(SfidaManager.DEVICE_NAME_PGP)
+        if (deviceName.all { it.text == SfidaManager.DEVICE_NAME_PGP }) return confirm[0]
+        if (deviceName.isNotEmpty()) Timber.w(Exception("Locate device name suspect: $packageName; " +
+                confirm[0].viewIdResourceName + "; " +
+                deviceName.joinToString { "${it.viewIdResourceName}: ${it.text}" }))
+        return null
+//            Timber.w(Exception("Locate device name via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
+//                    deviceName.joinToString { it.viewIdResourceName }))
+//        else Timber.w(Exception("Locate standard via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
+//                prompt.joinToString { it.viewIdResourceName }))
     }
 
     override fun onInterrupt() {
