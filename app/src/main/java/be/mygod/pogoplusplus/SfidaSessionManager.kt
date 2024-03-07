@@ -1,6 +1,7 @@
 package be.mygod.pogoplusplus
 
 import android.bluetooth.BluetoothDevice
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import be.mygod.pogoplusplus.App.Companion.app
@@ -8,6 +9,7 @@ import be.mygod.pogoplusplus.App.Companion.app
 object SfidaSessionManager {
     data class Stats(val deviceAddress: String, val deviceName: String?, val startTime: Long, val stats: String)
 
+    private const val KEY_ACTIVE = "sfidaSession.active"
     private const val KEY_DEVICE_ADDRESS = "sfidaSession.deviceAddress"
     private const val KEY_DEVICE_NAME = "sfidaSession.deviceName"
     private const val KEY_START_TIME = "sfidaSession.startTime"
@@ -49,40 +51,65 @@ object SfidaSessionManager {
         }
     }.toString())
 
+    private fun SharedPreferences.Editor.setActive(time: Long, spinCount: Long = 0, itemCount: Long = 0,
+                                                   capturedCount: Long = 0, escapedCount: Long = 0) {
+        putBoolean(KEY_ACTIVE, true)
+        putLong(KEY_CONNECTION_STATS, pref.getLong(KEY_CONNECTION_STATS, 0) + 1)
+        putLong(KEY_START_TIME, time)
+        putLong(KEY_SPIN_COUNT, spinCount)
+        putLong(KEY_ITEM_COUNT, itemCount)
+        putLong(KEY_CAPTURED_COUNT, capturedCount)
+        putLong(KEY_ESCAPED_COUNT, escapedCount)
+    }
     fun onConnect() = System.currentTimeMillis().let { time ->
-        pref.edit {
-            putLong(KEY_START_TIME, time)
-            putLong(KEY_SPIN_COUNT, 0)
-            putLong(KEY_ITEM_COUNT, 0)
-            putLong(KEY_CAPTURED_COUNT, 0)
-            putLong(KEY_ESCAPED_COUNT, 0)
-            putLong(KEY_CONNECTION_STATS, pref.getLong(KEY_CONNECTION_STATS, 0) + 1)
-        }
-        makeStats(0, 0, 0, 0, startTime = time)
+        val wasActive = pref.getBoolean(KEY_ACTIVE, false)
+        if (!wasActive) {
+            pref.edit { setActive(time) }
+            makeStats(0, 0, 0, 0, startTime = time)
+        } else makeStats()
     }
     fun onConnect(device: Pair<BluetoothDevice, String?>): Stats {
-        var name = device.second
         val time = System.currentTimeMillis()
+        var name = device.second
+        val wasActive = pref.getBoolean(KEY_ACTIVE, false)
         pref.edit {
+            if (!wasActive) setActive(time)
             if (name == null && device.first.address.equals(pref.getString(KEY_DEVICE_ADDRESS, null), true)) {
                 name = pref.getString(KEY_DEVICE_NAME, null)
             } else putString(KEY_DEVICE_NAME, name)
             putString(KEY_DEVICE_ADDRESS, device.first.address)
-            putLong(KEY_START_TIME, time)
-            putLong(KEY_SPIN_COUNT, 0)
-            putLong(KEY_ITEM_COUNT, 0)
-            putLong(KEY_CAPTURED_COUNT, 0)
-            putLong(KEY_ESCAPED_COUNT, 0)
         }
-        return makeStats(0, 0, 0, 0, device.first.address, name, time)
+        return makeStats(deviceAddress = device.first.address, deviceName = name)
     }
     fun onDisconnect(device: Pair<BluetoothDevice, String?>?) = when {
-        device == null -> makeStats()
-        device.second == null -> makeStats(deviceAddress = device.first.address)
-        else -> makeStats(deviceAddress = device.first.address, deviceName = device.second)
+        device == null -> {
+            pref.edit { remove(KEY_ACTIVE) }
+            makeStats()
+        }
+        device.second == null -> {
+            pref.edit { remove(KEY_ACTIVE) }
+            makeStats(deviceAddress = device.first.address)
+        }
+        else -> {
+            pref.edit {
+                remove(KEY_ACTIVE)
+                putString(KEY_DEVICE_ADDRESS, device.first.address)
+                putString(KEY_DEVICE_NAME, device.second)
+            }
+            makeStats(deviceAddress = device.first.address, deviceName = device.second)
+        }
     }
 
     fun onSpin(items: Long): Stats {
+        if (!pref.getBoolean(KEY_ACTIVE, false)) {
+            val time = System.currentTimeMillis()
+            pref.edit {
+                setActive(time, 1, items)
+                putLong(KEY_SPIN_STATS, pref.getLong(KEY_SPIN_STATS, 0) + 1)
+                putLong(KEY_ITEM_STATS, pref.getLong(KEY_ITEM_STATS, 0) + items)
+            }
+            return makeStats(1, items, 0, 0, startTime = time, delta = items)
+        }
         val spinCount = pref.getLong(KEY_SPIN_COUNT, 0) + 1
         val itemCount = pref.getLong(KEY_ITEM_COUNT, 0) + items
         pref.edit {
@@ -93,12 +120,36 @@ object SfidaSessionManager {
         }
         return makeStats(spinCount, itemCount, delta = items)
     }
-    private fun increment(countKey: String, statsKey: String) = (pref.getLong(countKey, 0) + 1).also {
-        pref.edit {
-            putLong(countKey, it)
-            putLong(statsKey, pref.getLong(statsKey, 0) + 1)
+    fun onCaptured(): Stats {
+        if (!pref.getBoolean(KEY_ACTIVE, false)) {
+            val time = System.currentTimeMillis()
+            pref.edit {
+                setActive(time, capturedCount = 1)
+                putLong(KEY_CAPTURED_STATS, pref.getLong(KEY_CAPTURED_STATS, 0) + 1)
+            }
+            return makeStats(0, 0, 1, 0, startTime = time, delta = -1)
         }
+        val count = pref.getLong(KEY_CAPTURED_COUNT, 0) + 1
+        pref.edit {
+            putLong(KEY_CAPTURED_COUNT, count)
+            putLong(KEY_CAPTURED_STATS, pref.getLong(KEY_CAPTURED_STATS, 0) + 1)
+        }
+        return makeStats(capturedCount = count, delta = -1)
     }
-    fun onCaptured() = makeStats(capturedCount = increment(KEY_CAPTURED_COUNT, KEY_CAPTURED_STATS), delta = -1)
-    fun onEscaped() = makeStats(escapedCount = increment(KEY_ESCAPED_COUNT, KEY_ESCAPED_STATS), delta = -2)
+    fun onEscaped(): Stats {
+        if (!pref.getBoolean(KEY_ACTIVE, false)) {
+            val time = System.currentTimeMillis()
+            pref.edit {
+                setActive(time, escapedCount = 1)
+                putLong(KEY_ESCAPED_STATS, pref.getLong(KEY_ESCAPED_STATS, 0) + 1)
+            }
+            return makeStats(0, 0, 0, 1, startTime = time, delta = -2)
+        }
+        val count = pref.getLong(KEY_ESCAPED_COUNT, 0) + 1
+        pref.edit {
+            putLong(KEY_ESCAPED_COUNT, count)
+            putLong(KEY_ESCAPED_STATS, pref.getLong(KEY_ESCAPED_STATS, 0) + 1)
+        }
+        return makeStats(escapedCount = count, delta = -2)
+    }
 }
