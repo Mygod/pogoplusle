@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Intent
+import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.core.content.IntentCompat
 import androidx.core.content.getSystemService
@@ -41,8 +42,8 @@ object SfidaManager : BluetoothGattCallback() {
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     fun isConnected(device: BluetoothDevice, isPgp: Boolean = false) =
-        (!isPgp || device.bondState != BluetoothDevice.BOND_NONE) &&
-                bluetooth.getConnectionState(device, BluetoothProfile.GATT) == BluetoothProfile.STATE_CONNECTED
+        (!isPgp || device.bondState != BluetoothDevice.BOND_NONE) && (Build.VERSION.SDK_INT < 31 ||
+                bluetooth.getConnectionState(device, BluetoothProfile.GATT) == BluetoothProfile.STATE_CONNECTED)
 
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     private fun getDeviceName(device: BluetoothDevice, action: String? = null): Optional<String>? {
