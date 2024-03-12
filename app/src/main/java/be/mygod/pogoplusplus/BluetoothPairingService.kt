@@ -163,9 +163,10 @@ class BluetoothPairingService : AccessibilityService() {
         // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
         val deviceName = root.findAccessibilityNodeInfosByText(SfidaManager.DEVICE_NAME_PGP)
         if (deviceName.all { it.text == SfidaManager.DEVICE_NAME_PGP }) return confirm[0]
-        if (deviceName.isNotEmpty()) Timber.w(Exception("Locate device name suspect: $packageName; " +
+        val filtered = deviceName.filter { !it.text.contains(SfidaManager.DEVICE_NAME_PGPP) }
+        if (filtered.isNotEmpty()) Timber.w(Exception("Locate device name suspect: $packageName; " +
                 confirm[0].viewIdResourceName + "; " +
-                deviceName.joinToString { "${it.viewIdResourceName}: ${it.text}" }))
+                filtered.joinToString { "${it.viewIdResourceName}: ${it.text}" }))
         return null
 //            Timber.w(Exception("Locate device name via text success: $packageName; ${confirm[0].viewIdResourceName}; " +
 //                    deviceName.joinToString { it.viewIdResourceName }))
