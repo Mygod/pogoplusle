@@ -62,11 +62,8 @@ object SfidaSessionManager {
         putLong(KEY_ESCAPED_COUNT, escapedCount)
     }
     fun onConnect() = System.currentTimeMillis().let { time ->
-        val wasActive = pref.getBoolean(KEY_ACTIVE, false)
-        if (!wasActive) {
-            pref.edit { setActive(time) }
-            makeStats(0, 0, 0, 0, startTime = time)
-        } else makeStats()
+        pref.edit { setActive(time) }
+        makeStats(0, 0, 0, 0, startTime = time)
     }
     fun onConnect(device: Pair<BluetoothDevice, String?>): Stats {
         val time = System.currentTimeMillis()
