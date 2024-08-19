@@ -72,7 +72,7 @@ object SfidaManager : BluetoothGattCallback() {
 
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     private fun disconnectGatt(device: BluetoothDevice) {
-        val gatt = device.connectGatt(app, false, SfidaManager)
+        val gatt = device.connectGatt(app, false, SfidaManager) ?: return
         try {
             for (i in 1..32) {  // https://cs.android.com/android/platform/superproject/+/master:packages/modules/Bluetooth/system/internal_include/bt_target.h;l=525;drc=a786e24777988f3207b90fdb5eb00bc68b540691
                 mClientIf.setInt(gatt, i)
