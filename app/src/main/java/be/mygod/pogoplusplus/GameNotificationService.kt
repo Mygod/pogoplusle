@@ -200,8 +200,9 @@ class GameNotificationService : NotificationListenerService() {
         if (text == resources.findString("Disconnecting_Companion_Device", sbn.packageName)) {
             return onAuxiliaryDisconnected()
         }
-        val shouldUpdate = SfidaManager.isConnected != false &&
-                sbn.notification.flags and Notification.FLAG_FOREGROUND_SERVICE == Notification.FLAG_FOREGROUND_SERVICE
+        val shouldUpdate = (Build.VERSION.SDK_INT >= 31 || sbn.notification.flags and
+                Notification.FLAG_FOREGROUND_SERVICE == Notification.FLAG_FOREGROUND_SERVICE) &&
+                SfidaManager.isConnected != false
         if (shouldUpdate) setTimeoutIfEnabled()
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
