@@ -269,11 +269,7 @@ class GameNotificationService : NotificationListenerService() {
             REASON_APP_CANCEL,
             REASON_PACKAGE_SUSPENDED,
             REASON_PROFILE_TURNED_OFF,
-            REASON_CLEAR_DATA -> { }
-            REASON_APP_CANCEL_ALL -> if (Build.VERSION.SDK_INT < 31) return
-            else -> return
+            REASON_CLEAR_DATA -> if (isInterested(sbn ?: return)) onAuxiliaryDisconnected()
         }
-        if (isInterested(sbn ?: return) && sbn.notification.flags and Notification.FLAG_FOREGROUND_SERVICE ==
-            Notification.FLAG_FOREGROUND_SERVICE) onAuxiliaryDisconnected()
     }
 }
