@@ -187,7 +187,7 @@ class GameNotificationService : NotificationListenerService() {
         if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
             !isInterested(sbn)) return
         val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
-        Timber.d("PGP notification updated @ ${sbn.postTime}: $text")
+        Timber.d("PGP notification updated @ ${sbn.postTime} (${sbn.notification.flags}): $text")
         if (text.isNullOrEmpty()) {
             updateConnectionStatus(SfidaSessionManager.onConnect())
             return setTimeoutIfEnabled()
@@ -200,10 +200,10 @@ class GameNotificationService : NotificationListenerService() {
         if (text == resources.findString("Disconnecting_Companion_Device", sbn.packageName)) {
             return onAuxiliaryDisconnected()
         }
-        val shouldUpdate = (Build.VERSION.SDK_INT >= 31 || sbn.notification.flags and
-                Notification.FLAG_FOREGROUND_SERVICE == Notification.FLAG_FOREGROUND_SERVICE) &&
-                SfidaManager.isConnected != false
+        val shouldUpdate = SfidaManager.isConnected != false
         if (shouldUpdate) setTimeoutIfEnabled()
+        if (Build.VERSION.SDK_INT < 31 && sbn.notification.flags and Notification.FLAG_FOREGROUND_SERVICE !=
+            Notification.FLAG_FOREGROUND_SERVICE) return    // ignore reposted notification
         var str = resources.findString("Item_Inventory_Full", sbn.packageName)
         if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
             R.drawable.ic_action_shopping_bag, sbn.packageName) {
