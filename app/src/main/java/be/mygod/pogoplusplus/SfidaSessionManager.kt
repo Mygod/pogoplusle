@@ -97,8 +97,8 @@ object SfidaSessionManager {
         }
     }
 
-    fun onSpin(items: Long): Stats {
-        if (!pref.getBoolean(KEY_ACTIVE, false)) {
+    fun onSpin(items: Long, isConnected: Boolean): Stats {
+        if (isConnected && !pref.getBoolean(KEY_ACTIVE, false)) {
             val time = System.currentTimeMillis()
             pref.edit {
                 setActive(time, 1, items)
@@ -117,8 +117,8 @@ object SfidaSessionManager {
         }
         return makeStats(spinCount, itemCount, delta = items)
     }
-    fun onCaptured(): Stats {
-        if (!pref.getBoolean(KEY_ACTIVE, false)) {
+    fun onCaptured(isConnected: Boolean): Stats {
+        if (isConnected && !pref.getBoolean(KEY_ACTIVE, false)) {
             val time = System.currentTimeMillis()
             pref.edit {
                 setActive(time, capturedCount = 1)
@@ -133,8 +133,8 @@ object SfidaSessionManager {
         }
         return makeStats(capturedCount = count, delta = -1)
     }
-    fun onEscaped(): Stats {
-        if (!pref.getBoolean(KEY_ACTIVE, false)) {
+    fun onEscaped(isConnected: Boolean): Stats {
+        if (isConnected && !pref.getBoolean(KEY_ACTIVE, false)) {
             val time = System.currentTimeMillis()
             pref.edit {
                 setActive(time, escapedCount = 1)
