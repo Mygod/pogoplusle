@@ -263,13 +263,15 @@ class GameNotificationService : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?, rankingMap: RankingMap?, reason: Int) {
-        when (reason) {
+        if (isInterested(sbn ?: return)) when (reason) {
             REASON_PACKAGE_CHANGED,
             REASON_USER_STOPPED,
             REASON_APP_CANCEL,
             REASON_PACKAGE_SUSPENDED,
             REASON_PROFILE_TURNED_OFF,
-            REASON_CLEAR_DATA -> if (isInterested(sbn ?: return)) onAuxiliaryDisconnected()
+            REASON_CLEAR_DATA -> onAuxiliaryDisconnected()
+            // since we are awake, might as well check if it is still connected
+            else -> if (SfidaManager.isConnected == false) onAuxiliaryDisconnected()
         }
     }
 }
