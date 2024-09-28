@@ -110,6 +110,7 @@ object SfidaSessionManager {
         val spinCount = pref.getLong(KEY_SPIN_COUNT, 0) + 1
         val itemCount = pref.getLong(KEY_ITEM_COUNT, 0) + items
         pref.edit {
+            putBoolean(KEY_ACTIVE, isConnected)
             putLong(KEY_SPIN_COUNT, spinCount)
             putLong(KEY_SPIN_STATS, pref.getLong(KEY_SPIN_STATS, 0) + 1)
             putLong(KEY_ITEM_COUNT, itemCount)
@@ -128,6 +129,7 @@ object SfidaSessionManager {
         }
         val count = pref.getLong(KEY_CAPTURED_COUNT, 0) + 1
         pref.edit {
+            putBoolean(KEY_ACTIVE, isConnected)
             putLong(KEY_CAPTURED_COUNT, count)
             putLong(KEY_CAPTURED_STATS, pref.getLong(KEY_CAPTURED_STATS, 0) + 1)
         }
@@ -144,6 +146,7 @@ object SfidaSessionManager {
         }
         val count = pref.getLong(KEY_ESCAPED_COUNT, 0) + 1
         pref.edit {
+            putBoolean(KEY_ACTIVE, isConnected)
             putLong(KEY_ESCAPED_COUNT, count)
             putLong(KEY_ESCAPED_STATS, pref.getLong(KEY_ESCAPED_STATS, 0) + 1)
         }
