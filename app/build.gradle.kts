@@ -17,8 +17,8 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 28
         targetSdk = 35
-        versionCode = 35
-        versionName = "1.3.7"
+        versionCode = 36
+        versionName = "1.3.8"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -76,7 +76,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.preference:preference:1.2.1")
     implementation("be.mygod.librootkotlinx:librootkotlinx:1.2.0")
-    implementation("com.android.billingclient:billing-ktx:7.0.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.0")
     implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.firebase:firebase-analytics:22.1.0")
