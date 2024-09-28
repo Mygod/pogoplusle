@@ -123,17 +123,17 @@ class BluetoothPairingService : AccessibilityService() {
         when (title.size) {
             0 -> {
                 title = root.findAccessibilityNodeInfosByViewId("android:id/alertTitle")
-                if (title.size == 1 && title[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) {
+                if (title.size == 1 && title[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) == true) {
                     // Some devices (eg Huawei) use Android AlertDialog instead of AppCompat
                     Timber.w("Locate title success: ${title[0].text}")
                     return confirm[0]
                 }
             }
-            1 -> if (title[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) return confirm[0]
+            1 -> if (title[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) == true) return confirm[0]
         }
         // Some devices (eg Samsung) put device name in message (#6)
         val message = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/message")
-        if (message.size != 1 || !message[0].text.contains(SfidaManager.DEVICE_NAME_PGP)) return null
+        if (message.size != 1 || message[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) != true) return null
         else Timber.w("Locate message success: ${message[0].text}")
         return confirm[0]
     }
@@ -163,7 +163,7 @@ class BluetoothPairingService : AccessibilityService() {
         // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
         val deviceName = root.findAccessibilityNodeInfosByText(SfidaManager.DEVICE_NAME_PGP)
         if (deviceName.all { it.text == SfidaManager.DEVICE_NAME_PGP }) return confirm[0]
-        val filtered = deviceName.filter { !it.text.contains(SfidaManager.DEVICE_NAME_PGPP) }
+        val filtered = deviceName.filter { it.text?.contains(SfidaManager.DEVICE_NAME_PGPP) != true }
         if (filtered.isNotEmpty()) Timber.w(Exception("Locate device name suspect: $packageName; " +
                 confirm[0].viewIdResourceName + "; " +
                 filtered.joinToString { "${it.viewIdResourceName}: ${it.text}" }))
