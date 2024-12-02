@@ -50,16 +50,14 @@ object SfidaManager : BluetoothGattCallback() {
     private fun getDeviceName(device: BluetoothDevice, action: String? = null): Optional<String>? {
         val name = device.name
         val type = device.type
-        val bluetoothClass = device.bluetoothClass
-        val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_LE ||
-                bluetoothClass?.hashCode() != BluetoothClass.Device.Major.UNCATEGORIZED || when (name) {
+        val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_LE || when (name) {
             DEVICE_NAME_PGP, DEVICE_NAME_PGPP, "Pokemon PBP", "EbisuEbisu test" -> false
             null -> !device.address.startsWith("7C:BB:8A:", true) &&
                     !device.address.startsWith("98:B6:E9:", true) &&
                     !device.address.startsWith("B8:78:26:", true)
             else -> true
         }
-        if (action != null) Timber.d("$action: ${device.address}, $name, $type, $bluetoothClass, $shouldSkip")
+        if (action != null) Timber.d("$action: ${device.address}, $name, $type, $shouldSkip")
         return if (shouldSkip) null else Optional.ofNullable(name)
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
