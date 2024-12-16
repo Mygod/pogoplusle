@@ -80,7 +80,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.firebase:firebase-analytics:22.1.2")
-    implementation("com.google.firebase:firebase-crashlytics:19.2.1")
+    implementation("com.google.firebase:firebase-crashlytics:19.3.0")
     implementation("com.jakewharton.timber:timber:5.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:runner:1.6.2")
