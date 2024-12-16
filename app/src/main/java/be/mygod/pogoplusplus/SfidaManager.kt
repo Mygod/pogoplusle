@@ -50,7 +50,8 @@ object SfidaManager : BluetoothGattCallback() {
     private fun getDeviceName(device: BluetoothDevice, action: String? = null): Optional<String>? {
         val name = device.name
         val type = device.type
-        val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_LE || when (name) {
+        val shouldSkip = type != BluetoothDevice.DEVICE_TYPE_UNKNOWN &&
+                type != BluetoothDevice.DEVICE_TYPE_LE || when (name) {
             DEVICE_NAME_PGP, DEVICE_NAME_PGPP, "Pokemon PBP", "EbisuEbisu test" -> false
             null -> !device.address.startsWith("7C:BB:8A:", true) &&
                     !device.address.startsWith("98:B6:E9:", true) &&
