@@ -17,8 +17,8 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 28
         targetSdk = 35
-        versionCode = 37
-        versionName = "1.3.9"
+        versionCode = 38
+        versionName = "1.3.10"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
