@@ -1,6 +1,5 @@
 package be.mygod.pogoplusplus
 
-import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
@@ -41,10 +40,6 @@ object SfidaManager : BluetoothGattCallback() {
     } catch (_: SecurityException) {
         null
     }
-    @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
-    fun isDisconnected(device: BluetoothDevice) = device.bondState == BluetoothDevice.BOND_NONE ||
-            Build.VERSION.SDK_INT >= 31 && bluetooth.getConnectionState(device, BluetoothProfile.GATT) !=
-                    BluetoothProfile.STATE_CONNECTED
 
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     private fun getDeviceName(device: BluetoothDevice, action: String? = null): Optional<String>? {
@@ -86,7 +81,9 @@ object SfidaManager : BluetoothGattCallback() {
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     fun disconnect(device: BluetoothDevice) {
         if (bluetooth.adapter.bondedDevices?.contains(device) != false && removeBond(device) ||
-            isDisconnected(device)) return
+            device.name == DEVICE_NAME_PGP && device.bondState == BluetoothDevice.BOND_NONE ||
+            Build.VERSION.SDK_INT >= 31 && bluetooth.getConnectionState(device, BluetoothProfile.GATT) !=
+            BluetoothProfile.STATE_CONNECTED) return
         disconnectGatt(device)
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
