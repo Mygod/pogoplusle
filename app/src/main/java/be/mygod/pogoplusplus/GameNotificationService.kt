@@ -90,9 +90,9 @@ class GameNotificationService : NotificationListenerService() {
             setContentTitle(title)
             setGroup(channel)
             setSmallIcon(icon)
-            setContentIntent(PendingIntent.getActivity(app, 0,
-                if (packageName == null) gameIntent else app.packageManager.getLaunchIntentForPackage(packageName),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            setContentIntent(PendingIntent.getActivity(app, 0, if (packageName != null) {
+                app.packageManager.getLaunchIntentForPackage(packageName) ?: gameIntent
+            } else gameIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             setShowWhen(true)
             setAutoCancel(true)
             setVisibility(Notification.VISIBILITY_PUBLIC)
