@@ -7,9 +7,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e9422e80b8274d80a6f391ea90fbc237)](https://app.codacy.com/gh/Mygod/pogoplusle/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![License](https://img.shields.io/github/license/Mygod/pogoplusle.svg)](LICENSE)
 
-<a href="https://play.google.com/store/apps/details?id=be.mygod.pogoplusplus"><img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height="48"></a>
-([beta](https://play.google.com/apps/testing/be.mygod.pogoplusplus))
-SHA-256 fingerprint of the [code transparency](https://developer.android.com/guide/app-bundle/code-transparency#verify_code_transparency) key certificate (must be compared with the developer's public key manually): `C8 70 92 46 B3 32 22 6F 33 57 05 B4 5C 37 83 81 65 67 42 44 1B DC CC B2 96 1B 66 4D CF 4C 74 BC`
+[![Get it on Obtainium](https://github.com/ImranR98/Obtainium/raw/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/Mygod/pogoplusle)
 
 Automagically skips pairing dialog when connecting Pokémon GO Plus, and alerts you when things go wrong.
 

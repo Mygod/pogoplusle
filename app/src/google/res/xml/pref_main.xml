@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Preference
+        app:key="play"
+        app:icon="@drawable/ic_alert_error_outline"
+        app:title="@string/google_play_unsupported"
+        app:summary="@string/google_play_unsupported_summary" />
+    <SwitchPreferenceCompat
+        app:key="service.pairing"
+        app:icon="@drawable/ic_action_touch_app"
+        app:title="@string/settings_service_pairing"
+        app:summary="@string/settings_service_pairing_summary"
+        app:persistent="false" />
+    <SwitchPreferenceCompat
+        app:key="service.gameNotification"
+        app:icon="@drawable/ic_device_monitor_heart"
+        app:title="@string/game_notification_service_name"
+        app:summary="@string/game_notification_service_summary"
+        app:persistent="false" />
+    <SwitchPreferenceCompat
+        app:key="permission.bluetooth"
+        app:icon="@drawable/ic_device_bluetooth_connected"
+        app:title="@string/settings_permission_bluetooth"
+        app:summary="@string/settings_permission_bluetooth_summary"
+        app:persistent="false" />
+    <Preference
+        app:key="permission.notification"
+        app:icon="@drawable/ic_social_notifications_active"
+        app:title="@string/settings_permission_notification"
+        app:summary="@string/settings_permission_notification_summary" />
+    <Preference
+        app:key="game"
+        app:icon="@drawable/ic_av_games"
+        app:title="@string/settings_game"
+        app:summary="@string/settings_game_summary" />
+
+    <PreferenceCategory app:title="@string/settings_advanced">
+        <SwitchPreferenceCompat
+            app:key="service.pairingRoot"
+            app:icon="@drawable/ic_home_electric_bolt"
+            app:title="@string/settings_service_pairing_root"
+            app:summary="@string/settings_service_pairing_root_summary"
+            app:persistent="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/settings_about">
+        <Preference
+            app:key="misc.source"
+            app:icon="@drawable/ic_toggle_star"
+            app:title="@string/settings_misc_source"
+            app:summary="@string/settings_misc_source_summary"/>
+        <Preference
+            app:key="misc.donate"
+            app:icon="@drawable/ic_action_card_giftcard"
+            app:title="@string/settings_misc_donate"
+            app:summary="@string/settings_misc_donate_summary"/>
+        <Preference
+            app:key="misc.licenses"
+            app:icon="@drawable/ic_action_code"
+            app:title="@string/oss_license_title"
+            app:summary="@string/preferences_license_summary"/>
+    </PreferenceCategory>
+</PreferenceScreen>

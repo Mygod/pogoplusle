@@ -56,4 +56,6 @@
     <string name="donations__thanks_dialog">感謝抖內！\n十分感謝您！</string>
     <string name="donations__description">這個應用程式有用嗎？\n小額的抖內給開發人員用來支援此應用程式的開發</string>
     <string name="donations__google_android_market_description">Google 將收取 30% 的費用</string>
+    <string name="google_play_unsupported">不再支援 Google Play</string>
+    <string name="google_play_unsupported_summary">請改用 GitHub 或 Obtainium 安裝此應用程式</string>
 </resources>

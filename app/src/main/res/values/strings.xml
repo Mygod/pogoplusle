@@ -61,4 +61,6 @@
     <string name="donations__google_android_market_donate_button">Donate!</string>
     <string name="donations__google_android_market_text">How much?</string>
     <string name="donations__thanks_dialog">Thanks for donating!\nI really appreciate this!</string>
+    <string name="google_play_unsupported">Google Play no longer supported</string>
+    <string name="google_play_unsupported_summary">Please install the app through GitHub or Obtainium instead</string>
 </resources>

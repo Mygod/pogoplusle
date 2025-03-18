@@ -37,6 +37,10 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_main)
+        findPreference<Preference>("play")?.setOnPreferenceClickListener {
+            app.launchUrl(requireContext(), "https://github.com/Mygod/pogoplusle/discussions/46")
+            true
+        }
         val needsServicePairing = if (Build.VERSION.SDK_INT >= 31) true else {
             val array = Build.VERSION.SECURITY_PATCH.split('-', limit = 3)
             val y = array.getOrNull(0)?.toIntOrNull()

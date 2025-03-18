@@ -56,4 +56,6 @@
 
     <string name="donations__description">觉得此应用很有用？\n捐赠给该开发者以支持此应用的开发！</string>
     <string name="donations__google_android_market_description">Google 收取 30% 的费用</string>
+    <string name="google_play_unsupported">不再支持 Google Play</string>
+    <string name="google_play_unsupported_summary">请改用 GitHub 或 Obtainium 安装此应用</string>
 </resources>
