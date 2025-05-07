@@ -9,14 +9,16 @@ import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import be.mygod.pogoplusplus.util.findString
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class BluetoothPairingService : AccessibilityService() {
+class BluetoothPairingService : AccessibilityService(), CoroutineScope {
     companion object {
         private const val PACKAGE_SETTINGS = "com.android.settings"
         // found in Realme and potentially other ColorOS
@@ -31,6 +33,7 @@ class BluetoothPairingService : AccessibilityService() {
             }
     }
 
+    override val coroutineContext = Dispatchers.Main.immediate + SupervisorJob()
     override fun onServiceConnected() {
         super.onServiceConnected()
         Timber.d("BluetoothPairingService started")
@@ -83,7 +86,7 @@ class BluetoothPairingService : AccessibilityService() {
     private var job: Job? = null
     private fun setTimeout() {
         job?.cancel()
-        job = GlobalScope.launch(Dispatchers.Main.immediate) {
+        job = launch(Dispatchers.Main.immediate) {
             delay(1000)
             val node = tryConfirm()
             if (node != null) Timber.w("TYPE_WINDOW_STATE_CHANGED not fired: $node")
@@ -183,5 +186,10 @@ class BluetoothPairingService : AccessibilityService() {
         Timber.d("BluetoothPairingService shutting down")
         resetTimeout()
         return super.onUnbind(intent)
+    }
+
+    override fun onDestroy() {
+        cancel()
+        super.onDestroy()
     }
 }
