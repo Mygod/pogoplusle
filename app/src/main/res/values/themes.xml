@@ -6,10 +6,6 @@
     </style>
 
     <style name="Theme.PoGoPlusPlus" parent="Base.Theme.PoGoPlusPlus" />
-    <style name="Theme.PoGoPlusPlus.ActionBar">
-        <item name="windowActionBar">true</item>
-        <item name="windowNoTitle">false</item>
-    </style>
     <style name="Theme.PoGoPlusPlus.Preference.MaterialSwitchPreference" parent="Preference.SwitchPreferenceCompat.Material">
         <item name="android:widgetLayout">@layout/preference_widget_material_switch</item>
     </style>

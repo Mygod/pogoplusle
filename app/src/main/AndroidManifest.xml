@@ -45,6 +45,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".AboutLibrariesActivity"/>
         <service
             android:name=".BluetoothPairingService"
             android:exported="true"
@@ -97,10 +98,10 @@
 
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
-            android:theme="@style/Theme.PoGoPlusPlus.ActionBar"/>
+            tools:node="remove"/>
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
-            android:theme="@style/Theme.PoGoPlusPlus.ActionBar"/>
+            tools:node="remove"/>
     </application>
 
 </manifest>

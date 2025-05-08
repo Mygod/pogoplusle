@@ -18,7 +18,6 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.TwoStatePreference
 import be.mygod.pogoplusplus.App.Companion.app
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
@@ -128,7 +127,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
         findPreference<Preference>("misc.licenses")!!.setOnPreferenceClickListener {
-            startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+            startActivity(Intent(context, AboutLibrariesActivity::class.java))
             true
         }
     }
