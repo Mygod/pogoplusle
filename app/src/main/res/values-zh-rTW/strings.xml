@@ -46,16 +46,4 @@
     <string name="settings_misc_source_summary">閱讀使用說明，標註星標，回報問題，提供意見與贊助</string>
     <string name="settings_misc_donate">抖內</string>
     <string name="settings_misc_donate_summary">請贊助我，讓我有更多寶可夢金幣</string>
-    <string name="settings_misc_donate_more">GitHub sponsors, PayPal 或其他贊助平台</string>
-
-    <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values-zh/donations__strings.xml -->
-    <string name="donations__google_android_market">Google Play 商店</string>
-    <string name="donations__google_android_market_not_supported">不支援應用程式內購，Play 商店是否正確安裝？</string>
-    <string name="donations__google_android_market_donate_button">抖內！</string>
-    <string name="donations__google_android_market_text">抖內多少錢</string>
-    <string name="donations__thanks_dialog">感謝抖內！\n十分感謝您！</string>
-    <string name="donations__description">這個應用程式有用嗎？\n小額的抖內給開發人員用來支援此應用程式的開發</string>
-    <string name="donations__google_android_market_description">Google 將收取 30% 的費用</string>
-    <string name="google_play_unsupported">不再支援 Google Play</string>
-    <string name="google_play_unsupported_summary">請改用 GitHub 或 Obtainium 安裝此應用程式</string>
 </resources>

@@ -123,7 +123,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
         findPreference<Preference>("misc.donate")!!.setOnPreferenceClickListener {
-            EBegFragment().show(parentFragmentManager, "EBegFragment")
+            app.launchUrl(requireContext(), "https://mygod.be/donate/")
             true
         }
         findPreference<Preference>("misc.licenses")!!.setOnPreferenceClickListener {

@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
@@ -20,6 +18,7 @@ android {
         versionCode = 39
         versionName = "1.3.11"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        androidResources.localeFilters += listOf("en", "zh-rCN", "zh-rTW")
     }
     buildTypes {
         debug {
@@ -45,29 +44,6 @@ android {
         viewBinding = true
     }
     packagingOptions.resources.excludes.add("**/*.kotlin_*")
-    flavorDimensions.add("freedom")
-    productFlavors {
-        create("freedom") {
-            dimension = "freedom"
-            androidResources.localeFilters += listOf("en", "zh-rCN", "zh-rTW")
-        }
-        create("google") {
-            dimension = "freedom"
-            versionNameSuffix = "-g"
-            val prop = Properties().apply {
-                val f = rootProject.file("local.properties")
-                if (f.exists()) load(f.inputStream())
-            }
-            if (prop.containsKey("codeTransparency.storeFile")) bundle.codeTransparency.signing {
-                storeFile = file(prop["codeTransparency.storeFile"]!!)
-                storePassword = prop["codeTransparency.storePassword"] as? String
-                keyAlias = prop["codeTransparency.keyAlias"] as? String
-                keyPassword = if (prop.containsKey("codeTransparency.keyPassword")) {
-                    prop["codeTransparency.keyPassword"] as? String
-                } else storePassword
-            }
-        }
-    }
 }
 
 dependencies {

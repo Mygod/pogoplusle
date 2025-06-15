@@ -45,17 +45,4 @@
     <string name="settings_misc_source_summary">查看使用手册、star、提交 issues、合作、赞助</string>
     <string name="settings_misc_donate">捐款</string>
     <string name="settings_misc_donate_summary">请给我钱帮我充值 PokéCoins</string>
-    <string name="settings_misc_donate_more">GitHub sponsors, PayPal 等其他方式…</string>
-
-    <!-- Based on: https://github.com/PrivacyApps/donations/blob/747d36a18433c7e9329691054122a8ad337a62d2/Donations/src/main/res/values-zh/donations__strings.xml -->
-    <string name="donations__google_android_market">Google Play 商店</string>
-    <string name="donations__google_android_market_not_supported">不支持 In-App 捐赠。你的 Google Play 商店是否安装正确了呢？</string>
-    <string name="donations__google_android_market_donate_button">捐赠！</string>
-    <string name="donations__google_android_market_text">捐赠多少？</string>
-    <string name="donations__thanks_dialog">谢谢捐赠！\n非常感谢您！</string>
-
-    <string name="donations__description">觉得此应用很有用？\n捐赠给该开发者以支持此应用的开发！</string>
-    <string name="donations__google_android_market_description">Google 收取 30% 的费用</string>
-    <string name="google_play_unsupported">不再支持 Google Play</string>
-    <string name="google_play_unsupported_summary">请改用 GitHub 或 Obtainium 安装此应用</string>
 </resources>
