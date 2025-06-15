@@ -15,8 +15,8 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 28
         targetSdk = 36
-        versionCode = 39
-        versionName = "1.3.11"
+        versionCode = 40
+        versionName = "1.3.12"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         androidResources.localeFilters += listOf("en", "zh-rCN", "zh-rTW")
     }
