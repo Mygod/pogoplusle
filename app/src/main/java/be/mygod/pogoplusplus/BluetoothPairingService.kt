@@ -136,9 +136,18 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
         }
         // Some devices (eg Samsung) put device name in message (#6)
         val message = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/message")
-        if (message.size != 1 || message[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) != true) return null
-        else Timber.w("Locate message success: ${message[0].text}")
-        return confirm[0]
+        if (message.size == 1 && message[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) == true) {
+            Timber.w("Locate message success: ${message[0].text}")
+            return confirm[0]
+        }
+        // Oplus/Realme uses a full sentence in a name field instead of a message. So rude!
+        val name = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/name")
+        if (name.size == 1 &&
+            name[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) == true) {
+            Timber.w("Locate name success: ${name[0].text}")
+            return confirm[0]
+        }
+        return null
     }
     private fun tryLocateByText(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
         val packageName = root.packageName?.toString()
