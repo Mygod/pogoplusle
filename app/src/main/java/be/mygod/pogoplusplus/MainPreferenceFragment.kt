@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.SpannableStringBuilder
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -52,7 +53,11 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             servicePairing.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
                     setTitle(R.string.bluetooth_pairing_service_disclosure_title)
-                    setMessage(R.string.bluetooth_pairing_service_disclosure)
+                    val base = getText(R.string.bluetooth_pairing_service_disclosure)
+                    setMessage(if (Build.VERSION.SDK_INT >= 33) SpannableStringBuilder(base).apply {
+                        append("\n\n")
+                        append(getText(R.string.bluetooth_pairing_service_disclosure_restricted_settings))
+                    } else base)
                     setNegativeButton(resources.getIdentifier("decline", "string", "android"), null)
                     setPositiveButton(resources.getIdentifier("accept", "string", "android")) { _, _ ->
                         startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {

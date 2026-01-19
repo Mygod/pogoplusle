@@ -10,6 +10,9 @@
         Pokémon GO Plus. No data is collected through this process except for crash logs.\n\nTo grant the permission,
         click <i>Agree</i>, then click on this app and turn on the main switch that says <i>Use PoGo+LE Bluetooth
             pairing assistant</i>.</string>
+    <string name="bluetooth_pairing_service_disclosure_restricted_settings">If that switch is greyed out, enable
+        restricted settings for this app first: long press the app icon, open <i>App info</i>, use the three-dot menu,
+        and choose <i>Allow restricted settings</i>, then return here.</string>
     <string name="game_notification_service_name">Monitor game notifications</string>
     <string name="game_notification_service_summary">Get useful statistics and receive alerts for disconnections, full
         bags, etc.</string>

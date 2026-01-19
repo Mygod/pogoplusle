@@ -7,6 +7,7 @@
     <string name="bluetooth_pairing_service_disclosure">此功能需要使用安卓的無障礙服務 API
         來讀取和控制系統設置的通知與屏幕，以便點擊通知當中的「配對並連線」按鈕，以及配對視窗中的「配對」以連接
         Pokémon GO Plus。除了當機日誌之外，並不會透過此功能蒐集任何數據。\n\n授與此應用權限，請點擊「同意」，然後選取此應用程式並且打開「使用寶夠樂藍牙配對助手」的按鈕。</string>
+    <string name="bluetooth_pairing_service_disclosure_restricted_settings">如果開關是灰色無法啟用，請先允許此應用程式的「受限制設定」：長按應用程式圖示，開啟「應用程式資訊」，點右上角三點選單，選擇「允許受限制設定」，然後返回此頁。</string>
     <string name="game_notification_service_name">監控遊戲通知</string>
     <string name="game_notification_service_summary">接收斷線、背包已滿等警報</string>
 

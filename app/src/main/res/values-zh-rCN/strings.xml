@@ -7,6 +7,7 @@
     <string name="bluetooth_pairing_service_disclosure">该功能需要使用 Android Accessibility\u200bService API
         来读取、控制系统设置的通知来点击“配对和连接”，并在弹出对话框时点击“配对”按钮来帮助你配对 Pokémon GO
         Plus。此过程中除崩溃日志以外不会收集任何数据。\n\n执行以下步骤以授予权限：点击“同意”，在新页面中点击此应用，打开“使用宝够乐蓝牙配对助手”主开关。</string>
+    <string name="bluetooth_pairing_service_disclosure_restricted_settings">如果该开关是灰色不可用，请先为此应用允许“受限设置”：长按应用图标，打开“应用信息”，点右上角三点菜单，选择“允许受限设置”，然后返回这里。</string>
     <string name="game_notification_service_name">监视游戏通知</string>
     <string name="game_notification_service_summary">统计使用数据并通知连接断开、满包等</string>
 

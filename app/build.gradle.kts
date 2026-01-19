@@ -44,7 +44,7 @@ android {
         compose = true
         viewBinding = true
     }
-    packagingOptions.resources.excludes.add("**/*.kotlin_*")
+    packaging.resources.excludes.add("**/*.kotlin_*")
 }
 
 kotlin.compilerOptions.jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
