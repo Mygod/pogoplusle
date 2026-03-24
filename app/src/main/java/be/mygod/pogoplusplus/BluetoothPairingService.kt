@@ -117,6 +117,10 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
             0 -> {
                 // Some devices (eg Samsung) use AppCompat (?) AlertDialog and "OK" instead of "Pair"
                 confirm = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/button1")
+                if (confirm.size == 0) {
+                    // Android 16 Pixel pairing dialog uses an expressive button container.
+                    confirm = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/positive_button_container")
+                }
                 if (confirm.size != 1) return null
             }
             1 -> { }
