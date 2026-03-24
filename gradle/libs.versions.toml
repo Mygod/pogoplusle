@@ -1,6 +1,6 @@
 [versions]
 aboutLibraries = "13.2.1"
-kotlin = "2.3.0"
+kotlin = "2.3.20"
 material3 = "1.4.0"
 
 [libraries]

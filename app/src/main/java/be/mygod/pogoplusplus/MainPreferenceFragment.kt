@@ -11,7 +11,6 @@ import android.text.SpannableStringBuilder
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -95,7 +94,9 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 } else {
                     action = Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
                     putExtra(EXTRA_KEY_LEGACY, componentName)
-                    putExtra(":settings:show_fragment_args", bundleOf(EXTRA_KEY_LEGACY to componentName))
+                    putExtra(":settings:show_fragment_args", Bundle().apply {
+                        putString(EXTRA_KEY_LEGACY, componentName)
+                    })
                 }
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
