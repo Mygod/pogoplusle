@@ -163,8 +163,11 @@ class GameNotificationService : NotificationListenerService() {
                 R.drawable.ic_device_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
                 if (device?.run {
-                        second == SfidaManager.DEVICE_NAME_PGP &&
-                                first.bondState != BluetoothDevice.BOND_NONE
+                        second == SfidaManager.DEVICE_NAME_PGP && try {
+                            first.bondState
+                        } catch (_: SecurityException) {
+                            BluetoothDevice.BOND_BONDED
+                        } != BluetoothDevice.BOND_NONE
                     } == true) addAction(Notification.Action.Builder(
                     Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
                     app.getText(R.string.notification_action_unpair),
