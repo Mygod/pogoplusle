@@ -2,11 +2,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.application")
+    id("com.google.android.gms.oss-licenses-plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("kotlin-parcelize")
-    alias(libs.plugins.aboutLibraries)
-    alias(libs.plugins.kotlin.compose)
 }
 
 val javaVersion = JavaVersion.VERSION_11
@@ -41,7 +40,6 @@ android {
     }
     buildFeatures {
         buildConfig = true
-        compose = true
         viewBinding = true
     }
     packaging.resources.excludes.add("**/*.kotlin_*")
@@ -51,11 +49,7 @@ kotlin.compilerOptions.jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-    implementation(libs.aboutlibraries.compose.m3)
-    implementation(libs.material3.android)
-    implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.browser:browser:1.9.0")
-    implementation("androidx.compose.foundation:foundation-layout:1.10.5")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.preference:preference:1.2.1")
