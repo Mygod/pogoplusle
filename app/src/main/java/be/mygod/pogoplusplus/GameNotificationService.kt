@@ -78,11 +78,17 @@ class GameNotificationService : NotificationListenerService() {
 
         private val bluetoothAdapter by lazy { app.getSystemService<BluetoothManager>()!!.adapter }
         private val notificationManager by lazy { app.getSystemService<NotificationManager>()!! }
-        private fun makeDisconnectingPendingIntent(device: BluetoothDevice) = PendingIntent.getBroadcast(app, 0,
-            Intent(app, SfidaDisconnectReceiver::class.java).apply {
-                data = Uri.fromParts("mac", device.address, null)  // to differentiate as ID
-                putExtra(BluetoothDevice.EXTRA_DEVICE, device)
-            }, PendingIntent.FLAG_IMMUTABLE)
+        const val EXTRA_GAME_ACTION = "game_action"
+        private var latestCompanionStopAction: PendingIntent? = null
+
+        private fun makeDisconnectingPendingIntent(device: BluetoothDevice? = null) =
+            PendingIntent.getBroadcast(app, 0, Intent(app, SfidaDisconnectReceiver::class.java).apply {
+                latestCompanionStopAction?.let { putExtra(EXTRA_GAME_ACTION, it) }
+                if (device != null) {
+                    data = Uri.fromParts("mac", device.address, null)  // to differentiate as ID
+                    putExtra(BluetoothDevice.EXTRA_DEVICE, device)
+                }
+            }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         private fun pushNotification(
             id: Int,
             channel: String,
@@ -177,8 +183,7 @@ class GameNotificationService : NotificationListenerService() {
             app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
             addAction(Notification.Action.Builder(
                 Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
-                app.getText(R.string.notification_action_disconnect), PendingIntent.getBroadcast(app, 0,
-                    Intent(app, SfidaDisconnectReceiver::class.java), PendingIntent.FLAG_IMMUTABLE)).build())
+                app.getText(R.string.notification_action_disconnect), makeDisconnectingPendingIntent()).build())
         }
 
         private fun isInterested(sbn: StatusBarNotification) = sbn.notification.channelId == sbn.packageName &&
@@ -186,15 +191,19 @@ class GameNotificationService : NotificationListenerService() {
     }
 
     override fun onListenerConnected() {
+        latestCompanionStopAction =
+            activeNotifications.firstOrNull(::isInterested)?.notification?.actions?.singleOrNull()?.actionIntent
         isRunning = true
     }
     override fun onListenerDisconnected() {
+        latestCompanionStopAction = null
         isRunning = false
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (BluetoothPairingService.instance?.onNotification(sbn.notification, sbn.packageName) == true ||
             !isInterested(sbn)) return
+        latestCompanionStopAction = sbn.notification.actions?.singleOrNull()?.actionIntent
         val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT)
         Timber.d("PGP notification updated @ ${sbn.postTime} (${sbn.notification.flags}): $text")
         if (text.isNullOrEmpty()) {
@@ -272,7 +281,10 @@ class GameNotificationService : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?, rankingMap: RankingMap?, reason: Int) {
-        if (isInterested(sbn ?: return)) when (reason) {
+        if (!isInterested(sbn ?: return)) return
+        latestCompanionStopAction = activeNotifications.firstOrNull(::isInterested)?.notification?.actions
+            ?.singleOrNull()?.actionIntent
+        when (reason) {
             REASON_PACKAGE_CHANGED,
             REASON_USER_STOPPED,
             REASON_APP_CANCEL,

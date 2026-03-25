@@ -19,6 +19,7 @@
     <string name="notification_channel_connection_status">连接状态</string>
     <string name="notification_channel_inactive_timeout">外部裝置连接失效</string>
     <string name="notification_action_disconnect">断开连接</string>
+    <string name="notification_action_disconnect_failed">无法发送断开连接请求</string>
     <string name="notification_action_unpair">取消配对</string>
     <string name="notification_title_auxiliary_connected">“%1$s”已连接</string>
     <string name="notification_title_auxiliary_connected_default">外部裝置已连接</string>

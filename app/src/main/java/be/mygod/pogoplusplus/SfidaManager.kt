@@ -65,32 +65,43 @@ object SfidaManager : BluetoothGattCallback() {
     }
 
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
-    private fun disconnectGatt(device: BluetoothDevice) {
-        val gatt = device.connectGatt(app, false, SfidaManager) ?: return
+    private fun disconnectGatt(device: BluetoothDevice): Boolean {
+        val gatt = device.connectGatt(app, false, SfidaManager) ?: return false
         try {
             for (i in 1..32) {  // https://cs.android.com/android/platform/superproject/+/master:packages/modules/Bluetooth/system/internal_include/bt_target.h;l=525;drc=a786e24777988f3207b90fdb5eb00bc68b540691
                 mClientIf.setInt(gatt, i)
                 gatt.disconnect()
             }
+            return true
         } catch (e: Exception) {
             Timber.w(e)
+            return false
         } finally {
             gatt.close()
         }
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
-    fun disconnect(device: BluetoothDevice) {
-        if (bluetooth.adapter.bondedDevices?.contains(device) != false && removeBond(device) ||
-            device.name == DEVICE_NAME_PGP && device.bondState == BluetoothDevice.BOND_NONE ||
-            Build.VERSION.SDK_INT >= 31 && bluetooth.getConnectionState(device, BluetoothProfile.GATT) !=
-            BluetoothProfile.STATE_CONNECTED) return
-        disconnectGatt(device)
+    fun disconnect(device: BluetoothDevice): Boolean {
+        if (bluetooth.adapter.bondedDevices?.contains(device) != false && removeBond(device)) return true
+        if (Build.VERSION.SDK_INT >= 31 && bluetooth.getConnectionState(device, BluetoothProfile.GATT) !=
+            BluetoothProfile.STATE_CONNECTED) return true
+        if (device.name == DEVICE_NAME_PGP && device.bondState == BluetoothDevice.BOND_NONE) return false
+        return disconnectGatt(device)
     }
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
-    fun disconnectAll() {
-        bluetooth.adapter.bondedDevices?.forEach { device -> getDeviceName(device) == null || removeBond(device) }
-        for (device in bluetooth.getConnectedDevices(BluetoothProfile.GATT)) {
-            if (getDeviceName(device) != null) disconnectGatt(device)
+    fun disconnectAll(): Boolean {
+        var attempted = false
+        var succeeded = false
+        bluetooth.adapter.bondedDevices?.forEach { device ->
+            if (getDeviceName(device) != null) {
+                attempted = true
+                succeeded = removeBond(device) || succeeded
+            }
         }
+        for (device in bluetooth.getConnectedDevices(BluetoothProfile.GATT)) if (getDeviceName(device) != null) {
+            attempted = true
+            succeeded = disconnect(device) || succeeded
+        }
+        return succeeded || !attempted
     }
 }

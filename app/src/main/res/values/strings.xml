@@ -25,6 +25,7 @@
     <string name="notification_channel_connection_status">Connection status</string>
     <string name="notification_channel_inactive_timeout">Accessory device inactive</string>
     <string name="notification_action_disconnect">Disconnect</string>
+    <string name="notification_action_disconnect_failed">Unable to send a disconnect request</string>
     <string name="notification_action_unpair">Unpair</string>
     <string name="notification_title_auxiliary_connected">%1$s connected</string>
     <string name="notification_title_auxiliary_connected_default">Accessory device connected</string>
