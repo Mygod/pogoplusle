@@ -78,6 +78,11 @@ class GameNotificationService : NotificationListenerService() {
 
         private val bluetoothAdapter by lazy { app.getSystemService<BluetoothManager>()!!.adapter }
         private val notificationManager by lazy { app.getSystemService<NotificationManager>()!! }
+        private fun makeDisconnectingPendingIntent(device: BluetoothDevice) = PendingIntent.getBroadcast(app, 0,
+            Intent(app, SfidaDisconnectReceiver::class.java).apply {
+                data = Uri.fromParts("mac", device.address, null)  // to differentiate as ID
+                putExtra(BluetoothDevice.EXTRA_DEVICE, device)
+            }, PendingIntent.FLAG_IMMUTABLE)
         private fun pushNotification(
             id: Int,
             channel: String,
@@ -130,10 +135,7 @@ class GameNotificationService : NotificationListenerService() {
                 if (stats.deviceAddress.isNotEmpty()) addAction(Notification.Action.Builder(
                     Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
                     app.getText(R.string.notification_action_disconnect),
-                    PendingIntent.getBroadcast(app, 0, Intent(app, SfidaDisconnectReceiver::class.java).apply {
-                        data = Uri.fromParts("mac", stats.deviceAddress, null)  // to differentiate as ID
-                        putExtra(BluetoothDevice.EXTRA_DEVICE, bluetoothAdapter.getRemoteDevice(stats.deviceAddress))
-                    }, PendingIntent.FLAG_IMMUTABLE)).build())
+                    makeDisconnectingPendingIntent(bluetoothAdapter.getRemoteDevice(stats.deviceAddress))).build())
                 setColor(app.getColor(R.color.primaryColor))
                 setOnlyAlertOnce(true)
                 if (Build.VERSION.SDK_INT >= 34) setOngoing(true)
@@ -154,6 +156,13 @@ class GameNotificationService : NotificationListenerService() {
                 app.getText(R.string.notification_title_auxiliary_disconnected_default),
                 R.drawable.ic_device_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
+                if (device?.run {
+                        second == SfidaManager.DEVICE_NAME_PGP &&
+                                first.bondState != BluetoothDevice.BOND_NONE
+                    } == true) addAction(Notification.Action.Builder(
+                    Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
+                    app.getText(R.string.notification_action_unpair),
+                    makeDisconnectingPendingIntent(device.first)).build())
                 setPublicVersion(build().clone())
                 setVisibility(Notification.VISIBILITY_PRIVATE)
                 stats.deviceName?.let {
