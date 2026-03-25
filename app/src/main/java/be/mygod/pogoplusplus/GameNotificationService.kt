@@ -20,6 +20,7 @@ import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
 import be.mygod.pogoplusplus.util.findString
+import be.mygod.pogoplusplus.util.findStrings
 import timber.log.Timber
 
 class GameNotificationService : NotificationListenerService() {
@@ -213,57 +214,57 @@ class GameNotificationService : NotificationListenerService() {
             updateConnectionStatus(SfidaSessionManager.onConnect())
             return setTimeoutIfEnabled()
         }
-        val resources = try {
-            packageManager.getResourcesForApplication(sbn.packageName)
+        val gameContext = try {
+            createPackageContext(sbn.packageName, 0)
         } catch (_: PackageManager.NameNotFoundException) {
             return
         }
-        if (text == resources.findString("Disconnecting_Companion_Device", sbn.packageName)) {
+        if (text in gameContext.findStrings("Disconnecting_Companion_Device") ||
+            text in gameContext.findStrings("Disconnecting_GO_Plus")) {
             return onAuxiliaryDisconnected()
         }
         val isConnected = SfidaManager.isConnected != false
         if (isConnected) setTimeoutIfEnabled()
         if (Build.VERSION.SDK_INT < 31 && sbn.notification.flags and Notification.FLAG_FOREGROUND_SERVICE !=
             Notification.FLAG_FOREGROUND_SERVICE) return    // ignore reposted notification
-        var str = resources.findString("Item_Inventory_Full", sbn.packageName)
-        if (text == str) return pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, str,
-            R.drawable.ic_action_shopping_bag, sbn.packageName) {
-            setOnlyAlertOnce(!notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
-        }
-        str = resources.findString("Pokemon_Inventory_Full", sbn.packageName)
-        if (text == str) return pushNotification(NOTIFICATION_POKEMON_FULL, CHANNEL_POKEMON_FULL, str,
-            R.drawable.ic_notification_disc_full, sbn.packageName)
-        str = resources.findString("Out_Of_Pokeballs", sbn.packageName)
         when (text) {
-            str -> pushNotification(NOTIFICATION_NO_BALL, CHANNEL_NO_BALL, str,
-                R.drawable.ic_action_hide_source, sbn.packageName)
-            resources.findString("Captured_Pokemon", sbn.packageName) -> {
+            in gameContext.findStrings("Item_Inventory_Full") -> pushNotification(NOTIFICATION_ITEM_FULL,
+                CHANNEL_ITEM_FULL, text, R.drawable.ic_action_shopping_bag, sbn.packageName) {
+                setOnlyAlertOnce(!notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
+            }
+            in gameContext.findStrings("Pokemon_Inventory_Full") -> pushNotification(NOTIFICATION_POKEMON_FULL,
+                CHANNEL_POKEMON_FULL, text, R.drawable.ic_notification_disc_full, sbn.packageName)
+            in gameContext.findStrings("Out_Of_Pokeballs") -> pushNotification(NOTIFICATION_NO_BALL,
+                CHANNEL_NO_BALL, text, R.drawable.ic_action_hide_source, sbn.packageName)
+            in gameContext.findStrings("Captured_Pokemon") -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
                 val stats = SfidaSessionManager.onCaptured(isConnected)
                 if (isConnected) updateConnectionStatus(stats)
             }
-            resources.findString("Pokemon_Escaped", sbn.packageName) -> {
+            in gameContext.findStrings("Pokemon_Escaped") -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
                 val stats = SfidaSessionManager.onEscaped(isConnected)
                 if (isConnected) updateConnectionStatus(stats)
             }
-            resources.findString("Retrieved_an_Item", sbn.packageName, "") -> { // remove %s if present
+            in gameContext.findStrings("Retrieved_an_Item", "") -> { // remove %s if present
                 notificationManager.cancel(NOTIFICATION_ITEM_FULL)
                 notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
                 val stats = SfidaSessionManager.onSpin(1, isConnected)
                 if (isConnected) updateConnectionStatus(stats)
             }
-            resources.findString("Pokestop_Cooldown", sbn.packageName),
-            resources.findString("Pokestop_Out_Of_Range", sbn.packageName) -> { }
+            in gameContext.findStrings("Pokestop_Cooldown"), in gameContext.findStrings("Pokestop_Out_Of_Range") -> { }
             else -> {
-                val split = resources.findString("Retrieved_Items", sbn.packageName)?.split("%s", limit = 2)
-                if (split?.size != 2) {
-                    Timber.e(Exception("Unrecognized Retrieved_Items ${split?.getOrNull(0)}"))
-                    return
+                var split: List<String>? = null
+                for (template in gameContext.findStrings("Retrieved_Items")) {
+                    val candidate = template.split("%s", limit = 2)
+                    if (candidate.size == 2 && text.startsWith(candidate[0]) && text.endsWith(candidate[1])) {
+                        split = candidate
+                        break
+                    }
                 }
-                if (text.startsWith(split[0]) && text.endsWith(split[1])) {
+                if (split != null) {
                     val items = try {
                         text.substring(split[0].length, text.length - split[1].length).toLong()
                     } catch (e: NumberFormatException) {
