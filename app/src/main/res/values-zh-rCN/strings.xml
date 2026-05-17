@@ -18,6 +18,7 @@
     <string name="notification_channel_spin_fail">补给失败</string>
     <string name="notification_channel_connection_status">连接状态</string>
     <string name="notification_channel_inactive_timeout">外部裝置连接失效</string>
+    <string name="notification_channel_root_pairing_failed">Root 配对失败</string>
     <string name="notification_action_disconnect">断开连接</string>
     <string name="notification_action_disconnect_failed">无法发送断开连接请求</string>
     <string name="notification_action_unpair">取消配对</string>
@@ -25,6 +26,8 @@
     <string name="notification_title_auxiliary_connected_default">外部裝置已连接</string>
     <string name="notification_title_auxiliary_disconnected">“%1$s”已断开连接</string>
     <string name="notification_title_auxiliary_disconnected_default">外部裝置已断开连接</string>
+    <string name="notification_title_root_pairing_failed">蓝牙配对失败</string>
+    <string name="notification_text_root_pairing_failed">宝够乐无法通过 root 确认配对请求。</string>
 
     <string name="settings_service_pairing">蓝牙配对助手</string>
     <string name="settings_service_pairing_summary">自动点击对话框配对</string>

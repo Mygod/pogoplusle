@@ -18,6 +18,7 @@
     <string name="notification_channel_spin_fail">轉補錯誤</string>
     <string name="notification_channel_connection_status">連線就緒</string>
     <string name="notification_channel_inactive_timeout">外部裝置連線失效</string>
+    <string name="notification_channel_root_pairing_failed">Root 配對失敗</string>
     <string name="notification_action_disconnect">關閉連線</string>
     <string name="notification_action_disconnect_failed">無法送出關閉連線請求</string>
     <string name="notification_action_unpair">取消配對</string>
@@ -25,6 +26,8 @@
     <string name="notification_title_auxiliary_connected_default">已連線至外部裝置</string>
     <string name="notification_title_auxiliary_disconnected">已關閉與「%1$s」的連線</string>
     <string name="notification_title_auxiliary_disconnected_default">已關閉與外部裝置的連線</string>
+    <string name="notification_title_root_pairing_failed">藍牙配對失敗</string>
+    <string name="notification_text_root_pairing_failed">寶夠樂無法透過 root 確認配對要求。</string>
 
     <string name="settings_service_pairing">藍牙配對助手</string>
     <string name="settings_service_pairing_summary">協助點擊配對視窗</string>

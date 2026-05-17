@@ -24,6 +24,7 @@
     <string name="notification_channel_spin_fail">PokéStop spin error</string>
     <string name="notification_channel_connection_status">Connection status</string>
     <string name="notification_channel_inactive_timeout">Accessory device inactive</string>
+    <string name="notification_channel_root_pairing_failed">Root pairing failed</string>
     <string name="notification_action_disconnect">Disconnect</string>
     <string name="notification_action_disconnect_failed">Unable to send a disconnect request</string>
     <string name="notification_action_unpair">Unpair</string>
@@ -31,6 +32,8 @@
     <string name="notification_title_auxiliary_connected_default">Accessory device connected</string>
     <string name="notification_title_auxiliary_disconnected">%1$s disconnected</string>
     <string name="notification_title_auxiliary_disconnected_default">Accessory device disconnected</string>
+    <string name="notification_title_root_pairing_failed">Bluetooth pairing failed</string>
+    <string name="notification_text_root_pairing_failed">PoGo+LE could not confirm the pairing request with root.</string>
 
     <string name="settings_service_pairing">Bluetooth pairing assistant</string>
     <string name="settings_service_pairing_summary">Click the pairing dialog for you</string>

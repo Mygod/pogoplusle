@@ -32,6 +32,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val CHANNEL_SPIN_FAIL = "spin_fail"
         private const val CHANNEL_CONNECTION_STATUS = "connection_pending"
         private const val CHANNEL_INACTIVE_TIMEOUT = "inactive_timeout"
+        private const val CHANNEL_ROOT_PAIRING_FAILED = "root_pairing_failed"
         private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
         private const val PACKAGE_POKEMON_GO_ARES = "com.nianticlabs.pokemongo.ares"
 
@@ -41,6 +42,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val NOTIFICATION_NO_BALL = 4
         private const val NOTIFICATION_SPIN_FAIL = 5
         private const val NOTIFICATION_CONNECTION_STATUS = 6
+        private const val NOTIFICATION_ROOT_PAIRING_FAILED = 7
 
         val gameIntent get() = listOf(PACKAGE_POKEMON_GO, PACKAGE_POKEMON_GO_ARES)
             .mapNotNull(app.packageManager::getLaunchIntentForPackage).let { list ->
@@ -75,6 +77,7 @@ class GameNotificationService : NotificationListenerService() {
                 setShowBadge(false)
             },
             makeNotificationChannel(CHANNEL_INACTIVE_TIMEOUT, R.string.notification_channel_inactive_timeout),
+            makeNotificationChannel(CHANNEL_ROOT_PAIRING_FAILED, R.string.notification_channel_root_pairing_failed),
         ))
 
         private val bluetoothAdapter by lazy { app.getSystemService<BluetoothManager>()!!.adapter }
@@ -96,6 +99,7 @@ class GameNotificationService : NotificationListenerService() {
             title: CharSequence,
             @DrawableRes icon: Int,
             packageName: String? = null,
+            contentIntent: Intent = gameIntent,
             block: (Notification.Builder.() -> Unit)? = null,
         ) = notificationManager.notify(id, Notification.Builder(app, channel).apply {
             setCategory(Notification.CATEGORY_STATUS)
@@ -104,7 +108,7 @@ class GameNotificationService : NotificationListenerService() {
             setSmallIcon(icon)
             setContentIntent(PendingIntent.getActivity(app, 0, if (packageName != null) {
                 app.packageManager.getLaunchIntentForPackage(packageName) ?: gameIntent
-            } else gameIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            } else contentIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             setShowWhen(true)
             setAutoCancel(true)
             setVisibility(Notification.VISIBILITY_PUBLIC)
@@ -188,6 +192,17 @@ class GameNotificationService : NotificationListenerService() {
             addAction(Notification.Action.Builder(
                 Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
                 app.getText(R.string.notification_action_disconnect), makeDisconnectingPendingIntent()).build())
+        }
+        fun onRootPairingSucceeded() = notificationManager.cancel(NOTIFICATION_ROOT_PAIRING_FAILED)
+        fun onRootPairingFailed() = pushNotification(
+            NOTIFICATION_ROOT_PAIRING_FAILED,
+            CHANNEL_ROOT_PAIRING_FAILED,
+            app.getText(R.string.notification_title_root_pairing_failed),
+            R.drawable.ic_alert_error_outline,
+            contentIntent = Intent(app, MainActivity::class.java),
+        ) {
+            setContentText(app.getText(R.string.notification_text_root_pairing_failed))
+            setOnlyAlertOnce(true)
         }
 
         private fun isInterested(sbn: StatusBarNotification) = sbn.notification.channelId == sbn.packageName &&

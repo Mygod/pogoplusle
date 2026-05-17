@@ -30,14 +30,23 @@ class BluetoothPairingReceiver : BroadcastReceiver() {
         val device = SfidaManager.getDevice(intent) ?: return
         abortBroadcast()    // stop system notification/popup
         try {
-            device.first.setPairingConfirmation(true)
+            if (device.first.setPairingConfirmation(true)) {
+                GameNotificationService.onRootPairingSucceeded()
+            } else {
+                GameNotificationService.onRootPairingFailed()
+            }
         } catch (se: SecurityException) {
             GlobalScope.launch {
                 try {
-                    RootManager.use { it.execute(PairingConfirmationCommand(device.first)) }
+                    if (RootManager.use { it.execute(PairingConfirmationCommand(device.first)).value }) {
+                        GameNotificationService.onRootPairingSucceeded()
+                    } else {
+                        GameNotificationService.onRootPairingFailed()
+                    }
                 } catch (e: Exception) {
                     e.addSuppressed(se)
                     Timber.w(e)
+                    GameNotificationService.onRootPairingFailed()
                 }
             }
         }
