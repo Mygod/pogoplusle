@@ -24,7 +24,7 @@
     <string name="notification_channel_spin_fail">PokéStop spin error</string>
     <string name="notification_channel_connection_status">Connection status</string>
     <string name="notification_channel_inactive_timeout">Accessory device inactive</string>
-    <string name="notification_channel_root_pairing_failed">Root pairing failed</string>
+    <string name="notification_channel_shizuku_pairing_failed">Shizuku pairing failed</string>
     <string name="notification_action_disconnect">Disconnect</string>
     <string name="notification_action_disconnect_failed">Unable to send a disconnect request</string>
     <string name="notification_action_unpair">Unpair</string>
@@ -32,8 +32,9 @@
     <string name="notification_title_auxiliary_connected_default">Accessory device connected</string>
     <string name="notification_title_auxiliary_disconnected">%1$s disconnected</string>
     <string name="notification_title_auxiliary_disconnected_default">Accessory device disconnected</string>
-    <string name="notification_title_root_pairing_failed">Bluetooth pairing failed</string>
-    <string name="notification_text_root_pairing_failed">PoGo+LE could not confirm the pairing request with root.</string>
+    <string name="notification_title_shizuku_pairing_failed">Bluetooth pairing failed</string>
+    <string name="notification_text_shizuku_pairing_failed">PoGo+LE could not confirm the pairing request through
+        Shizuku.</string>
 
     <string name="settings_service_pairing">Bluetooth pairing assistant</string>
     <string name="settings_service_pairing_summary">Click the pairing dialog for you</string>
@@ -49,9 +50,10 @@
     <string name="settings_game_battery_optimized_summary">Game may crash when put in the background. Get around this
         bug by checking <i>Unrestricted</i> in <i>App battery usage</i> for the game app</string>
     -->
-    <string name="settings_service_pairing_root">Pair Bluetooth with root</string>
-    <string name="settings_service_pairing_root_summary">DO NOT ENABLE THIS unless you already happen to have rooted
-        your device. This mode is quieter and has better compatibility, but is more resource intensive</string>
+    <string name="settings_service_pairing_shizuku">Pair Bluetooth with Shizuku</string>
+    <string name="settings_service_pairing_shizuku_summary">Confirm pairing through Shizuku. This mode is quieter and
+        has better compatibility, but Shizuku must be running</string>
+    <string name="settings_service_pairing_shizuku_missing">Shizuku is unavailable or permission was not granted</string>
 
     <string name="settings_advanced">Advanced</string>
     <string name="settings_about">About</string>

@@ -5,24 +5,10 @@ import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.annotation.RequiresApi
-import be.mygod.librootkotlinx.ParcelableBoolean
-import be.mygod.librootkotlinx.RootCommand
-import be.mygod.pogoplusplus.util.RootManager
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
+import be.mygod.pogoplusplus.util.ShizukuManager
 import timber.log.Timber
 
 class BluetoothPairingReceiver : BroadcastReceiver() {
-    @Parcelize
-    class PairingConfirmationCommand(private val device: BluetoothDevice) : RootCommand<ParcelableBoolean> {
-        @SuppressLint("MissingPermission")
-        override suspend fun execute() = ParcelableBoolean(device.setPairingConfirmation(true))
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent?) {
         // check for PAIRING_VARIANT_CONSENT
@@ -31,23 +17,21 @@ class BluetoothPairingReceiver : BroadcastReceiver() {
         abortBroadcast()    // stop system notification/popup
         try {
             if (device.first.setPairingConfirmation(true)) {
-                GameNotificationService.onRootPairingSucceeded()
+                GameNotificationService.onPrivilegedPairingSucceeded()
             } else {
-                GameNotificationService.onRootPairingFailed()
+                GameNotificationService.onPrivilegedPairingFailed()
             }
         } catch (se: SecurityException) {
-            GlobalScope.launch {
-                try {
-                    if (RootManager.use { it.execute(PairingConfirmationCommand(device.first)).value }) {
-                        GameNotificationService.onRootPairingSucceeded()
-                    } else {
-                        GameNotificationService.onRootPairingFailed()
-                    }
-                } catch (e: Exception) {
-                    e.addSuppressed(se)
-                    Timber.w(e)
-                    GameNotificationService.onRootPairingFailed()
+            try {
+                if (ShizukuManager.setPairingConfirmation(device.first)) {
+                    GameNotificationService.onPrivilegedPairingSucceeded()
+                } else {
+                    GameNotificationService.onPrivilegedPairingFailed()
                 }
+            } catch (e: Exception) {
+                e.addSuppressed(se)
+                Timber.w(e)
+                GameNotificationService.onPrivilegedPairingFailed()
             }
         }
     }

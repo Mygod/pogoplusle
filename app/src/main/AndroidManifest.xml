@@ -33,6 +33,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PoGoPlusPlus"
         tools:targetApi="33">
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

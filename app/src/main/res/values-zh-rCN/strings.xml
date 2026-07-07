@@ -18,7 +18,7 @@
     <string name="notification_channel_spin_fail">补给失败</string>
     <string name="notification_channel_connection_status">连接状态</string>
     <string name="notification_channel_inactive_timeout">外部裝置连接失效</string>
-    <string name="notification_channel_root_pairing_failed">Root 配对失败</string>
+    <string name="notification_channel_shizuku_pairing_failed">Shizuku 配对失败</string>
     <string name="notification_action_disconnect">断开连接</string>
     <string name="notification_action_disconnect_failed">无法发送断开连接请求</string>
     <string name="notification_action_unpair">取消配对</string>
@@ -26,8 +26,8 @@
     <string name="notification_title_auxiliary_connected_default">外部裝置已连接</string>
     <string name="notification_title_auxiliary_disconnected">“%1$s”已断开连接</string>
     <string name="notification_title_auxiliary_disconnected_default">外部裝置已断开连接</string>
-    <string name="notification_title_root_pairing_failed">蓝牙配对失败</string>
-    <string name="notification_text_root_pairing_failed">宝够乐无法通过 root 确认配对请求。</string>
+    <string name="notification_title_shizuku_pairing_failed">蓝牙配对失败</string>
+    <string name="notification_text_shizuku_pairing_failed">宝够乐无法通过 Shizuku 确认配对请求。</string>
 
     <string name="settings_service_pairing">蓝牙配对助手</string>
     <string name="settings_service_pairing_summary">自动点击对话框配对</string>
@@ -42,8 +42,9 @@
     <string name="settings_game_battery_optimized">已为游戏优化电池用量</string>
     <string name="settings_game_battery_optimized_summary">游戏在后台运行时连接可能会崩溃。在“应用的电池电量”中为游戏设置为“无限制”可绕过这个问题</string>
     -->
-    <string name="settings_service_pairing_root">用 root 配对蓝牙</string>
-    <string name="settings_service_pairing_root_summary">除非已有 root 权限，<b>不要打开此开关</b>！此模式相比更安静可靠，但占用资源更多</string>
+    <string name="settings_service_pairing_shizuku">用 Shizuku 配对蓝牙</string>
+    <string name="settings_service_pairing_shizuku_summary">通过 Shizuku 确认配对。此模式相比更安静可靠，但需要 Shizuku 正在运行</string>
+    <string name="settings_service_pairing_shizuku_missing">Shizuku 不可用或未授予权限</string>
 
     <string name="settings_advanced">高级</string>
     <string name="settings_about">关于</string>

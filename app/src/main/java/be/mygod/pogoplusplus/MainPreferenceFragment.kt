@@ -21,22 +21,27 @@ import be.mygod.pogoplusplus.App.Companion.app
 import com.google.android.gms.oss.licenses.v2.OssLicensesMenuActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import rikka.shizuku.Shizuku
+import timber.log.Timber
 
 class MainPreferenceFragment : PreferenceFragmentCompat() {
     companion object {
         var instance: MainPreferenceFragment? = null
 
         private const val EXTRA_KEY_LEGACY = ":settings:fragment_args_key"
+        private const val REQUEST_SHIZUKU_PAIRING = 1
     }
 
     private lateinit var servicePairing: TwoStatePreference
     private lateinit var serviceGameNotification: TwoStatePreference
     private lateinit var permissionBluetooth: TwoStatePreference
-    private lateinit var servicePairingRoot: TwoStatePreference
+    private lateinit var servicePairingShizuku: TwoStatePreference
+    private var pendingShizukuPairingEnable = false
     private fun Preference.remove() = parent!!.removePreference(this)
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_main)
+        Shizuku.addRequestPermissionResultListener(requestShizukuPermission)
         findPreference<Preference>("play")?.setOnPreferenceClickListener {
             app.launchUrl(requireContext(), "https://github.com/Mygod/pogoplusle/discussions/46")
             true
@@ -48,7 +53,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             y == null || y > 2020 || y == 2020 && (m == null || m >= 11)
         }
         servicePairing = findPreference("service.pairing")!!
-        servicePairingRoot = findPreference("service.pairingRoot")!!
+        servicePairingShizuku = findPreference("service.pairingRoot")!!
         if (needsServicePairing) {
             servicePairing.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
@@ -69,20 +74,18 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 })
                 false
             }
-            servicePairingRoot.setOnPreferenceChangeListener { _, newValue ->
+            servicePairingShizuku.setOnPreferenceChangeListener { _, newValue ->
                 val shouldEnable = newValue as Boolean
-                app.setEnabled<BluetoothPairingReceiver>(shouldEnable)
-                if (shouldEnable && Build.VERSION.SDK_INT >= 31 && !hasBluetoothPermission) {
-                    requestBluetoothPermission.launch(if (Build.VERSION.SDK_INT >= 33) {
-                        arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.POST_NOTIFICATIONS)
-                    } else arrayOf(Manifest.permission.BLUETOOTH_CONNECT))
-                    false
-                } else true
+                pendingShizukuPairingEnable = false
+                if (shouldEnable) enableShizukuPairing() else {
+                    app.setEnabled<BluetoothPairingReceiver>(false)
+                    true
+                }
             }
         } else {
             servicePairing.remove()
             // we only hit here if API < 31, in which case neither entries would be needed
-            servicePairingRoot.parent!!.remove()
+            servicePairingShizuku.parent!!.remove()
         }
         serviceGameNotification = findPreference("service.gameNotification")!!
         serviceGameNotification.setOnPreferenceChangeListener { _, _ ->
@@ -156,9 +159,56 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val granted = permissions.getOrDefault(Manifest.permission.BLUETOOTH_CONNECT, false)
         permissionBluetooth.isChecked = granted && app.isEnabled<BluetoothReceiver>()
-        servicePairingRoot.isChecked = granted && app.isEnabled<BluetoothPairingReceiver>(false)
+        if (pendingShizukuPairingEnable) {
+            pendingShizukuPairingEnable = false
+            servicePairingShizuku.isChecked = granted && enableShizukuPairing()
+        } else updateShizukuPairingSwitch()
         if (!granted) Snackbar.make(requireView(), R.string.settings_permission_bluetooth_missing,
             Snackbar.LENGTH_LONG).show()
+    }
+
+    private val requestShizukuPermission = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
+        if (requestCode == REQUEST_SHIZUKU_PAIRING) {
+            if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                app.setEnabled<BluetoothPairingReceiver>(true)
+            } else {
+                view?.let { Snackbar.make(it, R.string.settings_service_pairing_shizuku_missing,
+                    Snackbar.LENGTH_LONG).show() }
+            }
+            updateShizukuPairingSwitch()
+        }
+    }
+
+    private fun enableShizukuPairing(): Boolean {
+        if (Build.VERSION.SDK_INT >= 31 && !hasBluetoothPermission) {
+            pendingShizukuPairingEnable = true
+            requestBluetoothPermission.launch(if (Build.VERSION.SDK_INT >= 33) {
+                arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.POST_NOTIFICATIONS)
+            } else arrayOf(Manifest.permission.BLUETOOTH_CONNECT))
+            return false
+        }
+        try {
+            if (Shizuku.pingBinder() && !Shizuku.isPreV11()) {
+                if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
+                    app.setEnabled<BluetoothPairingReceiver>(true)
+                    return true
+                }
+                if (!Shizuku.shouldShowRequestPermissionRationale()) {
+                    Shizuku.requestPermission(REQUEST_SHIZUKU_PAIRING)
+                    return false
+                }
+            }
+        } catch (e: RuntimeException) {
+            Timber.w(e)
+        }
+        view?.let { Snackbar.make(it, R.string.settings_service_pairing_shizuku_missing,
+            Snackbar.LENGTH_LONG).show() }
+        return false
+    }
+
+    private fun updateShizukuPairingSwitch() {
+        servicePairingShizuku.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
+                app.isEnabled<BluetoothPairingReceiver>(false)
     }
 
     override fun onStart() {
@@ -167,8 +217,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         updateSwitches()
         permissionBluetooth.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
                 app.isEnabled<BluetoothReceiver>()
-        servicePairingRoot.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
-                app.isEnabled<BluetoothPairingReceiver>(false)
+        updateShizukuPairingSwitch()
     }
 
     fun updateSwitches() {
@@ -179,5 +228,10 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     override fun onStop() {
         instance = null
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        Shizuku.removeRequestPermissionResultListener(requestShizukuPermission)
+        super.onDestroy()
     }
 }

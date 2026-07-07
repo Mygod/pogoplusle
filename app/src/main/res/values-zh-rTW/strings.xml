@@ -18,7 +18,7 @@
     <string name="notification_channel_spin_fail">轉補錯誤</string>
     <string name="notification_channel_connection_status">連線就緒</string>
     <string name="notification_channel_inactive_timeout">外部裝置連線失效</string>
-    <string name="notification_channel_root_pairing_failed">Root 配對失敗</string>
+    <string name="notification_channel_shizuku_pairing_failed">Shizuku 配對失敗</string>
     <string name="notification_action_disconnect">關閉連線</string>
     <string name="notification_action_disconnect_failed">無法送出關閉連線請求</string>
     <string name="notification_action_unpair">取消配對</string>
@@ -26,8 +26,8 @@
     <string name="notification_title_auxiliary_connected_default">已連線至外部裝置</string>
     <string name="notification_title_auxiliary_disconnected">已關閉與「%1$s」的連線</string>
     <string name="notification_title_auxiliary_disconnected_default">已關閉與外部裝置的連線</string>
-    <string name="notification_title_root_pairing_failed">藍牙配對失敗</string>
-    <string name="notification_text_root_pairing_failed">寶夠樂無法透過 root 確認配對要求。</string>
+    <string name="notification_title_shizuku_pairing_failed">藍牙配對失敗</string>
+    <string name="notification_text_shizuku_pairing_failed">寶夠樂無法透過 Shizuku 確認配對要求。</string>
 
     <string name="settings_service_pairing">藍牙配對助手</string>
     <string name="settings_service_pairing_summary">協助點擊配對視窗</string>
@@ -42,9 +42,9 @@
     <string name="settings_game_battery_optimized">已優化遊戲電池用量</string>
     <string name="settings_game_battery_optimized_summary">遊戲置於背景運行時可能會崩潰，請至「電池與電量」中為遊戲設置「無限制」以解決此問題</string>
     -->
-    <string name="settings_service_pairing_root">以 root 權限進行藍牙配對</string>
-    <string name="settings_service_pairing_root_summary"><b>請勿啟動此功能</b>，除非您已授權 root
-        此裝置。此模式較為安靜並具有更好的相容性，但是相對更為耗能</string>
+    <string name="settings_service_pairing_shizuku">以 Shizuku 進行藍牙配對</string>
+    <string name="settings_service_pairing_shizuku_summary">透過 Shizuku 確認配對。此模式較為安靜並具有更好的相容性，但是需要 Shizuku 正在執行</string>
+    <string name="settings_service_pairing_shizuku_missing">Shizuku 不可用或未授與權限</string>
 
     <string name="settings_advanced">進階</string>
     <string name="settings_about">關於</string>

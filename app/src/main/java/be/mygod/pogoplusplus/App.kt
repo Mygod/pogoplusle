@@ -11,14 +11,9 @@ import android.widget.Toast
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-import be.mygod.librootkotlinx.NoShellException
-import be.mygod.pogoplusplus.util.RootManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class App : Application() {
@@ -43,21 +38,11 @@ class App : Application() {
                         Log.println(priority, tag, message)
                         Log.w(tag, message, t)
                     }
-                    if (priority >= Log.INFO && t !is NoShellException) {
-                        FirebaseCrashlytics.getInstance().recordException(t)
-                    }
+                    if (priority >= Log.INFO) FirebaseCrashlytics.getInstance().recordException(t)
                 }
             }
         })
         GameNotificationService.updateNotificationChannels()
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-        if (level == TRIM_MEMORY_RUNNING_CRITICAL || level >= TRIM_MEMORY_BACKGROUND) GlobalScope.launch {
-            RootManager.closeExisting()
-        }
     }
 
     inline fun <reified T> componentName() = ComponentName(this, T::class.java)
