@@ -31,7 +31,7 @@
 
     <PreferenceCategory app:title="@string/settings_advanced">
         <SwitchPreferenceCompat
-            app:key="service.pairingRoot"
+            app:key="service.pairingShizuku"
             app:icon="@drawable/ic_home_electric_bolt"
             app:title="@string/settings_service_pairing_shizuku"
             app:summary="@string/settings_service_pairing_shizuku_summary"

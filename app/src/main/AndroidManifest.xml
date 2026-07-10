@@ -89,7 +89,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".BluetoothPairingReceiver"
+            android:name=".ShizukuPairingReceiver"
             android:enabled="false"
             android:exported="true">
             <intent-filter android:priority="1000">

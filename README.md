@@ -16,6 +16,29 @@ Context: Pairing dialog were introduced in [November 2020 security patch](https:
 This project is tested with [BrowserStack](https://email.browserstack.com/c/eJwljEtuwyAQQE9T77D4DeAFZ4mAGRyU2DSAZfX2Re36fcgLY0EIBSAW9BAB7VK8UeiU1hk0x_iQKsjItykZQkqKWy1sdmsvSK_yYbnR56JzsIzsu-LVKfQh2BHKqdjeiE6GYDeILm1MdgvjS3Oa-L3OtD-R-mtN9ViePrgtoI2UuBMpCjBSa0hWO4pamqyXt7_ve42t3p1aHyH9l80fP3vFPi4sdd73v_skv_bLR70).
 See a table of tested compatibility [here](https://github.com/Mygod/pogoplusle/wiki/Device-compatibility-table-for-Bluetooth-pairing-assistant).
 
+## Android platform API inventory
+
+This is a concise audit index of app-owned non-SDK access. API restrictions are updated up to
+[SHA-256 checksum `9102af02fe6ab68b92464bdff5e5b09f3bd62c65d1130aaf85d3296f17d38074`](https://github.com/Mygod/hiddenapi/commit/2f90e9da30976febeb0630cba48c4da0116c323d).
+API qualifiers describe when this app uses each member.
+
+Hidden whitelisted APIs:
+
+* `Landroid/bluetooth/BluetoothDevice;->removeBond()Z,sdk,system-api,test-api`
+
+Private APIs:
+
+* `Landroid/bluetooth/BluetoothGatt;->mClientIf:I,unsupported`
+* (API 28-30) `Landroid/bluetooth/BluetoothAdapter;->getBluetoothService(Landroid/bluetooth/IBluetoothManagerCallback;)Landroid/bluetooth/IBluetooth;,greylist`
+* (API 31+) `Landroid/bluetooth/BluetoothAdapter;->getBluetoothService()Landroid/bluetooth/IBluetooth;,blocked`
+* `Landroid/bluetooth/IBluetooth$Stub;->asInterface(Landroid/os/IBinder;)Landroid/bluetooth/IBluetooth;,unsupported`
+* (API 28-30) `Landroid/bluetooth/IBluetooth;->setPairingConfirmation(Landroid/bluetooth/BluetoothDevice;Z)Z,greylist-max-o`
+* (API 31-32 and 35+) `Landroid/bluetooth/IBluetooth;->setPairingConfirmation(Landroid/bluetooth/BluetoothDevice;ZLandroid/content/AttributionSource;)Z,blocked`
+* (API 33-34) `Landroid/bluetooth/IBluetooth;->setPairingConfirmation(Landroid/bluetooth/BluetoothDevice;ZLandroid/content/AttributionSource;Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver;)V,blocked`
+* (API 33-34) `Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver;->get()Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver;,blocked`
+* (API 33-34) `Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver;->awaitResultNoInterrupt(Ljava/time/Duration;)Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver$Result;,blocked`
+* (API 33-34) `Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver$Result;->getValue(Ljava/lang/Object;)Ljava/lang/Object;,blocked`
+
 ## FAQ
 
 Q: How to use it?  
@@ -28,7 +51,8 @@ Q: Is this app safe to use?
 A: Yes. This app uses `AccessibilityService` API to help you skip the pairing dialog. Since this app only interacts with Android system interface and system Settings but not the game, PoGo+LE is fully compliant with Niantic's terms of service and is safe to use.
 
 Q: Not working?  
-A: Feel free to send the following information to me via GitHub issues or else: app version and configuration, device model, Android version, and a screenshot demonstrating the issue. Alternatively, you could try the root mode.
+A: Feel free to send the following information to me via GitHub issues or else: app version and configuration, device model, Android version, and a screenshot demonstrating the issue. You can also try the Shizuku pairing mode if Shizuku is running on your device.
 
-Q: Why should I use the root mode?  
-A: It works more reliably and eliminates pop ups entirely. However, it is more resource intensive. If you want to mitigate this issue, you can systemize this app.
+Q: Why should I use the Shizuku pairing mode?
+
+A: It confirms pairing without the system pop-up. It requires a running Shizuku service and permission for PoGo+LE; if Shizuku is unavailable, Android's normal pairing dialog remains available.
