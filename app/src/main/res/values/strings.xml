@@ -51,8 +51,8 @@
         bug by checking <i>Unrestricted</i> in <i>App battery usage</i> for the game app</string>
     -->
     <string name="settings_service_pairing_shizuku">Pair Bluetooth with Shizuku</string>
-    <string name="settings_service_pairing_shizuku_summary">Confirm pairing through Shizuku. This mode is quieter and
-        has better compatibility, but Shizuku must be running</string>
+    <string name="settings_service_pairing_shizuku_summary">This mode offers a superior experience but requires
+        Shizuku</string>
     <string name="settings_service_pairing_shizuku_missing">Shizuku is unavailable or permission was not granted</string>
 
     <string name="settings_advanced">Advanced</string>

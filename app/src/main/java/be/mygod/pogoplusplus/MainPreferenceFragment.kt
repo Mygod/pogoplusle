@@ -180,13 +180,12 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
 
     private val requestShizukuPermission = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
         if (requestCode == REQUEST_SHIZUKU_PAIRING) {
-            if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                app.setEnabled<ShizukuPairingReceiver>(true)
-            } else {
+            if (grantResult != PackageManager.PERMISSION_GRANTED) {
                 app.setEnabled<ShizukuPairingReceiver>(false)
-                view?.let { Snackbar.make(it, R.string.settings_service_pairing_shizuku_missing,
-                    Snackbar.LENGTH_LONG).show() }
-            }
+                view?.let {
+                    Snackbar.make(it, R.string.settings_service_pairing_shizuku_missing, Snackbar.LENGTH_LONG).show()
+                }
+            } else app.setEnabled<ShizukuPairingReceiver>(true)
             updateShizukuPairingSwitch()
         }
     }
@@ -207,17 +206,16 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 app.setEnabled<ShizukuPairingReceiver>(true)
                 return true
             }
-            if (Shizuku.pingBinder() && !Shizuku.isPreV11()) {
-                if (!Shizuku.shouldShowRequestPermissionRationale()) {
-                    Shizuku.requestPermission(REQUEST_SHIZUKU_PAIRING)
-                    return false
-                }
+            if (Shizuku.pingBinder() && !Shizuku.isPreV11() && !Shizuku.shouldShowRequestPermissionRationale()) {
+                Shizuku.requestPermission(REQUEST_SHIZUKU_PAIRING)
+                return false
             }
         } catch (e: RuntimeException) {
             Timber.w(e)
         }
-        view?.let { Snackbar.make(it, R.string.settings_service_pairing_shizuku_missing,
-            Snackbar.LENGTH_LONG).show() }
+        view?.let {
+            Snackbar.make(it, R.string.settings_service_pairing_shizuku_missing, Snackbar.LENGTH_LONG).show()
+        }
         return false
     }
 

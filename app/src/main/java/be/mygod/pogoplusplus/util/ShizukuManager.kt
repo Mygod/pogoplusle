@@ -1,6 +1,6 @@
 package be.mygod.pogoplusplus.util
 
-import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -16,30 +16,42 @@ import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import timber.log.Timber
-import java.lang.reflect.InvocationTargetException
 import java.time.Duration
 
-@SuppressLint("PrivateApi", "SoonBlockedPrivateApi")
 object ShizukuManager {
     private const val SYNCHRONOUS_RESULT_RECEIVER =
         "com.android.bluetooth.x.com.android.modules.utils.SynchronousResultReceiver"
     private val synchronousResultTimeout: Duration = Duration.ofSeconds(5)
 
+    private val hiddenApiAccess by lazy {
+        HiddenApiBypass.addHiddenApiExemptions(
+            "Landroid/bluetooth/",
+            "Lcom/android/bluetooth/",
+        )
+    }
+
     // API 28-30 only expose the callback overload. API 31 added the no-argument overload.
     // https://android.googlesource.com/platform/frameworks/base/+/android-11.0.0_r1/core/java/android/bluetooth/BluetoothAdapter.java#2487
     // https://android.googlesource.com/platform/frameworks/base/+/android-12.0.0_r1/core/java/android/bluetooth/BluetoothAdapter.java#2206
-    private val getBluetoothService: (BluetoothAdapter) -> IInterface? by lazy {
+    private val getBluetoothService: (BluetoothAdapter) -> IInterface by lazy {
         try {
             val method = BluetoothAdapter::class.java.getDeclaredMethod("getBluetoothService")
             method.isAccessible = true;
-            { adapter -> method.invoke(adapter) as? IInterface }
+            { adapter -> method(adapter) as IInterface }
         } catch (e: NoSuchMethodException) {
             if (Build.VERSION.SDK_INT >= 31) Timber.w(e)
             val method = BluetoothAdapter::class.java.getDeclaredMethod("getBluetoothService",
                 Class.forName("android.bluetooth.IBluetoothManagerCallback"))
             method.isAccessible = true;
-            { adapter -> method.invoke(adapter, null) as? IInterface }
+            { adapter -> method(adapter, null) as IInterface }
         }
+    }
+
+    @get:RequiresApi(31)
+    private val shellAttributionSource by lazy @TargetApi(31) {
+        AttributionSource.Builder(Process.SHELL_UID).apply {
+            setPackageName("com.android.shell")
+        }.build()
     }
 
     /**
@@ -52,20 +64,19 @@ object ShizukuManager {
      * Android 13-14 jarjar-shade SynchronousResultReceiver in the runtime descriptor:
      * https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-13.0.0_r1/framework/jarjar-rules.txt#2
      */
-    private val pairingConfirmation: (Any, BluetoothDevice) -> Boolean by lazy {
+    private val setPairingConfirmation: (Any?, BluetoothDevice) -> Boolean by lazy {
         val serviceClass = Class.forName("android.bluetooth.IBluetooth")
         if (Build.VERSION.SDK_INT < 31) {
             val method = serviceClass.getMethod("setPairingConfirmation", BluetoothDevice::class.java,
                 java.lang.Boolean.TYPE);
-            { service, device -> method.invoke(service, device, true) as Boolean }
+            { service, device -> method(service, device, true) as Boolean }
         } else {
-            val attributionSource = shellAttributionSource()
             try {
                 val method = serviceClass.getMethod("setPairingConfirmation", BluetoothDevice::class.java,
                     java.lang.Boolean.TYPE, AttributionSource::class.java);
-                { service, device -> method.invoke(service, device, true, attributionSource) as Boolean }
+                { service, device -> method(service, device, true, shellAttributionSource) as Boolean }
             } catch (e: NoSuchMethodException) {
-                if (Build.VERSION.SDK_INT < 33 || Build.VERSION.SDK_INT > 34) Timber.w(e)
+                if (Build.VERSION.SDK_INT !in 33..34) Timber.w(e)
                 val receiverClass = Class.forName(SYNCHRONOUS_RESULT_RECEIVER)
                 val method = serviceClass.getMethod("setPairingConfirmation", BluetoothDevice::class.java,
                     java.lang.Boolean.TYPE, AttributionSource::class.java, receiverClass)
@@ -73,47 +84,26 @@ object ShizukuManager {
                 val awaitResult = receiverClass.getMethod("awaitResultNoInterrupt", Duration::class.java)
                 val getValue = awaitResult.returnType.getMethod("getValue", Any::class.java);
                 { service, device ->
-                    val receiver = getReceiver.invoke(null)
-                    method.invoke(service, device, true, attributionSource, receiver)
+                    val receiver = getReceiver(null)
+                    method(service, device, true, shellAttributionSource, receiver)
                     // Match BluetoothUtils.getSyncTimeout() on Android 13-14.
                     // https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-13.0.0_r1/framework/java/android/bluetooth/BluetoothUtils.java#41
-                    val receiverResult = awaitResult.invoke(receiver, synchronousResultTimeout)
+                    val receiverResult = awaitResult(receiver, synchronousResultTimeout)
                         ?: error("SynchronousResultReceiver returned no result")
-                    getValue.invoke(receiverResult, false) as Boolean
+                    getValue(receiverResult, false) as Boolean
                 }
             }
         }
     }
-
-    fun isAuthorized() = try {
-        Shizuku.pingBinder() && !Shizuku.isPreV11() &&
-                Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
-    } catch (e: RuntimeException) {
-        Timber.d(e)
-        false
+    private val asInterface by lazy {
+        Class.forName("android.bluetooth.IBluetooth\$Stub").getMethod("asInterface", IBinder::class.java)
     }
 
-    @RequiresApi(31)
-    private fun shellAttributionSource() = AttributionSource.Builder(Process.SHELL_UID)
-        .setPackageName("com.android.shell")
-        .build()
+    fun isAuthorized() = Shizuku.pingBinder() && !Shizuku.isPreV11() &&
+            Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
 
-    @SuppressLint("MissingPermission")
-    fun setPairingConfirmation(device: BluetoothDevice): Boolean {
-        HiddenApiBypass.addHiddenApiExemptions(
-            "Landroid/bluetooth/",
-            "Lcom/android/bluetooth/",
-        )
-
-        val adapter = app.getSystemService(BluetoothManager::class.java)?.adapter ?: return false
-        val service = getBluetoothService(adapter) ?: return false
-        val wrappedService = Class.forName("android.bluetooth.IBluetooth\$Stub")
-            .getMethod("asInterface", IBinder::class.java)
-            .invoke(null, ShizukuBinderWrapper(service.asBinder()))
-        return try {
-            pairingConfirmation(wrappedService ?: return false, device)
-        } catch (e: InvocationTargetException) {
-            throw e.targetException ?: e
-        }
+    fun setPairingConfirmation(device: BluetoothDevice) = hiddenApiAccess.run {
+        setPairingConfirmation(asInterface(null, ShizukuBinderWrapper(getBluetoothService(
+            app.getSystemService(BluetoothManager::class.java).adapter).asBinder())), device)
     }
 }
