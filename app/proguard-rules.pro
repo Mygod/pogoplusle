@@ -16,6 +16,7 @@
 # debugging stack traces.
 -keepattributes SourceFile,LineNumberTable
 -dontobfuscate
+-keep class be.mygod.pogoplusplus.xposed.** { *; }
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
