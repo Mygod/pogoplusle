@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">宝够乐</string>
+    <string name="xposed_description">用于 Pokémon GO Plus 和 Nintendo Switch 的蓝牙兼容性 Hook</string>
     <string name="bluetooth_pairing_service_label">宝够乐蓝牙配对助手</string>
     <string name="bluetooth_pairing_service_description">智能跳过连接 Pokémon GO Plus 时的配对对话框</string>
     <string name="bluetooth_pairing_service_disclosure_title">为此应用授权？</string>

@@ -1,188 +1,192 @@
 package be.mygod.pogoplusplus.xposed
 
 import android.bluetooth.BluetoothDevice
-import android.content.AttributionSource
 import android.os.SystemClock
 import android.util.Log
+import be.mygod.pogoplusplus.POKEMON_GO_PACKAGES
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.util.Collections
+import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 class BluetoothGattServerFilter : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
-        if (lpparam.packageName != PACKAGE_BLUETOOTH) return
         try {
             val gattServerManager = XposedHelpers.findClassIfExists(CLASS_GATT_SERVER_MANAGER, lpparam.classLoader)
             if (gattServerManager != null) {
-                hookServerManagerRegistration(gattServerManager)
-                hookServerManagerClientConnection(gattServerManager)
-                runCatching { hookServerManagerUnregister(gattServerManager, lpparam.classLoader) }.onFailure(::log)
-                log("installed GattServerManager hooks in ${lpparam.processName}")
-                return
+                try {
+                    installServerManagerHooks(gattServerManager, lpparam.classLoader)
+                    log("installed GattServerManager hooks in ${lpparam.packageName}/${lpparam.processName}")
+                    return
+                } catch (e: NoSuchMethodException) {
+                    log("unsupported GattServerManager in ${lpparam.packageName}; trying GattService: ${e.message}")
+                }
             }
-            val gattService = XposedHelpers.findClassIfExists(CLASS_GATT_SERVICE, lpparam.classLoader)
-            if (gattService == null) {
-                log("GattService not found in ${lpparam.packageName}")
-                return
+            val gattService = XposedHelpers.findClassIfExists(CLASS_GATT_SERVICE, lpparam.classLoader) ?: return
+            try {
+                installGattServiceHooks(gattService, lpparam.classLoader)
+                log("installed GattService hooks in ${lpparam.packageName}/${lpparam.processName}")
+            } catch (e: NoSuchMethodException) {
+                log("unsupported GattService in ${lpparam.packageName}: ${e.message}")
+                log(e)
             }
-            hookServerRegistration(gattService)
-            hookClientConnection(gattService)
-            hookServerUnregister(gattService)
-            log("installed in ${lpparam.processName}")
         } catch (throwable: Throwable) {
+            // A module failure must never take down the host Bluetooth process.
             log(throwable)
         }
     }
 
-    private fun hookServerManagerRegistration(gattServerManager: Class<*>) {
-        XposedHelpers.findAndHookMethod(gattServerManager, "onServerRegisteredFromNative",
-            Integer.TYPE, Integer.TYPE, UUID::class.java,
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    try {
-                        val status = param.args[0] as Int
-                        if (status != 0) return
-                        val serverIf = param.args[1] as Int
-                        val uuid = param.args[2] as UUID
-                        val appName = appNameForServer(serverMapFromManager(param.thisObject), serverIf) ?: return
-                        if (appName != PACKAGE_POKEMON_GO) return
-                        val baseline = connectedAddressesFromManager(param.thisObject)
-                        if (baseline.isEmpty()) return
-                        serverFilters[serverIf] = ServerFilter(
-                            uuid = uuid,
-                            registeredAt = SystemClock.elapsedRealtime(),
-                            baselineAddresses = baseline,
-                        )
-                        log("tracking Pokemon GO GATT server $serverIf with ${baseline.size} existing devices")
-                    } catch (throwable: Throwable) {
-                        log(throwable)
-                    }
+    /**
+     * Android 17 moved GATT server callbacks and state into GattServerManager:
+     * https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-17.0.0_r1/android/app/src/com/android/bluetooth/gatt/GattServerManager.kt#66
+     * https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-17.0.0_r1/android/app/src/com/android/bluetooth/gatt/GattServerManager.kt#154
+     * https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-17.0.0_r1/android/app/src/com/android/bluetooth/gatt/GattServerManager.kt#527
+     */
+    private fun installServerManagerHooks(gattServerManager: Class<*>, classLoader: ClassLoader) {
+        // Resolve the complete shape before installing any hook so an incompatible vendor class can fall back safely.
+        val onServerRegistered = gattServerManager.getDeclaredMethod("onServerRegisteredFromNative",
+            Integer.TYPE, Integer.TYPE, UUID::class.java)
+        val onClientConnected = gattServerManager.getDeclaredMethod("onClientConnectedFromNative",
+            BluetoothDevice::class.java, Integer.TYPE, java.lang.Boolean.TYPE, Integer.TYPE, Integer.TYPE)
+        val callbackClass = XposedHelpers.findClassIfExists(CLASS_GATT_SERVER_CALLBACK, classLoader)
+            ?: throw NoSuchMethodException(CLASS_GATT_SERVER_CALLBACK)
+        val unregisterServer = gattServerManager.getDeclaredMethod("unregisterServer", callbackClass)
+
+        XposedBridge.hookMethod(onServerRegistered, object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                try {
+                    if (param.hasThrowable() || param.args[0] as Int != 0) return
+                    val serverIf = param.args[1] as Int
+                    val serverMap = serverMapFromManager(param.thisObject)
+                    trackServer(serverMap, serverIf) { connectedAddressesFromManager(param.thisObject) }
+                } catch (throwable: Throwable) {
+                    log(throwable)
                 }
-            })
+            }
+        })
+        XposedBridge.hookMethod(onClientConnected, object : XC_MethodHook() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
+                try {
+                    val address = addressOf(param.args[0]) ?: return
+                    val connected = param.args[2] as Boolean
+                    val connId = param.args[3] as Int
+                    val serverIf = param.args[4] as Int
+                    suppressIfNeeded(param, serverIf, connected, connId, address)
+                } catch (throwable: Throwable) {
+                    log(throwable)
+                }
+            }
+        })
+        XposedBridge.hookMethod(unregisterServer, object : XC_MethodHook() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
+                try {
+                    val serverIf = appIdForCallback(param.thisObject, param.args[0]) ?: return
+                    param.setObjectExtra(UNREGISTER_SERVER_IF_EXTRA, serverIf)
+                } catch (throwable: Throwable) {
+                    log(throwable)
+                }
+            }
+
+            override fun afterHookedMethod(param: MethodHookParam) {
+                try {
+                    if (param.hasThrowable()) return
+                    stopTracking(param.getObjectExtra(UNREGISTER_SERVER_IF_EXTRA) as? Int ?: return)
+                } catch (throwable: Throwable) {
+                    log(throwable)
+                }
+            }
+        })
     }
 
-    private fun hookServerManagerClientConnection(gattServerManager: Class<*>) {
-        XposedHelpers.findAndHookMethod(gattServerManager, "onClientConnectedFromNative",
-            BluetoothDevice::class.java, Integer.TYPE, java.lang.Boolean.TYPE, Integer.TYPE, Integer.TYPE,
-            object : XC_MethodHook() {
-                override fun beforeHookedMethod(param: MethodHookParam) {
-                    try {
-                        val address = addressOf(param.args[0]) ?: return
-                        val connected = param.args[2] as Boolean
-                        val connId = param.args[3] as Int
-                        val serverIf = param.args[4] as Int
-                        suppressIfNeeded(param, serverIf, connected, connId, address)
-                    } catch (throwable: Throwable) {
-                        log(throwable)
-                    }
-                }
-            })
-    }
-
-    private fun hookServerManagerUnregister(gattServerManager: Class<*>, classLoader: ClassLoader) {
-        val callbackClass = XposedHelpers.findClass("android.bluetooth.IBluetoothGattServerCallback", classLoader)
-        XposedHelpers.findAndHookMethod(gattServerManager, "unregisterServer",
-            callbackClass,
-            object : XC_MethodHook() {
-                override fun beforeHookedMethod(param: MethodHookParam) {
-                    try {
-                        val serverIf = appIdForCallback(param.thisObject, param.args[0]) ?: return
-                        if (serverFilters.remove(serverIf) != null) {
-                            log("stopped tracking Pokemon GO GATT server $serverIf")
-                        }
-                    } catch (throwable: Throwable) {
-                        log(throwable)
-                    }
-                }
-            })
-    }
-
-    private fun hookServerRegistration(gattService: Class<*>) {
-        XposedHelpers.findAndHookMethod(gattService, "onServerRegistered",
-            Integer.TYPE, Integer.TYPE, java.lang.Long.TYPE, java.lang.Long.TYPE,
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    try {
-                        val status = param.args[0] as Int
-                        if (status != 0) return
-                        val serverIf = param.args[1] as Int
-                        val uuidLsb = param.args[2] as Long
-                        val uuidMsb = param.args[3] as Long
-                        val appName = appNameForServer(serverMapFromService(param.thisObject), serverIf) ?: return
-                        if (appName != PACKAGE_POKEMON_GO) return
-                        val baseline = connectedAddressesFromService(param.thisObject)
-                        if (baseline.isEmpty()) return
-                        serverFilters[serverIf] = ServerFilter(
-                            uuid = UUID(uuidMsb, uuidLsb),
-                            registeredAt = SystemClock.elapsedRealtime(),
-                            baselineAddresses = baseline,
-                        )
-                        log("tracking Pokemon GO GATT server $serverIf with ${baseline.size} existing devices")
-                    } catch (throwable: Throwable) {
-                        log(throwable)
-                    }
-                }
-            })
-    }
-
-    private fun hookClientConnection(gattService: Class<*>) {
-        XposedHelpers.findAndHookMethod(gattService, "onClientConnected",
-            String::class.java, java.lang.Boolean.TYPE, Integer.TYPE, Integer.TYPE,
-            object : XC_MethodHook() {
-                override fun beforeHookedMethod(param: MethodHookParam) {
-                    try {
-                        val address = normalizeAddress(param.args[0] as? String ?: return)
-                        val connected = param.args[1] as Boolean
-                        val connId = param.args[2] as Int
-                        val serverIf = param.args[3] as Int
-                        suppressIfNeeded(param, serverIf, connected, connId, address)
-                    } catch (throwable: Throwable) {
-                        log(throwable)
-                    }
-                }
-            })
-    }
-
-    private fun hookServerUnregister(gattService: Class<*>) {
-        XposedHelpers.findAndHookMethod(gattService, "unregisterServer",
-            Integer.TYPE, AttributionSource::class.java,
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    val serverIf = param.args[0] as? Int ?: return
-                    if (serverFilters.remove(serverIf) != null) {
-                        log("stopped tracking Pokemon GO GATT server $serverIf")
-                    }
-                }
-            })
-    }
-
-    private data class ServerFilter(
-        val uuid: UUID,
-        val registeredAt: Long,
-        val baselineAddresses: Set<String>,
-        val ignoredConnIds: MutableSet<Int> = ConcurrentHashMap.newKeySet(),
-        val ignoredAddresses: MutableSet<String> = ConcurrentHashMap.newKeySet(),
-    ) {
-        fun shouldIgnoreInitial(address: String): Boolean {
-            if (address !in baselineAddresses) return false
-            return SystemClock.elapsedRealtime() - registeredAt <= STALE_CALLBACK_WINDOW_MS
+    /**
+     * AOSP keeps these callbacks stable from API 28 through 36. unregisterServer takes only the server ID on
+     * API 28-30 and adds AttributionSource on API 31:
+     * https://android.googlesource.com/platform/packages/apps/Bluetooth/+/android-9.0.0_r1/src/com/android/bluetooth/gatt/GattService.java#2516
+     * https://android.googlesource.com/platform/packages/apps/Bluetooth/+/android-11.0.0_r1/src/com/android/bluetooth/gatt/GattService.java#2977
+     * https://android.googlesource.com/platform/packages/apps/Bluetooth/+/android-12.0.0_r1/src/com/android/bluetooth/gatt/GattService.java#3402
+     * https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-16.0.0_r1/android/app/src/com/android/bluetooth/gatt/GattService.java#1753
+     */
+    private fun installGattServiceHooks(gattService: Class<*>, classLoader: ClassLoader) {
+        // Resolve the complete shape before installing any hook. Capability, not SDK_INT, owns dispatch because
+        // Bluetooth can be delivered as a Mainline module and vendors can ship a different module revision.
+        val onServerRegistered = gattService.getDeclaredMethod("onServerRegistered",
+            Integer.TYPE, Integer.TYPE, java.lang.Long.TYPE, java.lang.Long.TYPE)
+        val onClientConnected = gattService.getDeclaredMethod("onClientConnected",
+            String::class.java, java.lang.Boolean.TYPE, Integer.TYPE, Integer.TYPE)
+        val attributionSource = XposedHelpers.findClassIfExists(CLASS_ATTRIBUTION_SOURCE, classLoader)
+        val unregisterServer = if (attributionSource == null) {
+            gattService.getDeclaredMethod("unregisterServer", Integer.TYPE)
+        } else try {
+            gattService.getDeclaredMethod("unregisterServer", Integer.TYPE, attributionSource)
+        } catch (_: NoSuchMethodException) {
+            gattService.getDeclaredMethod("unregisterServer", Integer.TYPE)
         }
+
+        XposedBridge.hookMethod(onServerRegistered, object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                try {
+                    if (param.hasThrowable() || param.args[0] as Int != 0) return
+                    val serverIf = param.args[1] as Int
+                    val serverMap = serverMapFromService(param.thisObject)
+                    trackServer(serverMap, serverIf) { connectedAddressesFromService(param.thisObject) }
+                } catch (throwable: Throwable) {
+                    log(throwable)
+                }
+            }
+        })
+        XposedBridge.hookMethod(onClientConnected, object : XC_MethodHook() {
+            override fun beforeHookedMethod(param: MethodHookParam) {
+                try {
+                    val address = normalizeAddress(param.args[0] as? String ?: return)
+                    val connected = param.args[1] as Boolean
+                    val connId = param.args[2] as Int
+                    val serverIf = param.args[3] as Int
+                    suppressIfNeeded(param, serverIf, connected, connId, address)
+                } catch (throwable: Throwable) {
+                    log(throwable)
+                }
+            }
+        })
+        XposedBridge.hookMethod(unregisterServer, object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                try {
+                    if (param.hasThrowable()) return
+                    stopTracking(param.args[0] as? Int ?: return)
+                } catch (throwable: Throwable) {
+                    log(throwable)
+                }
+            }
+        })
     }
 
     private companion object {
         private const val TAG = "PoGoLE-Xposed"
-        private const val PACKAGE_BLUETOOTH = "com.google.android.bluetooth"
-        private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
+        private const val CLASS_ATTRIBUTION_SOURCE = "android.content.AttributionSource"
+        private const val CLASS_GATT_SERVER_CALLBACK = "android.bluetooth.IBluetoothGattServerCallback"
         private const val CLASS_GATT_SERVICE = "com.android.bluetooth.gatt.GattService"
         private const val CLASS_GATT_SERVER_MANAGER = "com.android.bluetooth.gatt.GattServerManager"
+        private const val UNREGISTER_SERVER_IF_EXTRA = "be.mygod.pogoplusplus.xposed.serverIf"
         private const val STALE_CALLBACK_WINDOW_MS = 3_000L
 
-        private val serverFilters = ConcurrentHashMap<Int, ServerFilter>()
+        private val serverFilters = ConcurrentHashMap<Int, StaleConnectionFilter>()
+
+        private fun trackServer(serverMap: Any, serverIf: Int, connectedAddresses: () -> Set<String>) {
+            serverFilters.remove(serverIf)
+            if (appNameForServer(serverMap, serverIf) !in POKEMON_GO_PACKAGES) return
+            val baseline = connectedAddresses()
+            if (baseline.isEmpty()) return
+            serverFilters[serverIf] = StaleConnectionFilter(
+                registeredAtMillis = SystemClock.elapsedRealtime(),
+                baselineAddresses = baseline,
+                callbackWindowMillis = STALE_CALLBACK_WINDOW_MS,
+            )
+            log("tracking Pokemon GO GATT server $serverIf with ${baseline.size} existing devices")
+        }
 
         private fun suppressIfNeeded(
             param: XC_MethodHook.MethodHookParam,
@@ -192,26 +196,28 @@ class BluetoothGattServerFilter : IXposedHookLoadPackage {
             address: String,
         ) {
             val filter = serverFilters[serverIf] ?: return
-            if (connected) {
-                if (!filter.shouldIgnoreInitial(address)) return
-                filter.ignoredConnIds += connId
-                filter.ignoredAddresses += address
-                param.result = null
-                log("suppressed stale Pokemon GO server $serverIf connect for $address connId=$connId")
-            } else if (filter.ignoredConnIds.remove(connId) || filter.ignoredAddresses.remove(address)) {
-                param.result = null
-                log("suppressed stale Pokemon GO server $serverIf disconnect for $address connId=$connId")
+            if (!filter.shouldSuppress(connected, connId, address, SystemClock.elapsedRealtime())) return
+            param.result = null
+            log("suppressed stale Pokemon GO server $serverIf ${if (connected) "connect" else "disconnect"} " +
+                    "for $address connId=$connId")
+        }
+
+        private fun stopTracking(serverIf: Int) {
+            if (serverFilters.remove(serverIf) != null) {
+                log("stopped tracking Pokemon GO GATT server $serverIf")
             }
         }
 
         private fun appNameForServer(serverMap: Any, serverIf: Int): String? {
             val app = XposedHelpers.callMethod(serverMap, "getById", serverIf) ?: return null
-            return callMethodOrNull(app, "getName") as? String ?: XposedHelpers.getObjectField(app, "name") as? String
+            return callMethodIfExists(app, "getName") as? String ?:
+                XposedHelpers.getObjectField(app, "name") as? String
         }
 
         private fun appIdForCallback(gattServerManager: Any, callback: Any?): Int? {
-            val app = XposedHelpers.callMethod(serverMapFromManager(gattServerManager), "getByCallbackId", callback) ?: return null
-            return callMethodOrNull(app, "getId") as? Int ?: XposedHelpers.getIntField(app, "id")
+            val app = XposedHelpers.callMethod(serverMapFromManager(gattServerManager),
+                "getByCallbackId", callback) ?: return null
+            return callMethodIfExists(app, "getId") as? Int ?: XposedHelpers.getIntField(app, "id")
         }
 
         private fun connectedAddressesFromManager(gattServerManager: Any): Set<String> {
@@ -238,26 +244,29 @@ class BluetoothGattServerFilter : IXposedHookLoadPackage {
             is BluetoothDevice -> value.address?.let(::normalizeAddress)
             is String -> normalizeAddress(value)
             null -> null
-            else -> (callMethodOrNull(value, "getAddress") as? String)?.let(::normalizeAddress)
+            else -> (callMethodIfExists(value, "getAddress") as? String)?.let(::normalizeAddress)
         }
 
         private fun gattServiceFromManager(gattServerManager: Any) =
             XposedHelpers.getObjectField(gattServerManager, "gatt")
 
         private fun clientMapFromService(gattService: Any) =
-            callMethodOrNull(gattService, "getClientMap") ?: XposedHelpers.getObjectField(gattService, "mClientMap")
+            callMethodIfExists(gattService, "getClientMap") ?: XposedHelpers.getObjectField(gattService, "mClientMap")
 
         private fun serverMapFromManager(gattServerManager: Any) =
-            callMethodOrNull(gattServerManager, "getServerMap")
-                ?: XposedHelpers.getObjectField(gattServerManager, "serverMap")
+            callMethodIfExists(gattServerManager, "getServerMap") ?:
+                XposedHelpers.getObjectField(gattServerManager, "serverMap")
 
         private fun serverMapFromService(gattService: Any) =
-            callMethodOrNull(gattService, "getServerMap") ?: XposedHelpers.getObjectField(gattService, "mServerMap")
+            callMethodIfExists(gattService, "getServerMap") ?: XposedHelpers.getObjectField(gattService, "mServerMap")
 
-        private fun callMethodOrNull(receiver: Any, methodName: String, vararg args: Any?) =
-            runCatching { XposedHelpers.callMethod(receiver, methodName, *args) }.getOrNull()
+        private fun callMethodIfExists(receiver: Any, methodName: String, vararg args: Any?) = try {
+            XposedHelpers.callMethod(receiver, methodName, *args)
+        } catch (_: NoSuchMethodError) {
+            null
+        }
 
-        private fun normalizeAddress(address: String) = address.uppercase()
+        private fun normalizeAddress(address: String) = address.uppercase(Locale.ROOT)
 
         private fun log(message: String) {
             XposedBridge.log("$TAG: $message")

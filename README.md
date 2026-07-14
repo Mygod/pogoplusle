@@ -39,6 +39,31 @@ Private APIs:
 * (API 33-34) `Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver;->awaitResultNoInterrupt(Ljava/time/Duration;)Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver$Result;,blocked`
 * (API 33-34) `Lcom/android/bluetooth/x/com/android/modules/utils/SynchronousResultReceiver$Result;->getValue(Ljava/lang/Object;)Ljava/lang/Object;,blocked`
 
+Xposed private APIs:
+
+* (API 28-36) `Lcom/android/bluetooth/gatt/GattService;->onServerRegistered(IIJJ)V`
+* (API 28-36) `Lcom/android/bluetooth/gatt/GattService;->onClientConnected(Ljava/lang/String;ZII)V`
+* (API 28-30) `Lcom/android/bluetooth/gatt/GattService;->unregisterServer(I)V`
+* (API 31-36) `Lcom/android/bluetooth/gatt/GattService;->unregisterServer(ILandroid/content/AttributionSource;)V`
+* (API 28-35) `Lcom/android/bluetooth/gatt/GattService;->mClientMap:Lcom/android/bluetooth/gatt/GattService$ClientMap;`
+* (API 28-35) `Lcom/android/bluetooth/gatt/GattService;->mServerMap:Lcom/android/bluetooth/gatt/GattService$ServerMap;`
+* (API 36) `Lcom/android/bluetooth/gatt/GattService;->mClientMap:Lcom/android/bluetooth/gatt/ContextMap;`
+* (API 36) `Lcom/android/bluetooth/gatt/GattService;->mServerMap:Lcom/android/bluetooth/gatt/ContextMap;`
+* (API 28-36) `Lcom/android/bluetooth/gatt/ContextMap;->getById(I)Lcom/android/bluetooth/gatt/ContextMap$App;`
+* (API 28-36) `Lcom/android/bluetooth/gatt/ContextMap;->getConnectedDevices()Ljava/util/Set;`
+* (API 28-36) `Lcom/android/bluetooth/gatt/ContextMap$App;->name:Ljava/lang/String;`
+* (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->onServerRegisteredFromNative(IILjava/util/UUID;)V`
+* (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->onClientConnectedFromNative(Landroid/bluetooth/BluetoothDevice;IZII)V`
+* (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->unregisterServer(Landroid/bluetooth/IBluetoothGattServerCallback;)V`
+* (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->gatt:Lcom/android/bluetooth/gatt/GattService;`
+* (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->getServerMap()Lcom/android/bluetooth/gatt/ContextMap;`
+* (API 37) `Lcom/android/bluetooth/gatt/GattService;->getClientMap()Lcom/android/bluetooth/gatt/ContextMap;`
+* (API 37) `Lcom/android/bluetooth/gatt/ContextMap;->getById(I)Lcom/android/bluetooth/gatt/ContextApp;`
+* (API 37) `Lcom/android/bluetooth/gatt/ContextMap;->getByCallbackId(Landroid/os/IInterface;)Lcom/android/bluetooth/gatt/ContextApp;`
+* (API 37) `Lcom/android/bluetooth/gatt/ContextMap;->getConnectedDevices()Ljava/util/Set;`
+* (API 37) `Lcom/android/bluetooth/gatt/ContextApp;->getName()Ljava/lang/String;`
+* (API 37) `Lcom/android/bluetooth/gatt/ContextApp;->getId()I`
+
 ## FAQ
 
 Q: How to use it?  
@@ -52,6 +77,15 @@ A: Yes. This app uses `AccessibilityService` API to help you skip the pairing di
 
 Q: Not working?  
 A: Feel free to send the following information to me via GitHub issues or else: app version and configuration, device model, Android version, and a screenshot demonstrating the issue. You can also try the Shizuku pairing mode if Shizuku is running on your device.
+
+Q: What does the Xposed Bluetooth workaround do, and how do I enable it?
+
+A: This workaround allows Pokémon GO to connect to a Nintendo Switch while another Bluetooth LE device is already
+connected by filtering the initial GATT callbacks for pre-existing connections. Enable PoGo+LE in LSPosed and select
+the system Bluetooth package. LSPosed recommends
+`com.android.bluetooth` for AOSP and OEM-derived stacks and `com.google.android.bluetooth` for Google's Pixel
+stack. You may select a different package for a vendor ROM: the module has no package allowlist and activates only
+when that package contains one of the exact supported AOSP GATT implementations.
 
 Q: Why should I use the Shizuku pairing mode?
 

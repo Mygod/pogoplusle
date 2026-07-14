@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="xposed_scope" translatable="false">
+        <item>com.android.bluetooth</item>
+        <item>com.google.android.bluetooth</item>
+    </string-array>
+</resources>

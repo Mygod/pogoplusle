@@ -34,9 +34,6 @@ class GameNotificationService : NotificationListenerService() {
         private const val CHANNEL_INACTIVE_TIMEOUT = "inactive_timeout"
         // Keep the old channel id so Android preserves existing user notification settings.
         private const val CHANNEL_PRIVILEGED_PAIRING_FAILED = "root_pairing_failed"
-        private const val PACKAGE_POKEMON_GO = "com.nianticlabs.pokemongo"
-        private const val PACKAGE_POKEMON_GO_ARES = "com.nianticlabs.pokemongo.ares"
-
         private const val NOTIFICATION_AUXILIARY_DISCONNECTED = 1
         private const val NOTIFICATION_ITEM_FULL = 2
         private const val NOTIFICATION_POKEMON_FULL = 3
@@ -45,7 +42,7 @@ class GameNotificationService : NotificationListenerService() {
         private const val NOTIFICATION_CONNECTION_STATUS = 6
         private const val NOTIFICATION_PRIVILEGED_PAIRING_FAILED = 7
 
-        val gameIntent get() = listOf(PACKAGE_POKEMON_GO, PACKAGE_POKEMON_GO_ARES)
+        val gameIntent get() = POKEMON_GO_PACKAGES
             .mapNotNull(app.packageManager::getLaunchIntentForPackage).let { list ->
                 when (list.size) {
                     0 -> Intent(Intent.ACTION_CHOOSER).putExtra(Intent.EXTRA_INTENT, Intent())
@@ -208,7 +205,7 @@ class GameNotificationService : NotificationListenerService() {
         }
 
         private fun isInterested(sbn: StatusBarNotification) = sbn.notification.channelId == sbn.packageName &&
-                (sbn.packageName == PACKAGE_POKEMON_GO || sbn.packageName == PACKAGE_POKEMON_GO_ARES)
+                sbn.packageName in POKEMON_GO_PACKAGES
     }
 
     override fun onListenerConnected() {

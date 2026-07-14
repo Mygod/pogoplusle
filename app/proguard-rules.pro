@@ -16,7 +16,10 @@
 # debugging stack traces.
 -keepattributes SourceFile,LineNumberTable
 -dontobfuscate
--keep class be.mygod.pogoplusplus.xposed.** { *; }
+-keep,allowoptimization class be.mygod.pogoplusplus.xposed.BluetoothGattServerFilter {
+    public <init>();
+    public void handleLoadPackage(de.robv.android.xposed.callbacks.XC_LoadPackage$LoadPackageParam);
+}
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
