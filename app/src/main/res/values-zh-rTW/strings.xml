@@ -43,8 +43,8 @@
     <string name="settings_game_battery_optimized">已優化遊戲電池用量</string>
     <string name="settings_game_battery_optimized_summary">遊戲置於背景運行時可能會崩潰，請至「電池與電量」中為遊戲設置「無限制」以解決此問題</string>
     -->
-    <string name="settings_service_pairing_shizuku">以 Shizuku 進行藍牙配對</string>
-    <string name="settings_service_pairing_shizuku_summary">透過 Shizuku 確認配對。此模式較為安靜並具有更好的相容性，但是需要 Shizuku 正在執行</string>
+    <string name="settings_service_pairing_privileged">自動配對藍牙</string>
+    <string name="settings_service_pairing_privileged_summary">使用系統特權或 Shizuku 自動確認配對要求</string>
     <string name="settings_service_pairing_shizuku_missing">Shizuku 不可用或未授與權限</string>
 
     <string name="settings_advanced">進階</string>

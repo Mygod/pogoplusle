@@ -51,8 +51,8 @@
     <string name="settings_game_battery_optimized_summary">Game may crash when put in the background. Get around this
         bug by checking <i>Unrestricted</i> in <i>App battery usage</i> for the game app</string>
     -->
-    <string name="settings_service_pairing_shizuku">Pair Bluetooth with Shizuku</string>
-    <string name="settings_service_pairing_shizuku_summary">This mode offers a superior experience but requires
+    <string name="settings_service_pairing_privileged">Pair Bluetooth automatically</string>
+    <string name="settings_service_pairing_privileged_summary">Confirm pairing requests using system privileges or
         Shizuku</string>
     <string name="settings_service_pairing_shizuku_missing">Shizuku is unavailable or permission was not granted</string>
 
