@@ -1,13 +1,9 @@
 # PoGo+LE
 
-[![CircleCI](https://circleci.com/gh/Mygod/pogoplusle.svg?style=shield)](https://circleci.com/gh/Mygod/pogoplusle)
-[![API](https://img.shields.io/badge/API-28%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=28)
 [![Releases](https://img.shields.io/github/downloads/Mygod/pogoplusle/total.svg)](https://github.com/Mygod/pogoplusle/releases)
-[![Language: Kotlin](https://img.shields.io/github/languages/top/Mygod/pogoplusle.svg)](https://github.com/Mygod/pogoplusle/search?l=kotlin)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e9422e80b8274d80a6f391ea90fbc237)](https://app.codacy.com/gh/Mygod/pogoplusle/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![License](https://img.shields.io/github/license/Mygod/pogoplusle.svg)](LICENSE)
+[![Android 9-17](https://img.shields.io/badge/Android-9--17-3DDC84?logo=android&logoColor=white)](app/build.gradle.kts)
 
-[![Get it on Obtainium](https://github.com/ImranR98/Obtainium/raw/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/Mygod/pogoplusle)
+[![Get it on Obtainium](https://github.com/ImranR98/Obtainium/raw/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522be.mygod.pogoplusplus%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FMygod%252Fpogoplusle%2522%252C%2522author%2522%253A%2522%2522%252C%2522name%2522%253A%2522%2522%252C%2522additionalSettings%2522%253A%2522%257B%257D%2522%257D)
 
 Automagically skips pairing dialog when connecting Pokémon GO Plus, and alerts you when things go wrong.
 

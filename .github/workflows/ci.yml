@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: jetbrains
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager \
+            "platforms;android-37.0" \
+            "build-tools;37.0.0"
+
+      - name: Run build and checks
+        run: ./gradlew assembleDebug check --no-daemon
+
+      - name: Upload APK
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: apk
+          path: app/build/outputs/apk
+          if-no-files-found: ignore
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports
+          path: app/build/reports
+          if-no-files-found: ignore

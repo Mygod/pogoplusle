@@ -12,11 +12,11 @@ val javaVersion = JavaVersion.VERSION_11
 
 android {
     namespace = "be.mygod.pogoplusplus"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 42
         versionName = "1.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -49,14 +49,14 @@ kotlin.compilerOptions.jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-    implementation("androidx.browser:browser:1.9.0")
+    implementation("androidx.browser:browser:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.core:core-ktx:1.18.0")
+    implementation("androidx.core:core-ktx:1.19.0")
     implementation("androidx.preference:preference:1.2.1")
-    implementation("com.google.android.gms:play-services-oss-licenses:17.4.0")
-    implementation("com.google.android.material:material:1.13.0")
+    implementation("com.google.android.gms:play-services-oss-licenses:17.5.1")
+    implementation("com.google.android.material:material:1.14.0")
     implementation("com.google.firebase:firebase-analytics:23.2.0")
-    implementation("com.google.firebase:firebase-crashlytics:20.0.4")
+    implementation("com.google.firebase:firebase-crashlytics:20.1.0")
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("dev.rikka.shizuku:api:13.1.5")
     implementation("dev.rikka.shizuku:provider:13.1.5")
