@@ -15,6 +15,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -26,10 +28,13 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
         // found in Oppo and OnePlus
         private const val PACKAGE_SETTINGS_OPPO = "com.oplus.wirelesssettings"
 
+        private val _running = MutableStateFlow(false)
+        val running = _running.asStateFlow()
+
         var instance: BluetoothPairingService? = null
             private set(value) {
                 field = value
-                MainPreferenceFragment.instance?.updateSwitches()
+                _running.value = value != null
             }
     }
 

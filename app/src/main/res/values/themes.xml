@@ -2,11 +2,7 @@
     <style name="Base.Theme.PoGoPlusPlus" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorSecondary">@color/secondaryColor</item>
-        <item name="switchPreferenceCompatStyle">@style/Theme.PoGoPlusPlus.Preference.MaterialSwitchPreference</item>
     </style>
 
     <style name="Theme.PoGoPlusPlus" parent="Base.Theme.PoGoPlusPlus" />
-    <style name="Theme.PoGoPlusPlus.Preference.MaterialSwitchPreference" parent="Preference.SwitchPreferenceCompat.Material">
-        <item name="android:widgetLayout">@layout/preference_widget_material_switch</item>
-    </style>
 </resources>

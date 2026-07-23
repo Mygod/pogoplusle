@@ -21,6 +21,8 @@ import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
 import be.mygod.pogoplusplus.util.findString
 import be.mygod.pogoplusplus.util.findStrings
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 
 class GameNotificationService : NotificationListenerService() {
@@ -115,11 +117,8 @@ class GameNotificationService : NotificationListenerService() {
             block?.invoke(this)
         }.build())
 
-        var isRunning = false
-            private set(value) {
-                field = value
-                MainPreferenceFragment.instance?.updateSwitches()
-            }
+        private val _running = MutableStateFlow(false)
+        val running = _running.asStateFlow()
 
         private fun setTimeoutIfEnabled() {
             if (notificationManager.getNotificationChannel(CHANNEL_INACTIVE_TIMEOUT)
@@ -211,11 +210,11 @@ class GameNotificationService : NotificationListenerService() {
     override fun onListenerConnected() {
         latestCompanionStopAction =
             activeNotifications.firstOrNull(::isInterested)?.notification?.actions?.singleOrNull()?.actionIntent
-        isRunning = true
+        _running.value = true
     }
     override fun onListenerDisconnected() {
         latestCompanionStopAction = null
-        isRunning = false
+        _running.value = false
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {

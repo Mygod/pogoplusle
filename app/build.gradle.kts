@@ -6,6 +6,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 val javaVersion = JavaVersion.VERSION_11
@@ -40,7 +41,7 @@ android {
     }
     buildFeatures {
         buildConfig = true
-        viewBinding = true
+        compose = true
     }
     packaging.resources.excludes.add("**/*.kotlin_*")
 }
@@ -49,9 +50,13 @@ kotlin.compilerOptions.jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    implementation(platform("androidx.compose:compose-bom-alpha:2026.06.00"))
+    implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.browser:browser:1.10.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+    implementation("androidx.compose.material3:material3")
     implementation("androidx.core:core-ktx:1.19.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
     implementation("androidx.preference:preference:1.2.1")
     implementation("com.google.android.gms:play-services-oss-licenses:17.5.1")
     implementation("com.google.android.material:material:1.14.0")
@@ -60,6 +65,7 @@ dependencies {
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("dev.rikka.shizuku:api:13.1.5")
     implementation("dev.rikka.shizuku:provider:13.1.5")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     compileOnly("de.robv.android.xposed:api:82")
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:6.1")
     testImplementation("junit:junit:4.13.2")
