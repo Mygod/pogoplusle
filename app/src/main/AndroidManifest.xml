@@ -24,6 +24,7 @@
         <package android:name="com.nianticlabs.pokemongo.ares" />
     </queries>
 
+    <!-- Android resources require the legacy "in" qualifier for the canonical "id-ID" locale. -->
     <application
         android:name=".App"
         android:appCategory="accessibility"
@@ -35,6 +36,7 @@
         android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.PoGoPlusPlus"
+        tools:ignore="UnusedTranslation"
         tools:targetApi="33">
         <meta-data
             android:name="xposedmodule"

@@ -1,5 +1,5 @@
-<resources>
-    <string name="app_name">PoGo+LE</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" tools:ignore="MissingTranslation">PoGo+LE</string>
     <string name="xposed_description">Pokemon GO Plus and Nintendo Switch Bluetooth compatibility hooks</string>
     <string name="bluetooth_pairing_service_label">PoGo+LE Bluetooth pairing assistant</string>
     <string name="bluetooth_pairing_service_description">Automagically skips pairing dialog when connecting

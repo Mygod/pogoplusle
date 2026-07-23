@@ -21,7 +21,10 @@ android {
         versionCode = 42
         versionName = "1.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        androidResources.localeFilters += listOf("en", "zh-rCN", "zh-rTW")
+        androidResources.localeFilters += listOf(
+            "en", "fr", "de", "hi", "in", "zh-rTW", "it", "ja", "ko", "pt-rBR", "ru", "es-rES", "th",
+            "tr", "es-rMX",
+        )
     }
     buildTypes {
         debug {
