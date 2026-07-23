@@ -145,7 +145,7 @@ internal fun MainScreen(
                 if (state.showPairingServices) row(R.string.settings_service_pairing) {
                     PreferenceSwitchRow(
                         checked = state.pairingServiceRunning,
-                        icon = R.drawable.ic_action_touch_app,
+                        icon = R.drawable.ic_touch_app,
                         title = stringResource(R.string.settings_service_pairing),
                         summary = stringResource(R.string.settings_service_pairing_summary),
                         onCheckedChange = onPairingServiceChange,
@@ -154,7 +154,7 @@ internal fun MainScreen(
                 row(R.string.game_notification_service_name) {
                     PreferenceSwitchRow(
                         checked = state.gameNotificationServiceRunning,
-                        icon = R.drawable.ic_device_monitor_heart,
+                        icon = R.drawable.ic_monitor_heart,
                         title = stringResource(R.string.game_notification_service_name),
                         summary = stringResource(R.string.game_notification_service_summary),
                         onCheckedChange = onGameNotificationServiceChange,
@@ -163,7 +163,7 @@ internal fun MainScreen(
                 row(R.string.settings_permission_bluetooth) {
                     PreferenceSwitchRow(
                         checked = state.bluetoothMonitorEnabled,
-                        icon = R.drawable.ic_device_bluetooth_connected,
+                        icon = R.drawable.ic_bluetooth_searching,
                         title = stringResource(R.string.settings_permission_bluetooth),
                         summary = stringResource(R.string.settings_permission_bluetooth_summary),
                         onCheckedChange = onBluetoothMonitorChange,
@@ -171,7 +171,7 @@ internal fun MainScreen(
                 }
                 row(R.string.settings_permission_notification) {
                     PreferenceRow(
-                        icon = R.drawable.ic_social_notifications_active,
+                        icon = R.drawable.ic_notifications_active,
                         title = stringResource(R.string.settings_permission_notification),
                         summary = stringResource(R.string.settings_permission_notification_summary),
                         onClick = onManageNotifications,
@@ -179,7 +179,7 @@ internal fun MainScreen(
                 }
                 row(R.string.settings_game) {
                     PreferenceRow(
-                        icon = R.drawable.ic_av_games,
+                        icon = R.drawable.ic_sports_esports,
                         title = stringResource(R.string.settings_game),
                         summary = stringResource(R.string.settings_game_summary),
                         onClick = onLaunchGame,
@@ -190,7 +190,7 @@ internal fun MainScreen(
             if (state.showPairingServices) preferenceGroup(title = R.string.settings_advanced) {
                 if (state.showCompanionAssociation) row(R.string.settings_companion_association) {
                     PreferenceRow(
-                        icon = R.drawable.ic_device_bluetooth_connected,
+                        icon = R.drawable.ic_bluetooth_connected,
                         title = stringResource(R.string.settings_companion_association),
                         summary = if (state.companionAssociationCount == 0) {
                             stringResource(R.string.settings_companion_association_summary)
@@ -204,7 +204,7 @@ internal fun MainScreen(
                 row(R.string.settings_service_pairing_privileged) {
                     PreferenceSwitchRow(
                         checked = state.privilegedPairingEnabled,
-                        icon = R.drawable.ic_home_electric_bolt,
+                        icon = R.drawable.ic_electric_bolt,
                         title = stringResource(R.string.settings_service_pairing_privileged),
                         summary = stringResource(R.string.settings_service_pairing_privileged_summary),
                         onCheckedChange = onPrivilegedPairingChange,
@@ -215,7 +215,7 @@ internal fun MainScreen(
             preferenceGroup(title = R.string.settings_about) {
                 row(R.string.settings_misc_source) {
                     PreferenceRow(
-                        icon = R.drawable.ic_toggle_star,
+                        icon = R.drawable.ic_star,
                         title = stringResource(R.string.settings_misc_source),
                         summary = stringResource(R.string.settings_misc_source_summary),
                         onClick = onOpenSource,
@@ -223,7 +223,7 @@ internal fun MainScreen(
                 }
                 row(R.string.settings_misc_donate) {
                     PreferenceRow(
-                        icon = R.drawable.ic_action_card_giftcard,
+                        icon = R.drawable.ic_volunteer_activism,
                         title = stringResource(R.string.settings_misc_donate),
                         summary = stringResource(R.string.settings_misc_donate_summary),
                         onClick = onDonate,
@@ -231,7 +231,7 @@ internal fun MainScreen(
                 }
                 row(OssLicensesR.string.oss_license_title) {
                     PreferenceRow(
-                        icon = R.drawable.ic_action_code,
+                        icon = R.drawable.ic_license,
                         title = stringResource(OssLicensesR.string.oss_license_title),
                         summary = stringResource(OssLicensesR.string.preferences_license_summary),
                         onClick = onOpenLicenses,

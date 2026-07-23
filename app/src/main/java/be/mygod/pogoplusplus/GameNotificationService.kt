@@ -133,7 +133,7 @@ class GameNotificationService : NotificationListenerService() {
                 setCategory(Notification.CATEGORY_STATUS)
                 setContentTitle(app.getText(R.string.notification_title_auxiliary_connected_default))
                 setGroup(CHANNEL_CONNECTION_STATUS)
-                setSmallIcon(R.drawable.ic_maps_mode_of_travel)
+                setSmallIcon(R.drawable.ic_mode_of_travel)
                 setContentIntent(PendingIntent.getActivity(app, 0, gameIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                 setShowWhen(true)
@@ -142,7 +142,7 @@ class GameNotificationService : NotificationListenerService() {
                 setLocalOnly(true)
                 setVisibility(Notification.VISIBILITY_PUBLIC)
                 if (stats.deviceAddress.isNotEmpty()) addAction(Notification.Action.Builder(
-                    Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
+                    Icon.createWithResource(app, R.drawable.ic_link_off),
                     app.getText(R.string.notification_action_disconnect),
                     makeDisconnectingPendingIntent(bluetoothAdapter.getRemoteDevice(stats.deviceAddress))).build())
                 setColor(app.getColor(R.color.primaryColor))
@@ -163,7 +163,7 @@ class GameNotificationService : NotificationListenerService() {
             notificationManager.cancel(NOTIFICATION_CONNECTION_STATUS)
             pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_AUXILIARY_DISCONNECTED,
                 app.getText(R.string.notification_title_auxiliary_disconnected_default),
-                R.drawable.ic_device_bluetooth_disabled, packageName) {
+                R.drawable.ic_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
                 if (device?.run {
                         second == SfidaManager.DEVICE_NAME_PGP && try {
@@ -172,7 +172,7 @@ class GameNotificationService : NotificationListenerService() {
                             BluetoothDevice.BOND_BONDED
                         } != BluetoothDevice.BOND_NONE
                     } == true) addAction(Notification.Action.Builder(
-                    Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
+                    Icon.createWithResource(app, R.drawable.ic_link_off),
                     app.getText(R.string.notification_action_unpair),
                     makeDisconnectingPendingIntent(device.first)).build())
                 setPublicVersion(build().clone())
@@ -186,9 +186,9 @@ class GameNotificationService : NotificationListenerService() {
             SfidaTimeoutReceiver.reportDisconnection()
         }
         fun onAuxiliaryTimeout() = pushNotification(NOTIFICATION_AUXILIARY_DISCONNECTED, CHANNEL_INACTIVE_TIMEOUT,
-            app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_notification_sync_problem) {
+            app.getText(R.string.notification_channel_inactive_timeout), R.drawable.ic_timer_off) {
             addAction(Notification.Action.Builder(
-                Icon.createWithResource(app, com.google.android.material.R.drawable.ic_m3_chip_close),
+                Icon.createWithResource(app, R.drawable.ic_link_off),
                 app.getText(R.string.notification_action_disconnect), makeDisconnectingPendingIntent()).build())
         }
         fun onPrivilegedPairingSucceeded() = notificationManager.cancel(NOTIFICATION_PRIVILEGED_PAIRING_FAILED)
@@ -196,7 +196,7 @@ class GameNotificationService : NotificationListenerService() {
             NOTIFICATION_PRIVILEGED_PAIRING_FAILED,
             CHANNEL_PRIVILEGED_PAIRING_FAILED,
             app.getText(R.string.notification_title_shizuku_pairing_failed),
-            R.drawable.ic_alert_error_outline,
+            R.drawable.ic_error,
             contentIntent = Intent(app, MainActivity::class.java),
         ) {
             setContentText(app.getText(R.string.notification_text_shizuku_pairing_failed))
@@ -242,13 +242,13 @@ class GameNotificationService : NotificationListenerService() {
             Notification.FLAG_FOREGROUND_SERVICE) return    // ignore reposted notification
         when (text) {
             in gameContext.findStrings("Item_Inventory_Full") -> pushNotification(NOTIFICATION_ITEM_FULL,
-                CHANNEL_ITEM_FULL, text, R.drawable.ic_action_shopping_bag, sbn.packageName) {
+                CHANNEL_ITEM_FULL, text, R.drawable.ic_shopping_bag, sbn.packageName) {
                 setOnlyAlertOnce(!notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
             }
             in gameContext.findStrings("Pokemon_Inventory_Full") -> pushNotification(NOTIFICATION_POKEMON_FULL,
-                CHANNEL_POKEMON_FULL, text, R.drawable.ic_notification_disc_full, sbn.packageName)
+                CHANNEL_POKEMON_FULL, text, R.drawable.ic_disc_full, sbn.packageName)
             in gameContext.findStrings("Out_Of_Pokeballs") -> pushNotification(NOTIFICATION_NO_BALL,
-                CHANNEL_NO_BALL, text, R.drawable.ic_action_hide_source, sbn.packageName)
+                CHANNEL_NO_BALL, text, R.drawable.ic_hide_source, sbn.packageName)
             in gameContext.findStrings("Captured_Pokemon") -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
@@ -289,7 +289,7 @@ class GameNotificationService : NotificationListenerService() {
                         val stats = SfidaSessionManager.onSpin(items, isConnected)
                         if (isConnected) updateConnectionStatus(stats)
                     } else pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
-                        R.drawable.ic_alert_error_outline, sbn.packageName)
+                        R.drawable.ic_error, sbn.packageName)
                     // Ignore Samsung stupid shit: https://github.com/universal9611-dev/framework-res/blob/4645162b385057fb77ee91565c802cdf528613da/res/values/strings.xml#L2895
                 } else if (Build.VERSION.SDK_INT < 33 || text != resources.findString("sanitized_content_text_sf",
                         "android")) Timber.e(Exception("Unrecognized notification text: $text"))
