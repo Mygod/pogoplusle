@@ -55,6 +55,12 @@
     <string name="settings_service_pairing_privileged_summary">Confirm pairing requests using system privileges or
         Shizuku</string>
     <string name="settings_service_pairing_shizuku_missing">Shizuku is unavailable or permission was not granted</string>
+    <string name="settings_companion_association">Associate Bluetooth accessory</string>
+    <string name="settings_companion_association_summary">Allow unpairing without system privileges</string>
+    <string name="settings_companion_association_summary_count">Allow unpairing without system privileges · Associated:
+        %1$d</string>
+    <string name="settings_companion_association_unavailable">Pair an unassociated accessory first</string>
+    <string name="settings_companion_association_failed">Unable to associate Bluetooth accessory</string>
 
     <string name="settings_advanced">Advanced</string>
     <string name="settings_about">About</string>

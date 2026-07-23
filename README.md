@@ -86,3 +86,10 @@ when that package contains one of the exact supported AOSP GATT implementations.
 Q: Why should I use the Shizuku pairing mode?
 
 A: It confirms pairing without the system pop-up. It requires a running Shizuku service and permission for PoGo+LE; if Shizuku is unavailable, Android's normal pairing dialog remains available.
+
+Q: Why should I associate my Bluetooth accessory?
+
+A: On Android 16 and later, a one-time system-approved companion-device association lets PoGo+LE use Android's
+public API to unpair that accessory from the game notification without system privileges. PoGo+LE uses the
+association only for unpairing; the pairing assistant and Shizuku pairing mode remain separate features. Repeat the
+association step for each bonded accessory.

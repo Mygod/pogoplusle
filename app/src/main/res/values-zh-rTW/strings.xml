@@ -46,6 +46,11 @@
     <string name="settings_service_pairing_privileged">自動配對藍牙</string>
     <string name="settings_service_pairing_privileged_summary">使用系統特權或 Shizuku 自動確認配對要求</string>
     <string name="settings_service_pairing_shizuku_missing">Shizuku 不可用或未授與權限</string>
+    <string name="settings_companion_association">關聯藍牙配件</string>
+    <string name="settings_companion_association_summary">無需系統特權即可取消配對</string>
+    <string name="settings_companion_association_summary_count">無需系統特權即可取消配對 · 已關聯：%1$d</string>
+    <string name="settings_companion_association_unavailable">請先配對一個尚未關聯的配件</string>
+    <string name="settings_companion_association_failed">無法關聯藍牙配件</string>
 
     <string name="settings_advanced">進階</string>
     <string name="settings_about">關於</string>

@@ -2,18 +2,23 @@ package be.mygod.pogoplusplus
 
 import android.Manifest
 import android.annotation.TargetApi
+import android.companion.AssociationInfo
+import android.companion.CompanionDeviceManager
 import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.view.View
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.TwoStatePreference
@@ -31,20 +36,21 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
 
         private const val EXTRA_KEY_LEGACY = ":settings:fragment_args_key"
         private const val REQUEST_SHIZUKU_PAIRING = 1
-        private const val STATE_PENDING_PRIVILEGED_PAIRING_ENABLE = "pendingPrivilegedPairingEnable"
+        private const val STATE_PENDING_SHIZUKU_PAIRING_ENABLE = "pendingShizukuPairingEnable"
     }
 
     private lateinit var servicePairing: TwoStatePreference
     private lateinit var serviceGameNotification: TwoStatePreference
     private lateinit var permissionBluetooth: TwoStatePreference
     private lateinit var servicePairingPrivileged: TwoStatePreference
-    private var pendingPrivilegedPairingEnable = false
+    private var companionAssociation: Preference? = null
+    private var pendingShizukuPairingEnable = false
     private fun Preference.remove() = parent!!.removePreference(this)
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_main)
-        pendingPrivilegedPairingEnable = savedInstanceState?.getBoolean(
-            STATE_PENDING_PRIVILEGED_PAIRING_ENABLE) == true
+        pendingShizukuPairingEnable = savedInstanceState?.getBoolean(
+            STATE_PENDING_SHIZUKU_PAIRING_ENABLE) == true
         findPreference<Preference>("play")?.setOnPreferenceClickListener {
             app.launchUrl(requireContext(), "https://github.com/Mygod/pogoplusle/discussions/46")
             true
@@ -57,6 +63,17 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         }
         servicePairing = findPreference("service.pairing")!!
         servicePairingPrivileged = findPreference("service.pairingPrivileged")!!
+        findPreference<Preference>("bluetooth.companionAssociation")!!.let { preference ->
+            if (SfidaManager.companionDeviceSetupSupported) {
+                companionAssociation = preference
+                preference.setOnPreferenceClickListener {
+                    if (hasBluetoothPermission) associateCompanion() else {
+                        requestCompanionBluetoothPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                    }
+                    true
+                }
+            } else preference.remove()
+        }
         if (needsServicePairing) {
             servicePairing.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue as Boolean) MaterialAlertDialogBuilder(requireContext()).apply {
@@ -79,7 +96,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             }
             servicePairingPrivileged.setOnPreferenceChangeListener { _, newValue ->
                 val shouldEnable = newValue as Boolean
-                pendingPrivilegedPairingEnable = false
+                pendingShizukuPairingEnable = false
                 if (shouldEnable) enablePrivilegedPairing() else {
                     app.setEnabled<ShizukuPairingReceiver>(false)
                     true
@@ -158,7 +175,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(STATE_PENDING_PRIVILEGED_PAIRING_ENABLE, pendingPrivilegedPairingEnable)
+        outState.putBoolean(STATE_PENDING_SHIZUKU_PAIRING_ENABLE, pendingShizukuPairingEnable)
         super.onSaveInstanceState(outState)
     }
 
@@ -172,11 +189,22 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val granted = permissions.getOrDefault(Manifest.permission.BLUETOOTH_CONNECT, false)
         permissionBluetooth.isChecked = granted && app.isEnabled<BluetoothReceiver>()
-        if (pendingPrivilegedPairingEnable) {
-            pendingPrivilegedPairingEnable = false
+        if (pendingShizukuPairingEnable) {
+            pendingShizukuPairingEnable = false
             servicePairingPrivileged.isChecked = granted && enablePrivilegedPairing()
         } else updatePrivilegedPairingSwitch()
         if (!granted) Snackbar.make(requireView(), R.string.settings_permission_bluetooth_missing,
+            Snackbar.LENGTH_LONG).show()
+    }
+
+    @TargetApi(31)
+    private val requestCompanionBluetoothPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) { granted ->
+        permissionBluetooth.isChecked = granted && app.isEnabled<BluetoothReceiver>()
+        updatePrivilegedPairingSwitch()
+        if (granted) {
+            if (Build.VERSION.SDK_INT >= 36) associateCompanion()
+        } else Snackbar.make(requireView(), R.string.settings_permission_bluetooth_missing,
             Snackbar.LENGTH_LONG).show()
     }
 
@@ -192,12 +220,58 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private val requestCompanionAssociation = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()) { updateCompanionAssociationPreference() }
+
+    @RequiresApi(36)
+    private fun associateCompanion() {
+        val callback = object : CompanionDeviceManager.Callback() {
+            override fun onAssociationPending(intentSender: IntentSender) {
+                if (isAdded && lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+                    requestCompanionAssociation.launch(IntentSenderRequest.Builder(intentSender).build())
+                } else Timber.w("Companion device association is pending after settings closed")
+            }
+
+            override fun onAssociationCreated(associationInfo: AssociationInfo) {
+                if (isAdded && lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+                    updateCompanionAssociationPreference()
+                }
+            }
+
+            override fun onFailure(error: CharSequence?) {
+                Timber.w("Companion device association failed: $error")
+                view?.let {
+                    Snackbar.make(it, R.string.settings_companion_association_failed, Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
+        try {
+            if (!SfidaManager.associateCompanion(requireContext().mainExecutor, callback)) {
+                Snackbar.make(requireView(), R.string.settings_companion_association_unavailable,
+                    Snackbar.LENGTH_LONG).show()
+            }
+        } catch (e: SecurityException) {
+            Timber.w(e)
+            Snackbar.make(requireView(), R.string.settings_permission_bluetooth_missing,
+                Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun updateCompanionAssociationPreference() {
+        val preference = companionAssociation ?: return
+        if (Build.VERSION.SDK_INT >= 36) {
+            val count = SfidaManager.companionAssociationCount
+            preference.summary = if (count == 0) getString(R.string.settings_companion_association_summary)
+            else getString(R.string.settings_companion_association_summary_count, count)
+        }
+    }
+
     private val shizukuBinderReceived = Shizuku.OnBinderReceivedListener { updatePrivilegedPairingSwitch() }
     private val shizukuBinderDead = Shizuku.OnBinderDeadListener { updatePrivilegedPairingSwitch() }
 
     private fun enablePrivilegedPairing(): Boolean {
         if (Build.VERSION.SDK_INT >= 31 && !hasBluetoothPermission) {
-            pendingPrivilegedPairingEnable = true
+            pendingShizukuPairingEnable = true
             requestBluetoothPermission.launch(if (Build.VERSION.SDK_INT >= 33) {
                 arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.POST_NOTIFICATIONS)
             } else arrayOf(Manifest.permission.BLUETOOTH_CONNECT))
@@ -238,6 +312,7 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
         permissionBluetooth.isChecked = (Build.VERSION.SDK_INT < 31 || hasBluetoothPermission) &&
                 app.isEnabled<BluetoothReceiver>()
         updatePrivilegedPairingSwitch()
+        updateCompanionAssociationPreference()
     }
 
     fun updateSwitches() {

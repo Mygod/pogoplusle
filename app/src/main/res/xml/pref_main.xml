@@ -30,6 +30,11 @@
         app:summary="@string/settings_game_summary" />
 
     <PreferenceCategory app:title="@string/settings_advanced">
+        <Preference
+            app:key="bluetooth.companionAssociation"
+            app:icon="@drawable/ic_device_bluetooth_connected"
+            app:title="@string/settings_companion_association"
+            app:summary="@string/settings_companion_association_summary" />
         <SwitchPreferenceCompat
             app:key="service.pairingPrivileged"
             app:icon="@drawable/ic_home_electric_bolt"
