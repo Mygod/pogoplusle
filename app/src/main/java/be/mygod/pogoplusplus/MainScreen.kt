@@ -24,8 +24,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -45,8 +43,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.expressiveLightColorScheme
+import androidx.compose.material3.nonInteractiveScrollbar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
-import androidx.compose.material3.scrollbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -85,7 +83,6 @@ internal data class MainUiState(
 )
 
 @Composable
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 internal fun PoGoPlusPlusTheme(dynamicColor: Boolean = true, content: @Composable () -> Unit) {
     val darkTheme = isSystemInDarkTheme()
     val colorScheme = if (dynamicColor && Build.VERSION.SDK_INT >= 31) {
@@ -100,7 +97,6 @@ internal fun PoGoPlusPlusTheme(dynamicColor: Boolean = true, content: @Composabl
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 internal fun MainScreen(
     state: MainUiState,
     snackbarHostState: SnackbarHostState,
@@ -254,15 +250,21 @@ private fun SettingsList(
     content: LazyListScope.() -> Unit,
 ) {
     val state = rememberLazyListState()
+    val scrollIndicatorState = state.scrollIndicatorState
+    val scrollbarModifier = if (scrollIndicatorState != null) {
+        Modifier.nonInteractiveScrollbar(
+            state = scrollIndicatorState,
+            orientation = Orientation.Vertical,
+            isFadeEnabled = false,
+        )
+    } else {
+        Modifier
+    }
     LazyColumn(
         state = state,
         modifier = modifier
             .fillMaxSize()
-            .scrollbar(
-                state = state.scrollIndicatorState,
-                orientation = Orientation.Vertical,
-                isFadeEnabled = false,
-            ),
+            .then(scrollbarModifier),
         contentPadding = contentPadding,
         content = content,
     )
@@ -282,7 +284,6 @@ private fun LazyListScope.preferenceGroup(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 private fun PreferenceGroup(
     title: String? = null,
     horizontalPadding: Dp = 16.dp,
@@ -329,7 +330,6 @@ private class PreferenceGroupScope(private val items: MutableList<@Composable ()
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 private fun PreferenceRow(
     title: String,
     @DrawableRes icon: Int,
