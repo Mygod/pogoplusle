@@ -195,9 +195,7 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
 //                prompt.joinToString { it.viewIdResourceName }))
     }
 
-    override fun onInterrupt() {
-        Timber.d("BluetoothPairingService interrupted")
-    }
+    override fun onInterrupt() { }
 
     override fun onUnbind(intent: Intent?): Boolean {
         instance = null
