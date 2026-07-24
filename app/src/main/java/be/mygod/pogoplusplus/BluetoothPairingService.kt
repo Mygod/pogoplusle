@@ -159,11 +159,7 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
         return null
     }
     private fun tryLocateByText(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
-        val packageName = root.packageName?.toString()
-        if (packageName == null) {
-            Timber.w(NullPointerException("packageName is null: $root"))
-            return null
-        }
+        val packageName = root.packageName?.toString() ?: return null
         val resources = try {
             packageManager.getResourcesForApplication(packageName)
         } catch (_: PackageManager.NameNotFoundException) {
@@ -183,7 +179,8 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
         if (root.findAccessibilityNodeInfosByText(promptText).any { it.text == promptText }) return confirm[0]
         // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
         val deviceName = root.findAccessibilityNodeInfosByText(SfidaManager.DEVICE_NAME_PGP)
-        if (deviceName.all { it.text == SfidaManager.DEVICE_NAME_PGP }) return confirm[0]
+        if (deviceName.isNotEmpty() &&
+            deviceName.all { it.text == SfidaManager.DEVICE_NAME_PGP }) return confirm[0]
         val filtered = deviceName.filter { it.text?.contains(SfidaManager.DEVICE_NAME_PGPP) != true }
         if (filtered.isNotEmpty()) Timber.w(Exception("Locate device name suspect: $packageName; " +
                 confirm[0].viewIdResourceName + "; " +
