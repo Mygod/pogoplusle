@@ -93,13 +93,48 @@ class GameStringsTest {
     }
 
     @Test
-    fun failedLoadIsNotCached() {
+    fun failedLoadIsCachedUntilRevisionChanges() {
         var loads = 0
         val cache = GameStringsCache {
             if (++loads == 1) null else strings("loaded")
         }
 
         assertNull(cache.get(revision()))
+        assertNull(cache.get(revision()))
+        assertEquals(1, loads)
+        assertEquals(strings("loaded"), cache.get(revision(longVersionCode = 2)))
+        assertEquals(2, loads)
+    }
+
+    @Test
+    fun failedRevisionDoesNotReturnStaleStrings() {
+        var loads = 0
+        val cache = GameStringsCache {
+            when (++loads) {
+                1 -> strings("old")
+                2 -> null
+                else -> strings("new")
+            }
+        }
+
+        assertEquals(strings("old"), cache.get(revision()))
+        assertNull(cache.get(revision(longVersionCode = 2)))
+        assertNull(cache.get(revision(longVersionCode = 2)))
+        assertEquals(2, loads)
+        assertEquals(strings("new"), cache.get(revision(longVersionCode = 3)))
+        assertEquals(3, loads)
+    }
+
+    @Test
+    fun clearRetriesFailedRevision() {
+        var loads = 0
+        val cache = GameStringsCache {
+            if (++loads == 1) null else strings("loaded")
+        }
+
+        assertNull(cache.get(revision()))
+        cache.clear()
+
         assertEquals(strings("loaded"), cache.get(revision()))
         assertEquals(2, loads)
     }

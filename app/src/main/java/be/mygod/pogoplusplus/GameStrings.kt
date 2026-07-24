@@ -77,16 +77,13 @@ internal data class GamePackageRevision(
 )
 
 internal class GameStringsCache(private val loader: (String) -> GameStrings?) {
-    private data class Entry(val revision: GamePackageRevision, val strings: GameStrings)
+    private data class Entry(val revision: GamePackageRevision, val strings: GameStrings?)
 
     private val entries = mutableMapOf<String, Entry>()
 
     fun get(revision: GamePackageRevision): GameStrings? {
         entries[revision.packageName]?.takeIf { it.revision == revision }?.let { return it.strings }
-        val strings = loader(revision.packageName) ?: run {
-            entries.remove(revision.packageName)
-            return null
-        }
+        val strings = loader(revision.packageName)
         entries[revision.packageName] = Entry(revision, strings)
         return strings
     }
@@ -95,8 +92,9 @@ internal class GameStringsCache(private val loader: (String) -> GameStrings?) {
 }
 
 @SuppressLint("DiscouragedApi")
-internal fun Context.loadGameStrings(): GameStrings {
-    val baseResources = resources
+internal fun Context.loadGameStrings(): GameStrings? {
+    val baseResources: Resources? = resources
+    if (baseResources == null) return null
     fun id(name: String) = baseResources.getIdentifier(name, "string", packageName)
     val disconnectingCompanionDevice = id("Disconnecting_Companion_Device")
     val disconnectingGoPlus = id("Disconnecting_GO_Plus")
@@ -132,10 +130,12 @@ internal fun Context.loadGameStrings(): GameStrings {
 
     add(baseResources)
     val baseConfiguration = Configuration(baseResources.configuration)
-    for (localeTag in assets.locales.orEmpty().asSequence().filter(String::isNotEmpty).distinct()) {
-        add(createConfigurationContext(Configuration(baseConfiguration).apply {
+    for (localeTag in baseResources.assets.locales.orEmpty().asSequence().filter(String::isNotEmpty).distinct()) {
+        val localizedResources: Resources? = createConfigurationContext(Configuration(baseConfiguration).apply {
             setLocales(LocaleList.forLanguageTags(localeTag))
-        }).resources)
+        }).resources
+        if (localizedResources == null) return null
+        add(localizedResources)
     }
     return builder.build()
 }

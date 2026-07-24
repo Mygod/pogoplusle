@@ -209,7 +209,9 @@ class GameNotificationService : NotificationListenerService() {
 
     private val gameStringsCache = GameStringsCache { packageName ->
         try {
-            createPackageContext(packageName, 0).loadGameStrings()
+            val strings = createPackageContext(packageName, 0).loadGameStrings()
+            if (strings == null) Timber.w("Unable to load game strings for $packageName")
+            strings
         } catch (_: PackageManager.NameNotFoundException) {
             null
         }
