@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Icon
 import android.net.Uri
@@ -20,7 +21,6 @@ import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import be.mygod.pogoplusplus.App.Companion.app
 import be.mygod.pogoplusplus.util.findString
-import be.mygod.pogoplusplus.util.findStrings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
@@ -207,6 +207,14 @@ class GameNotificationService : NotificationListenerService() {
                 sbn.packageName in POKEMON_GO_PACKAGES
     }
 
+    private val gameStringsCache = GameStringsCache { packageName ->
+        try {
+            createPackageContext(packageName, 0).loadGameStrings()
+        } catch (_: PackageManager.NameNotFoundException) {
+            null
+        }
+    }
+
     override fun onListenerConnected() {
         latestCompanionStopAction =
             activeNotifications.firstOrNull(::isInterested)?.notification?.actions?.singleOrNull()?.actionIntent
@@ -215,6 +223,11 @@ class GameNotificationService : NotificationListenerService() {
     override fun onListenerDisconnected() {
         latestCompanionStopAction = null
         _running.value = false
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        gameStringsCache.clear()
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
@@ -227,13 +240,22 @@ class GameNotificationService : NotificationListenerService() {
             updateConnectionStatus(SfidaSessionManager.onConnect())
             return setTimeoutIfEnabled()
         }
-        val gameContext = try {
-            createPackageContext(sbn.packageName, 0)
+        @Suppress("DEPRECATION")
+        val packageInfo = try {
+            packageManager.getPackageInfo(sbn.packageName, 0)
         } catch (_: PackageManager.NameNotFoundException) {
+            gameStringsCache.clear()
             return
         }
-        if (text in gameContext.findStrings("Disconnecting_Companion_Device") ||
-            text in gameContext.findStrings("Disconnecting_GO_Plus")) {
+        val applicationInfo = packageInfo.applicationInfo ?: return
+        val gameStrings = gameStringsCache.get(GamePackageRevision(
+            packageName = sbn.packageName,
+            longVersionCode = packageInfo.longVersionCode,
+            lastUpdateTime = packageInfo.lastUpdateTime,
+            publicSourceDir = applicationInfo.publicSourceDir,
+            splitPublicSourceDirs = applicationInfo.splitPublicSourceDirs.orEmpty().toList(),
+        )) ?: return
+        if (text in gameStrings.disconnecting) {
             return onAuxiliaryDisconnected()
         }
         val isConnected = SfidaManager.isConnected != false
@@ -241,36 +263,36 @@ class GameNotificationService : NotificationListenerService() {
         if (Build.VERSION.SDK_INT < 31 && sbn.notification.flags and Notification.FLAG_FOREGROUND_SERVICE !=
             Notification.FLAG_FOREGROUND_SERVICE) return    // ignore reposted notification
         when (text) {
-            in gameContext.findStrings("Item_Inventory_Full") -> pushNotification(NOTIFICATION_ITEM_FULL,
+            in gameStrings.itemInventoryFull -> pushNotification(NOTIFICATION_ITEM_FULL,
                 CHANNEL_ITEM_FULL, text, R.drawable.ic_shopping_bag, sbn.packageName) {
                 setOnlyAlertOnce(!notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
             }
-            in gameContext.findStrings("Pokemon_Inventory_Full") -> pushNotification(NOTIFICATION_POKEMON_FULL,
+            in gameStrings.pokemonInventoryFull -> pushNotification(NOTIFICATION_POKEMON_FULL,
                 CHANNEL_POKEMON_FULL, text, R.drawable.ic_disc_full, sbn.packageName)
-            in gameContext.findStrings("Out_Of_Pokeballs") -> pushNotification(NOTIFICATION_NO_BALL,
+            in gameStrings.outOfPokeballs -> pushNotification(NOTIFICATION_NO_BALL,
                 CHANNEL_NO_BALL, text, R.drawable.ic_hide_source, sbn.packageName)
-            in gameContext.findStrings("Captured_Pokemon") -> {
+            in gameStrings.capturedPokemon -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
                 val stats = SfidaSessionManager.onCaptured(isConnected)
                 if (isConnected) updateConnectionStatus(stats)
             }
-            in gameContext.findStrings("Pokemon_Escaped") -> {
+            in gameStrings.escapedPokemon -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
                 val stats = SfidaSessionManager.onEscaped(isConnected)
                 if (isConnected) updateConnectionStatus(stats)
             }
-            in gameContext.findStrings("Retrieved_an_Item", "") -> { // remove %s if present
+            in gameStrings.retrievedAnItem -> { // remove %s if present
                 notificationManager.cancel(NOTIFICATION_ITEM_FULL)
                 notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
                 val stats = SfidaSessionManager.onSpin(1, isConnected)
                 if (isConnected) updateConnectionStatus(stats)
             }
-            in gameContext.findStrings("Pokestop_Cooldown"), in gameContext.findStrings("Pokestop_Out_Of_Range") -> { }
+            in gameStrings.ignoredPokestop -> { }
             else -> {
                 var split: List<String>? = null
-                for (template in gameContext.findStrings("Retrieved_Items")) {
+                for (template in gameStrings.retrievedItems) {
                     val candidate = template.split("%s", limit = 2)
                     if (candidate.size == 2 && text.startsWith(candidate[0]) && text.endsWith(candidate[1])) {
                         split = candidate

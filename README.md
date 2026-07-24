@@ -3,7 +3,7 @@
 [![Releases](https://img.shields.io/github/downloads/Mygod/pogoplusle/total.svg)](https://github.com/Mygod/pogoplusle/releases)
 [![Android 9-17](https://img.shields.io/badge/Android-9--17-3DDC84?logo=android&logoColor=white)](app/build.gradle.kts)
 
-[![Get it on Obtainium](https://github.com/ImranR98/Obtainium/raw/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522be.mygod.pogoplusplus%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FMygod%252Fpogoplusle%2522%252C%2522author%2522%253A%2522%2522%252C%2522name%2522%253A%2522%2522%252C%2522additionalSettings%2522%253A%2522%257B%257D%2522%257D)
+[![Get it on Obtainium](https://github.com/ImranR98/Obtainium/raw/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.page/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522be.mygod.pogoplusplus%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FMygod%252Fpogoplusle%2522%252C%2522author%2522%253A%2522%2522%252C%2522name%2522%253A%2522%2522%252C%2522additionalSettings%2522%253A%2522%257B%257D%2522%257D)
 
 Automagically skips pairing dialog when connecting Pokémon GO Plus, and alerts you when things go wrong.
 
