@@ -255,7 +255,6 @@ private fun SettingsList(
         Modifier.nonInteractiveScrollbar(
             state = scrollIndicatorState,
             orientation = Orientation.Vertical,
-            isFadeEnabled = false,
         )
     } else {
         Modifier
