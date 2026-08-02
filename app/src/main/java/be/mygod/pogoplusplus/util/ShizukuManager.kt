@@ -19,14 +19,16 @@ import timber.log.Timber
 import java.time.Duration
 
 object ShizukuManager {
+    private const val BLUETOOTH_JARJAR_PREFIX = "com.android.bluetooth.x."
     private const val SYNCHRONOUS_RESULT_RECEIVER =
-        "com.android.bluetooth.x.com.android.modules.utils.SynchronousResultReceiver"
+        "${BLUETOOTH_JARJAR_PREFIX}com.android.modules.utils.SynchronousResultReceiver"
     private val synchronousResultTimeout: Duration = Duration.ofSeconds(5)
 
     private val hiddenApiAccess by lazy {
         HiddenApiBypass.addHiddenApiExemptions(
             "Landroid/bluetooth/",
             "Lcom/android/bluetooth/",
+            "Lcom/android/modules/utils/",
         )
     }
 
@@ -63,6 +65,8 @@ object ShizukuManager {
      *
      * Android 13-14 jarjar-shade SynchronousResultReceiver in the runtime descriptor:
      * https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-13.0.0_r1/framework/jarjar-rules.txt#2
+     * Motorola Android 13 build T1SSS33.1-119-8-16 exposes the unshaded source name, so prefixed
+     * runtime class names fall back to their unshaded form.
      */
     private val setPairingConfirmation: (Any?, BluetoothDevice) -> Boolean by lazy {
         val serviceClass = Class.forName("android.bluetooth.IBluetooth")
@@ -77,7 +81,11 @@ object ShizukuManager {
                 { service, device -> method(service, device, true, shellAttributionSource) as Boolean }
             } catch (e: NoSuchMethodException) {
                 if (Build.VERSION.SDK_INT !in 33..34) Timber.w(e)
-                val receiverClass = Class.forName(SYNCHRONOUS_RESULT_RECEIVER)
+                val receiverClass = try {
+                    Class.forName(SYNCHRONOUS_RESULT_RECEIVER)
+                } catch (_: ClassNotFoundException) {
+                    Class.forName(SYNCHRONOUS_RESULT_RECEIVER.removePrefix(BLUETOOTH_JARJAR_PREFIX))
+                }
                 val method = serviceClass.getMethod("setPairingConfirmation", BluetoothDevice::class.java,
                     java.lang.Boolean.TYPE, AttributionSource::class.java, receiverClass)
                 val getReceiver = receiverClass.getMethod("get")
