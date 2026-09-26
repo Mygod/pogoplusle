@@ -165,16 +165,18 @@ class GameNotificationService : NotificationListenerService() {
                 app.getText(R.string.notification_title_auxiliary_disconnected_default),
                 R.drawable.ic_bluetooth_disabled, packageName) {
                 setOnlyAlertOnce(true)
-                if (device?.run {
-                        second == SfidaManager.DEVICE_NAME_PGP && try {
-                            first.bondState
+                // game callbacks carry no device, so the action follows the session identity instead
+                if (stats.deviceName == SfidaManager.DEVICE_NAME_PGP && stats.deviceAddress.isNotEmpty()) {
+                    val target = device?.first ?: bluetoothAdapter.getRemoteDevice(stats.deviceAddress)
+                    if (try {
+                            target.bondState
                         } catch (_: SecurityException) {
                             BluetoothDevice.BOND_BONDED
-                        } != BluetoothDevice.BOND_NONE
-                    } == true) addAction(Notification.Action.Builder(
-                    Icon.createWithResource(app, R.drawable.ic_link_off),
-                    app.getText(R.string.notification_action_unpair),
-                    makeDisconnectingPendingIntent(device.first)).build())
+                        } != BluetoothDevice.BOND_NONE) addAction(Notification.Action.Builder(
+                        Icon.createWithResource(app, R.drawable.ic_link_off),
+                        app.getText(R.string.notification_action_unpair),
+                        makeDisconnectingPendingIntent(target)).build())
+                }
                 setPublicVersion(build().clone())
                 setVisibility(Notification.VISIBILITY_PRIVATE)
                 stats.deviceName?.let {

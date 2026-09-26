@@ -61,40 +61,32 @@ object SfidaSessionManager {
         putLong(KEY_CAPTURED_COUNT, capturedCount)
         putLong(KEY_ESCAPED_COUNT, escapedCount)
     }
+    private fun SharedPreferences.Editor.setDevice(device: Pair<BluetoothDevice, String?>) {
+        // a missing name may only reuse the saved name of the same device
+        if (device.second != null || !device.first.address.equals(pref.getString(KEY_DEVICE_ADDRESS, null), true)) {
+            putString(KEY_DEVICE_NAME, device.second)
+        }
+        putString(KEY_DEVICE_ADDRESS, device.first.address)
+    }
     fun onConnect() = System.currentTimeMillis().let { time ->
         pref.edit { setActive(time) }
         makeStats(0, 0, 0, 0, startTime = time)
     }
     fun onConnect(device: Pair<BluetoothDevice, String?>): Stats {
         val time = System.currentTimeMillis()
-        var name = device.second
         val wasActive = pref.getBoolean(KEY_ACTIVE, false)
         pref.edit {
             if (!wasActive) setActive(time)
-            if (name == null && device.first.address.equals(pref.getString(KEY_DEVICE_ADDRESS, null), true)) {
-                name = pref.getString(KEY_DEVICE_NAME, null)
-            } else putString(KEY_DEVICE_NAME, name)
-            putString(KEY_DEVICE_ADDRESS, device.first.address)
+            setDevice(device)
         }
-        return makeStats(deviceAddress = device.first.address, deviceName = name)
+        return makeStats()
     }
-    fun onDisconnect(device: Pair<BluetoothDevice, String?>?) = when {
-        device == null -> {
-            pref.edit { remove(KEY_ACTIVE) }
-            makeStats()
+    fun onDisconnect(device: Pair<BluetoothDevice, String?>?): Stats {
+        pref.edit {
+            remove(KEY_ACTIVE)
+            if (device != null) setDevice(device)
         }
-        device.second == null -> {
-            pref.edit { remove(KEY_ACTIVE) }
-            makeStats(deviceAddress = device.first.address)
-        }
-        else -> {
-            pref.edit {
-                remove(KEY_ACTIVE)
-                putString(KEY_DEVICE_ADDRESS, device.first.address)
-                putString(KEY_DEVICE_NAME, device.second)
-            }
-            makeStats(deviceAddress = device.first.address, deviceName = device.second)
-        }
+        return makeStats()
     }
 
     fun onSpin(items: Long, isConnected: Boolean): Stats {
