@@ -1,6 +1,7 @@
 package be.mygod.pogoplusplus.xposed
 
 import android.bluetooth.BluetoothDevice
+import android.os.Build
 import android.os.SystemClock
 import android.util.Log
 import be.mygod.pogoplusplus.POKEMON_GO_PACKAGES
@@ -56,6 +57,12 @@ class BluetoothGattServerFilter : IXposedHookLoadPackage {
         val callbackClass = XposedHelpers.findClassIfExists(CLASS_GATT_SERVER_CALLBACK, classLoader)
             ?: throw NoSuchMethodException(CLASS_GATT_SERVER_CALLBACK)
         val unregisterServer = gattServerManager.getDeclaredMethod("unregisterServer", callbackClass)
+        val linkHolder = try {
+            ServerLinkHolder(gattServerManager)
+        } catch (e: NoSuchMethodException) {
+            log("unsupported GattNativeInterface; Pokemon GO may miss MTU changes: ${e.message}")
+            null
+        }
 
         XposedBridge.hookMethod(onServerRegistered, object : XC_MethodHook() {
             override fun afterHookedMethod(param: MethodHookParam) {
@@ -77,6 +84,17 @@ class BluetoothGattServerFilter : IXposedHookLoadPackage {
                     val connId = param.args[3] as Int
                     val serverIf = param.args[4] as Int
                     suppressIfNeeded(param, serverIf, connected, connId, address)
+                } catch (throwable: Throwable) {
+                    log(throwable)
+                }
+            }
+
+            override fun afterHookedMethod(param: MethodHookParam) {
+                if (linkHolder == null) return
+                try {
+                    if (param.hasThrowable() || param.getObjectExtra(SUPPRESSED_EXTRA) == true) return
+                    if (param.args[2] as Boolean) linkHolder.hold(param.thisObject,
+                        param.args[4] as Int, param.args[0] as BluetoothDevice, param.args[1] as Int)
                 } catch (throwable: Throwable) {
                     log(throwable)
                 }
@@ -171,15 +189,55 @@ class BluetoothGattServerFilter : IXposedHookLoadPackage {
         private const val CLASS_GATT_SERVICE = "com.android.bluetooth.gatt.GattService"
         private const val CLASS_GATT_SERVER_MANAGER = "com.android.bluetooth.gatt.GattServerManager"
         private const val UNREGISTER_SERVER_IF_EXTRA = "be.mygod.pogoplusplus.xposed.serverIf"
+        private const val SUPPRESSED_EXTRA = "be.mygod.pogoplusplus.xposed.suppressed"
         private const val STALE_CALLBACK_WINDOW_MS = 3_000L
 
+        private val pokemonGoServers: MutableSet<Int> = ConcurrentHashMap.newKeySet()
         private val serverFilters = ConcurrentHashMap<Int, StaleConnectionFilter>()
+
+        /**
+         * Bluetooth module builds with the read-only fix_mtu_exchange_race_condition flag enabled (e.g. 373041380)
+         * report an ATT MTU exchange only to apps holding the link (gatt_notify_mtu_changed). Pokemon GO accepts
+         * incoming connections without calling BluetoothGattServer.connect, so it would never learn the negotiated
+         * MTU. Hold the link on its behalf like BluetoothGattServer.connect(device, false) does; the stack drops
+         * the hold when Pokemon GO cancels the connection or closes the server.
+         *
+         * The hold must be taken on connect: the stack answers discovery and static reads natively, so the MTU
+         * exchange can be the first peer activity Java sees. Every registered GATT app receives every LE connect,
+         * and Java cannot tell which links came through Pokemon GO's advertisement, so unrelated links connected
+         * while the server is registered are held as well. That only lasts until Pokemon GO closes its short-lived
+         * server: a link whose other users already left then idles out, and a remote-initiated link nobody else
+         * holds gets disconnected by the idle timer.
+         */
+        private class ServerLinkHolder(gattServerManager: Class<*>) {
+            private val getNativeInterface = gattServerManager.getDeclaredMethod("getNativeInterface")
+                .apply { isAccessible = true }
+            private val gattServerConnect = getNativeInterface.returnType.getDeclaredMethod("gattServerConnect",
+                Integer.TYPE, BluetoothDevice::class.java, Integer.TYPE, java.lang.Boolean.TYPE, Integer.TYPE)
+                .apply { isAccessible = true }
+
+            fun hold(gattServerManager: Any, serverIf: Int, device: BluetoothDevice, transport: Int) {
+                if (serverIf !in pokemonGoServers || transport != BluetoothDevice.TRANSPORT_LE) return
+                // GattServerManager only ships in Bluetooth modules requiring API 36+
+                if (Build.VERSION.SDK_INT < 35) return
+                gattServerConnect(getNativeInterface(gattServerManager), serverIf, device, device.addressType, true,
+                    transport)
+                log("holding Pokemon GO server $serverIf link to ${addressOf(device)}")
+            }
+        }
 
         private fun trackServer(serverMap: Any, serverIf: Int, connectedAddresses: () -> Set<String>) {
             serverFilters.remove(serverIf)
-            if (appNameForServer(serverMap, serverIf) !in POKEMON_GO_PACKAGES) return
+            if (appNameForServer(serverMap, serverIf) !in POKEMON_GO_PACKAGES) {
+                pokemonGoServers.remove(serverIf)
+                return
+            }
+            pokemonGoServers.add(serverIf)
             val baseline = connectedAddresses()
-            if (baseline.isEmpty()) return
+            if (baseline.isEmpty()) {
+                log("tracking Pokemon GO GATT server $serverIf")
+                return
+            }
             serverFilters[serverIf] = StaleConnectionFilter(
                 registeredAtMillis = SystemClock.elapsedRealtime(),
                 baselineAddresses = baseline,
@@ -197,13 +255,15 @@ class BluetoothGattServerFilter : IXposedHookLoadPackage {
         ) {
             val filter = serverFilters[serverIf] ?: return
             if (!filter.shouldSuppress(connected, connId, address, SystemClock.elapsedRealtime())) return
+            param.setObjectExtra(SUPPRESSED_EXTRA, true)
             param.result = null
             log("suppressed stale Pokemon GO server $serverIf ${if (connected) "connect" else "disconnect"} " +
                     "for $address connId=$connId")
         }
 
         private fun stopTracking(serverIf: Int) {
-            if (serverFilters.remove(serverIf) != null) {
+            val wasPokemonGo = pokemonGoServers.remove(serverIf)
+            if (serverFilters.remove(serverIf) != null || wasPokemonGo) {
                 log("stopped tracking Pokemon GO GATT server $serverIf")
             }
         }

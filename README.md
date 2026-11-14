@@ -29,7 +29,11 @@ A: Feel free to send the following information to me via GitHub issues or else: 
 Q: What does the Xposed Bluetooth workaround do, and how do I enable it?
 
 A: This workaround allows Pokémon GO to connect to a Nintendo Switch while another Bluetooth LE device is already
-connected by filtering the initial GATT callbacks for pre-existing connections. Enable PoGo+LE in LSPosed and select
+connected by filtering the initial GATT callbacks for pre-existing connections. It also holds new Pokémon GO GATT
+server connections on Pokémon GO's behalf, because some Bluetooth module updates delivered through Google Play system
+updates (such as 373041380) stop reporting the negotiated MTU to GATT servers that do not hold the link, which makes
+Nintendo Switch transfers fail.
+Enable PoGo+LE in LSPosed and select
 the system Bluetooth package. LSPosed recommends
 `com.android.bluetooth` for AOSP and OEM-derived stacks and `com.google.android.bluetooth` for Google's Pixel
 stack. You may select a different package for a vendor ROM: the module has no package allowlist and activates only
@@ -87,6 +91,8 @@ Xposed private APIs:
 * (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->unregisterServer(Landroid/bluetooth/IBluetoothGattServerCallback;)V`
 * (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->gatt:Lcom/android/bluetooth/gatt/GattService;`
 * (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->getServerMap()Lcom/android/bluetooth/gatt/ContextMap;`
+* (API 37) `Lcom/android/bluetooth/gatt/GattServerManager;->getNativeInterface()Lcom/android/bluetooth/gatt/GattNativeInterface;`
+* (API 37) `Lcom/android/bluetooth/gatt/GattNativeInterface;->gattServerConnect(ILandroid/bluetooth/BluetoothDevice;IZI)V`
 * (API 37) `Lcom/android/bluetooth/gatt/GattService;->getClientMap()Lcom/android/bluetooth/gatt/ContextMap;`
 * (API 37) `Lcom/android/bluetooth/gatt/ContextMap;->getById(I)Lcom/android/bluetooth/gatt/ContextApp;`
 * (API 37) `Lcom/android/bluetooth/gatt/ContextMap;->getByCallbackId(Landroid/os/IInterface;)Lcom/android/bluetooth/gatt/ContextApp;`
