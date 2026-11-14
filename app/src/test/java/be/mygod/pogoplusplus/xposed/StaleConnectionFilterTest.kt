@@ -40,6 +40,25 @@ class StaleConnectionFilterTest {
         assertTrue(filter.shouldSuppress(false, 2, SECOND_BASELINE_ADDRESS, 10_002))
     }
 
+    @Test
+    fun reconnectAfterStaleDisconnectIsNotSuppressed() {
+        val filter = filter()
+        assertTrue(filter.shouldSuppress(true, 1, BASELINE_ADDRESS, 1_001))
+        assertTrue(filter.shouldSuppress(false, 1, BASELINE_ADDRESS, 1_500))
+
+        assertFalse(filter.shouldSuppress(true, 1, BASELINE_ADDRESS, 3_000))
+        assertFalse(filter.shouldSuppress(false, 1, BASELINE_ADDRESS, 3_500))
+    }
+
+    @Test
+    fun reconnectAfterUnseenDisconnectIsNotSuppressed() {
+        val filter = filter()
+        assertFalse(filter.shouldSuppress(false, 1, BASELINE_ADDRESS, 1_001))
+
+        assertFalse(filter.shouldSuppress(true, 1, BASELINE_ADDRESS, 1_500))
+        assertTrue(filter.shouldSuppress(true, 2, SECOND_BASELINE_ADDRESS, 1_501))
+    }
+
     private fun filter() = StaleConnectionFilter(
         registeredAtMillis = 1_000,
         baselineAddresses = setOf(BASELINE_ADDRESS, SECOND_BASELINE_ADDRESS),

@@ -5,7 +5,7 @@ internal class StaleConnectionFilter(
     baselineAddresses: Set<String>,
     private val callbackWindowMillis: Long,
 ) {
-    private val baselineAddresses = baselineAddresses.toSet()
+    private val baselineAddresses = baselineAddresses.toMutableSet()
     private val ignoredConnections = HashMap<Int, String>()
 
     @Synchronized
@@ -17,6 +17,8 @@ internal class StaleConnectionFilter(
             ignoredConnections[connId] = address
             return true
         }
+        // The pre-existing link is gone, so any later connect from this device is a new link Pokemon GO must see.
+        baselineAddresses.remove(address)
         if (ignoredConnections.remove(connId) != null) return true
         val iterator = ignoredConnections.iterator()
         while (iterator.hasNext()) {
