@@ -18,6 +18,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
 
     <queries>
         <package android:name="com.nianticlabs.pokemongo" />
@@ -51,11 +52,15 @@
             android:name="xposedscope"
             android:resource="@array/xposed_scope" />
 
+        <!-- Lets the Porter SDK take a Binder from an original Shizuku server; Porter's own provider is merged
+             from the SDK. -->
+        <meta-data
+            android:name="moe.shizuku.client.V3_SUPPORT"
+            android:value="true" />
         <provider
-            android:name="rikka.shizuku.ShizukuProvider"
+            android:name="eu.darken.porter.sdk.PorterShizukuApiProvider"
             android:authorities="${applicationId}.shizuku"
             android:multiprocess="false"
-            android:enabled="true"
             android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 

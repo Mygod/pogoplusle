@@ -6,16 +6,18 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.AttributionSource
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
 import android.os.IInterface
 import android.os.Process
 import androidx.annotation.RequiresApi
 import be.mygod.pogoplusplus.App.Companion.app
+import eu.darken.porter.sdk.Porter
+import eu.darken.porter.sdk.PorterConnection
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import org.lsposed.hiddenapibypass.HiddenApiBypass
-import rikka.shizuku.Shizuku
-import rikka.shizuku.ShizukuBinderWrapper
 import timber.log.Timber
 import java.time.Duration
 
@@ -108,21 +110,27 @@ object ShizukuManager {
         Class.forName("android.bluetooth.IBluetooth\$Stub").getMethod("asInterface", IBinder::class.java)
     }
 
-    fun isAuthorized() = Shizuku.pingBinder() && !Shizuku.isPreV11() &&
-            Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+    /**
+     * A process started by the pairing broadcast receives the server's binder asynchronously. Porter publishes a
+     * connection only after the server's attach reply, so a connection is always usable once it arrives.
+     */
+    suspend fun awaitConnection(timeoutMillis: Long) = withTimeoutOrNull(timeoutMillis) {
+        Porter.connection.filterNotNull().first()
+    }
 
     /**
-     * Requires [isAuthorized]. Bluetooth enforces BLUETOOTH_PRIVILEGED on the Shizuku server's UID, which shell
-     * only holds since API 33, so ADB-started Shizuku cannot confirm pairing before that:
+     * Bluetooth enforces BLUETOOTH_PRIVILEGED on the server's UID, which shell only holds since API 33, so an
+     * ADB-started Shizuku or Porter cannot confirm pairing before that:
      * https://android.googlesource.com/platform/packages/apps/Bluetooth/+/android-12.0.0_r1/src/com/android/bluetooth/btservice/AdapterService.java#1983
      * https://android.googlesource.com/platform/frameworks/base/+/android-12.1.0_r1/packages/Shell/AndroidManifest.xml#120
      * https://android.googlesource.com/platform/frameworks/base/+/android-13.0.0_r1/packages/Shell/AndroidManifest.xml#126
      */
-    fun canConfirmPairing() = Shizuku.checkRemotePermission(Manifest.permission.BLUETOOTH_PRIVILEGED) ==
-            PackageManager.PERMISSION_GRANTED
+    suspend fun canConfirmPairing(connection: PorterConnection) =
+        connection.checkRemotePermission(Manifest.permission.BLUETOOTH_PRIVILEGED)
 
-    fun setPairingConfirmation(device: BluetoothDevice) = hiddenApiAccess.run {
-        setPairingConfirmation(asInterface(null, ShizukuBinderWrapper(getBluetoothService(
+    /** Blocks on Binder calls; call off the main thread. */
+    fun setPairingConfirmation(connection: PorterConnection, device: BluetoothDevice) = hiddenApiAccess.run {
+        setPairingConfirmation(asInterface(null, connection.wrap(getBluetoothService(
             app.getSystemService(BluetoothManager::class.java).adapter).asBinder())), device)
     }
 }

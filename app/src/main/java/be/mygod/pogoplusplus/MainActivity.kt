@@ -25,17 +25,27 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import be.mygod.pogoplusplus.App.Companion.app
 import be.mygod.pogoplusplus.util.ShizukuManager
 import com.google.android.gms.oss.licenses.v2.OssLicensesMenuActivity
+import eu.darken.porter.sdk.PermissionState
+import eu.darken.porter.sdk.Porter
+import eu.darken.porter.sdk.PorterConnectionLostException
+import eu.darken.porter.sdk.PorterException
+import eu.darken.porter.sdk.isGranted
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
-import rikka.shizuku.Shizuku
 import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
     companion object {
         private const val EXTRA_KEY_LEGACY = ":settings:fragment_args_key"
-        private const val REQUEST_SHIZUKU_PAIRING = 1
         private const val STATE_PENDING_SHIZUKU_PAIRING_ENABLE = "pendingShizukuPairingEnable"
     }
 
@@ -50,6 +60,8 @@ class MainActivity : ComponentActivity() {
     private var platformState by mutableStateOf(PlatformState())
     private var showPairingDisclosure by mutableStateOf(false)
     private var pendingShizukuPairingEnable = false
+    private var shizukuPairingReady = false
+    private var enableJob: Job? = null
 
     @get:RequiresApi(31)
     private val hasBluetoothPermission get() = checkSelfPermission(
@@ -81,21 +93,17 @@ class MainActivity : ComponentActivity() {
     private val requestCompanionAssociation = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()) { refreshPlatformState() }
 
-    private val requestShizukuPermission = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
-        if (requestCode == REQUEST_SHIZUKU_PAIRING) runOnUiThread {
-            if (grantResult == PackageManager.PERMISSION_GRANTED) enableShizukuPairing() else {
-                app.setEnabled<ShizukuPairingReceiver>(false)
-                showSnackbar(R.string.settings_service_pairing_shizuku_missing)
+    /** Whether the current Porter or Shizuku server has granted access and can confirm pairing. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val shizukuPairingReadyFlow = Porter.connection.flatMapLatest { connection ->
+        connection?.permission?.mapLatest { permission ->
+            permission.isGranted && try {
+                ShizukuManager.canConfirmPairing(connection)
+            } catch (e: PorterException) {
+                Timber.w(e)
+                false
             }
-            refreshPlatformState()
-        }
-    }
-
-    private val shizukuBinderReceived = Shizuku.OnBinderReceivedListener {
-        runOnUiThread(::refreshPlatformState)
-    }
-    private val shizukuBinderDead = Shizuku.OnBinderDeadListener {
-        runOnUiThread(::refreshPlatformState)
+        } ?: flowOf(false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,10 +111,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         pendingShizukuPairingEnable = savedInstanceState?.getBoolean(
             STATE_PENDING_SHIZUKU_PAIRING_ENABLE) == true
-        if (pairingServicesVisible) {
-            Shizuku.addRequestPermissionResultListener(requestShizukuPermission)
-            Shizuku.addBinderReceivedListenerSticky(shizukuBinderReceived)
-            Shizuku.addBinderDeadListener(shizukuBinderDead)
+        if (pairingServicesVisible) lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shizukuPairingReadyFlow.collect { ready ->
+                    shizukuPairingReady = ready
+                    refreshPlatformState()
+                }
+            }
         }
         refreshPlatformState()
         setContent {
@@ -174,6 +185,7 @@ class MainActivity : ComponentActivity() {
                     },
                     onPrivilegedPairingChange = { shouldEnable ->
                         pendingShizukuPairingEnable = false
+                        enableJob?.cancel()
                         if (shouldEnable) enablePrivilegedPairing()
                         else app.setEnabled<ShizukuPairingReceiver>(false)
                         refreshPlatformState()
@@ -200,26 +212,12 @@ class MainActivity : ComponentActivity() {
         super.onSaveInstanceState(outState)
     }
 
-    override fun onDestroy() {
-        if (pairingServicesVisible) {
-            Shizuku.removeRequestPermissionResultListener(requestShizukuPermission)
-            Shizuku.removeBinderReceivedListener(shizukuBinderReceived)
-            Shizuku.removeBinderDeadListener(shizukuBinderDead)
-        }
-        super.onDestroy()
-    }
-
     private fun refreshPlatformState() {
         val bluetoothPermissionGranted = Build.VERSION.SDK_INT < 31 || hasBluetoothPermission
         val privilegedPairingComponentEnabled = pairingServicesVisible &&
             app.isEnabled<ShizukuPairingReceiver>(false)
         val shizukuAuthorized = bluetoothPermissionGranted && privilegedPairingComponentEnabled &&
-            !hasBluetoothPrivilegedPermission && try {
-                ShizukuManager.isAuthorized() && ShizukuManager.canConfirmPairing()
-            } catch (e: RuntimeException) {
-                Timber.w(e)
-                false
-            }
+            !hasBluetoothPrivilegedPermission && shizukuPairingReady
         platformState = PlatformState(
             bluetoothMonitorEnabled = bluetoothPermissionGranted && app.isEnabled<BluetoothReceiver>(),
             privilegedPairingEnabled = bluetoothPermissionGranted && privilegedPairingComponentEnabled &&
@@ -241,32 +239,35 @@ class MainActivity : ComponentActivity() {
             app.setEnabled<ShizukuPairingReceiver>(true)
             return
         }
-        try {
-            if (ShizukuManager.isAuthorized()) {
-                enableShizukuPairing()
-                return
-            }
-            if (Shizuku.pingBinder() && !Shizuku.isPreV11() &&
-                !Shizuku.shouldShowRequestPermissionRationale()) {
-                Shizuku.requestPermission(REQUEST_SHIZUKU_PAIRING)
-                return
-            }
-        } catch (e: RuntimeException) {
-            Timber.w(e)
+        val connection = Porter.connection.value
+        if (connection == null) {
+            showSnackbar(R.string.settings_service_pairing_shizuku_missing)
+            return
         }
-        showSnackbar(R.string.settings_service_pairing_shizuku_missing)
-    }
-
-    /** Requires [ShizukuManager.isAuthorized]. */
-    private fun enableShizukuPairing() {
-        val failure = try {
-            if (ShizukuManager.canConfirmPairing()) null else R.string.settings_service_pairing_shizuku_unsupported
-        } catch (e: RuntimeException) {
-            Timber.w(e)
-            R.string.settings_service_pairing_shizuku_missing
+        // Recreating this activity cancels a pending request and Porter drops its answer, but the server keeps the
+        // grant, so enabling again succeeds without asking.
+        enableJob?.cancel()
+        enableJob = lifecycleScope.launch {
+            val failure = try {
+                var permission = connection.checkPermission()
+                if (permission is PermissionState.Denied && !permission.permanentlyDenied) {
+                    permission = connection.requestPermission()
+                }
+                when {
+                    !permission.isGranted -> R.string.settings_service_pairing_shizuku_missing
+                    ShizukuManager.canConfirmPairing(connection) -> null
+                    else -> R.string.settings_service_pairing_shizuku_unsupported
+                }
+            } catch (e: PorterException) {
+                if (e !is PorterConnectionLostException) Timber.w(e)
+                R.string.settings_service_pairing_shizuku_missing
+            }
+            // Commit only if the toggle has not changed since.
+            ensureActive()
+            app.setEnabled<ShizukuPairingReceiver>(failure == null)
+            if (failure != null) showSnackbar(failure)
+            refreshPlatformState()
         }
-        app.setEnabled<ShizukuPairingReceiver>(failure == null)
-        if (failure != null) showSnackbar(failure)
     }
 
     @RequiresApi(36)

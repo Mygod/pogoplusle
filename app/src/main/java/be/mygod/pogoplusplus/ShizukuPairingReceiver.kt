@@ -6,9 +6,21 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import be.mygod.pogoplusplus.util.ShizukuManager
+import eu.darken.porter.sdk.isGranted
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ShizukuPairingReceiver : BroadcastReceiver() {
+    companion object {
+        /**
+         * Bounds the wait for a cold-started process to receive the server's binder, leaving room for the
+         * confirmation itself within the ordered broadcast's timeout.
+         */
+        private const val CONNECTION_TIMEOUT_MILLIS = 3_000L
+    }
+
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action != BluetoothDevice.ACTION_PAIRING_REQUEST) return
@@ -23,21 +35,35 @@ class ShizukuPairingReceiver : BroadcastReceiver() {
             directFailure = e
             false
         }
-        val confirmed = if (directlyConfirmed) true else if (!ShizukuManager.isAuthorized()) {
-            directFailure?.let(Timber::d)
-            false
-        } else try {
-            ShizukuManager.canConfirmPairing() && ShizukuManager.setPairingConfirmation(device.first)
-        } catch (e: Exception) {
-            directFailure?.let(e::addSuppressed)
-            Timber.w(e)
-            false
-        }
-
-        if (confirmed) {
-            // Commit only after confirmation so every failure retains Android's normal pairing UI.
+        if (directlyConfirmed) {
             abortBroadcast()
             GameNotificationService.onPrivilegedPairingSucceeded()
-        } else GameNotificationService.onPrivilegedPairingFailed()
+            return
+        }
+
+        val result = goAsync()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val confirmed = try {
+                    val connection = ShizukuManager.awaitConnection(CONNECTION_TIMEOUT_MILLIS)
+                    if (connection?.checkPermission()?.isGranted != true) {
+                        directFailure?.let(Timber::d)
+                        false
+                    } else ShizukuManager.canConfirmPairing(connection) &&
+                            ShizukuManager.setPairingConfirmation(connection, device.first)
+                } catch (e: Exception) {
+                    directFailure?.let(e::addSuppressed)
+                    Timber.w(e)
+                    false
+                }
+                // Commit only after confirmation so every failure retains Android's normal pairing UI.
+                if (confirmed) {
+                    result.abortBroadcast()
+                    GameNotificationService.onPrivilegedPairingSucceeded()
+                } else GameNotificationService.onPrivilegedPairingFailed()
+            } finally {
+                result.finish()
+            }
+        }
     }
 }

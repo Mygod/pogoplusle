@@ -14,6 +14,9 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://api.xposed.info/")
+        maven("https://jitpack.io") {
+            content { includeGroup("com.github.d4rken-org.porter-api") }
+        }
     }
 }
 include(":app")
