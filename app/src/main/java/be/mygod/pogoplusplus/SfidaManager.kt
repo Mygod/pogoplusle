@@ -53,6 +53,9 @@ object SfidaManager : BluetoothGattCallback() {
 
     /**
      * (API 28-36) Landroid/bluetooth/BluetoothGatt;->mClientIf:I,unsupported
+     * Android 16 Bluetooth module updates removed it, so it can be missing on API 36:
+     * https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-16.0.0_r2/framework/java/android/bluetooth/BluetoothGatt.java#70
+     * https://android.googlesource.com/platform/packages/modules/Bluetooth/+/android-16.0.0_r4/framework/java/android/bluetooth/BluetoothGatt.java
      */
     private val mClientIf by lazy {
         BluetoothGatt::class.java.getDeclaredField("mClientIf").apply { isAccessible = true }
@@ -126,6 +129,10 @@ object SfidaManager : BluetoothGattCallback() {
                 gatt.disconnect()
             }
             return true
+        } catch (e: NoSuchFieldException) {
+            // Expected on API 36 once a Bluetooth module update removed mClientIf; unexpected on earlier versions.
+            if (Build.VERSION.SDK_INT >= 36) Timber.d(e) else Timber.w(e)
+            return false
         } catch (e: Exception) {
             Timber.w(e)
             return false
