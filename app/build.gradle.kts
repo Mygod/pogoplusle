@@ -34,10 +34,10 @@ android {
             isPseudoLocalesEnabled = true
         }
         release {
-            isShrinkResources = true
-            isMinifyEnabled = true
+            optimization {
+                enable = true
+            }
             vcsInfo.include = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -48,6 +48,10 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
+    }
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
     packaging.resources.excludes.add("**/*.kotlin_*")
 }
