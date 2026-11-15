@@ -219,9 +219,22 @@ class GameNotificationService : NotificationListenerService() {
         }
     }
 
+    /**
+     * The system throws SecurityException ("Disallowed call from unknown notification listener") when it no longer
+     * recognizes this listener's token, as seen from onListenerConnected, and the client only catches
+     * RemoteException and BadParcelableException:
+     * https://android.googlesource.com/platform/frameworks/base/+/android-17.0.0_r1/services/core/java/com/android/server/notification/ManagedServices.java#1344
+     * https://android.googlesource.com/platform/frameworks/base/+/android-17.0.0_r1/core/java/android/service/notification/NotificationListenerService.java#1146
+     */
+    private fun findCompanionStopAction() = try {
+        activeNotifications.firstOrNull(::isInterested)?.notification?.actions?.singleOrNull()?.actionIntent
+    } catch (e: SecurityException) {
+        Timber.w(e)
+        null
+    }
+
     override fun onListenerConnected() {
-        latestCompanionStopAction =
-            activeNotifications.firstOrNull(::isInterested)?.notification?.actions?.singleOrNull()?.actionIntent
+        latestCompanionStopAction = findCompanionStopAction()
         _running.value = true
     }
     override fun onListenerDisconnected() {
@@ -325,8 +338,7 @@ class GameNotificationService : NotificationListenerService() {
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?, rankingMap: RankingMap?, reason: Int) {
         if (!isInterested(sbn ?: return)) return
-        latestCompanionStopAction = activeNotifications.firstOrNull(::isInterested)?.notification?.actions
-            ?.singleOrNull()?.actionIntent
+        latestCompanionStopAction = findCompanionStopAction()
         when (reason) {
             REASON_PACKAGE_CHANGED,
             REASON_USER_STOPPED,
