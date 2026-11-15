@@ -2,11 +2,14 @@ package be.mygod.pogoplusplus
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.bluetooth.BluetoothDevice
 import android.companion.AssociationInfo
 import android.companion.CompanionDeviceManager
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -22,6 +25,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +52,17 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val EXTRA_KEY_LEGACY = ":settings:fragment_args_key"
         private const val STATE_PENDING_SHIZUKU_PAIRING_ENABLE = "pendingShizukuPairingEnable"
+        private const val STATE_PENDING_UNPAIR_DEVICE = "pendingUnpairDevice"
+        /** Unexported alias of this activity declared in the manifest; MainActivity itself is exported. */
+        private const val UNPAIR_ALIAS = "be.mygod.pogoplusplus.UnpairActivity"
+
+        /** Opens PoGo+LE to unpair [device], creating its companion association first when needed. */
+        fun makeUnpairPendingIntent(device: BluetoothDevice): PendingIntent = PendingIntent.getActivity(app, 0,
+            Intent().apply {
+                setClassName(app, UNPAIR_ALIAS)
+                data = Uri.fromParts("mac", device.address, null)  // to differentiate as ID
+                putExtra(BluetoothDevice.EXTRA_DEVICE, device)
+            }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     private data class PlatformState(
@@ -62,6 +78,7 @@ class MainActivity : ComponentActivity() {
     private var pendingShizukuPairingEnable = false
     private var shizukuPairingReady = false
     private var enableJob: Job? = null
+    private var pendingUnpairDevice: BluetoothDevice? = null
 
     @get:RequiresApi(31)
     private val hasBluetoothPermission get() = checkSelfPermission(
@@ -84,14 +101,22 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("InlinedApi")
     private val requestCompanionBluetoothPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()) { granted ->
+        val unpairDevice = pendingUnpairDevice
+        pendingUnpairDevice = null
         refreshPlatformState()
         if (granted) {
-            if (Build.VERSION.SDK_INT >= 36) associateCompanion()
+            if (Build.VERSION.SDK_INT >= 36) {
+                if (unpairDevice == null) associateCompanion() else unpair(unpairDevice)
+            }
         } else showSnackbar(R.string.settings_permission_bluetooth_missing)
     }
 
     private val requestCompanionAssociation = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()) { refreshPlatformState() }
+        ActivityResultContracts.StartIntentSenderForResult()) {
+        refreshPlatformState()
+        // Unlike the association callback, this result reaches an activity recreated while the prompt was open.
+        finishPendingUnpair()
+    }
 
     /** Whether the current Porter or Shizuku server has granted access and can confirm pairing. */
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -111,6 +136,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         pendingShizukuPairingEnable = savedInstanceState?.getBoolean(
             STATE_PENDING_SHIZUKU_PAIRING_ENABLE) == true
+        pendingUnpairDevice = savedInstanceState?.let {
+            BundleCompat.getParcelable(it, STATE_PENDING_UNPAIR_DEVICE, BluetoothDevice::class.java)
+        }
+        if (savedInstanceState == null) handleIntent(intent)
         if (pairingServicesVisible) lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shizukuPairingReadyFlow.collect { ready ->
@@ -178,6 +207,7 @@ class MainActivity : ComponentActivity() {
                     onLaunchGame = { startActivity(GameNotificationService.gameIntent) },
                     onCompanionAssociation = {
                         if (Build.VERSION.SDK_INT >= 36) {
+                            pendingUnpairDevice = null
                             if (hasBluetoothPermission) associateCompanion() else {
                                 requestCompanionBluetoothPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
                             }
@@ -207,9 +237,58 @@ class MainActivity : ComponentActivity() {
         refreshPlatformState()
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(STATE_PENDING_SHIZUKU_PAIRING_ENABLE, pendingShizukuPairingEnable)
+        outState.putParcelable(STATE_PENDING_UNPAIR_DEVICE, pendingUnpairDevice)
         super.onSaveInstanceState(outState)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        // Only the unexported alias may unpair, since other apps can launch this exported activity with any device.
+        // Relaunching from recents redelivers the original intent, which must not start another unpair.
+        if (intent?.component?.className != UNPAIR_ALIAS || Build.VERSION.SDK_INT < 36 ||
+            intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0) return
+        val device = IntentCompat.getParcelableExtra(intent, BluetoothDevice.EXTRA_DEVICE,
+            BluetoothDevice::class.java) ?: return
+        if (hasBluetoothPermission) unpair(device) else {
+            pendingUnpairDevice = device
+            requestCompanionBluetoothPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
+        }
+    }
+
+    /** Unpairs [device] through its companion association, creating the association first when needed. */
+    @RequiresApi(36)
+    private fun unpair(device: BluetoothDevice) {
+        if (SfidaManager.hasCompanionAssociation(device)) return removeBond(device)
+        pendingUnpairDevice = device
+        associateCompanion(device)
+    }
+
+    /**
+     * Unpairs [pendingUnpairDevice] once its association exists. Cancellations leave it in place, since a late one
+     * could otherwise clear a retried Unpair; a leftover device is harmless, as only its own association acts on it.
+     */
+    private fun finishPendingUnpair() {
+        val device = pendingUnpairDevice ?: return
+        if (!SfidaManager.hasCompanionAssociation(device)) return
+        pendingUnpairDevice = null
+        removeBond(device)
+    }
+
+    private fun removeBond(device: BluetoothDevice) {
+        val removed = try {
+            SfidaManager.disconnect(device)
+        } catch (e: SecurityException) {
+            Timber.d(e)
+            false
+        }
+        if (!removed) showSnackbar(R.string.notification_action_disconnect_failed)
     }
 
     private fun refreshPlatformState() {
@@ -270,8 +349,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /** Associates [unpairDevice] if given, else the first bonded accessory that has no association yet. */
     @RequiresApi(36)
-    private fun associateCompanion() {
+    private fun associateCompanion(unpairDevice: BluetoothDevice? = null) {
         val callback = object : CompanionDeviceManager.Callback() {
             override fun onAssociationPending(intentSender: IntentSender) {
                 if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
@@ -280,7 +360,9 @@ class MainActivity : ComponentActivity() {
             }
 
             override fun onAssociationCreated(associationInfo: AssociationInfo) {
-                if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) refreshPlatformState()
+                if (!lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) return
+                refreshPlatformState()
+                finishPendingUnpair()
             }
 
             override fun onFailure(error: CharSequence?) {
@@ -291,11 +373,13 @@ class MainActivity : ComponentActivity() {
             }
         }
         try {
-            if (!SfidaManager.associateCompanion(mainExecutor, callback)) {
+            if (!SfidaManager.associateCompanion(mainExecutor, callback, unpairDevice)) {
+                pendingUnpairDevice = null
                 showSnackbar(R.string.settings_companion_association_unavailable)
             }
         } catch (e: SecurityException) {
             Timber.w(e)
+            pendingUnpairDevice = null
             showSnackbar(R.string.settings_permission_bluetooth_missing)
         }
     }

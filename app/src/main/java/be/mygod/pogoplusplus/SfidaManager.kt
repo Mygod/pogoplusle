@@ -36,20 +36,28 @@ object SfidaManager : BluetoothGattCallback() {
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     private fun removeBond(device: BluetoothDevice): Boolean {
         if (Build.VERSION.SDK_INT >= 36 && companionDeviceSetupSupported) {
-            companionDeviceManager.myAssociations.firstOrNull {
-                !it.isSelfManaged && it.deviceMacAddress?.toString().equals(device.address, true)
-            }?.let { if (companionDeviceManager.removeBond(it.id)) return true }
+            findCompanionAssociation(device)?.let { if (companionDeviceManager.removeBond(it.id)) return true }
         }
         return try {
             removeBond.invoke(device) as Boolean
         } catch (e: InvocationTargetException) {
             val cause = e.cause ?: throw e
             if (Build.VERSION.SDK_INT >= 37 && cause is SecurityException) {
-                Timber.w(cause, "Direct Bluetooth bond removal is unavailable")
+                // Expected without a companion association: the Unpair action guides users to create one instead.
+                Timber.d(cause, "Direct Bluetooth bond removal is unavailable")
                 false
             } else throw cause
         }
     }
+
+    @RequiresApi(36)
+    private fun findCompanionAssociation(device: BluetoothDevice) = companionDeviceManager.myAssociations.firstOrNull {
+        !it.isSelfManaged && it.deviceMacAddress?.toString().equals(device.address, true)
+    }
+
+    /** Whether [device] can be unpaired through an app-owned companion association. */
+    fun hasCompanionAssociation(device: BluetoothDevice) = Build.VERSION.SDK_INT >= 36 &&
+            companionDeviceSetupSupported && findCompanionAssociation(device) != null
 
     /**
      * (API 28-36) Landroid/bluetooth/BluetoothGatt;->mClientIf:I,unsupported
@@ -74,13 +82,15 @@ object SfidaManager : BluetoothGattCallback() {
 
     @RequiresApi(36)
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
-    fun associateCompanion(executor: Executor, callback: CompanionDeviceManager.Callback): Boolean {
+    fun associateCompanion(executor: Executor, callback: CompanionDeviceManager.Callback,
+                           device: BluetoothDevice? = null): Boolean {
         val associations = companionDeviceManager.myAssociations
-        val candidate = bluetooth.adapter.bondedDevices.orEmpty().firstOrNull { device ->
-            getDeviceName(device) != null && associations.none {
-                !it.isSelfManaged && it.deviceMacAddress?.toString().equals(device.address, true)
-            }
-        } ?: return false
+        fun isAssociated(device: BluetoothDevice) = associations.any {
+            !it.isSelfManaged && it.deviceMacAddress?.toString().equals(device.address, true)
+        }
+        val candidate = (if (device != null) device.takeUnless(::isAssociated) else {
+            bluetooth.adapter.bondedDevices.orEmpty().firstOrNull { getDeviceName(it) != null && !isAssociated(it) }
+        }) ?: return false
         // Single-device requests can retroactively find an existing bond without rediscovering the accessory.
         val request = AssociationRequest.Builder().setSingleDevice(true)
             .addDeviceFilter(BluetoothDeviceFilter.Builder().setAddress(candidate.address).build())

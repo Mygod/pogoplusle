@@ -94,6 +94,20 @@ class GameNotificationService : NotificationListenerService() {
                     putExtra(BluetoothDevice.EXTRA_DEVICE, device)
                 }
             }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+        /**
+         * Android 17 refuses direct bond removal without BLUETOOTH_PRIVILEGED. Unless the game's own stop action or a
+         * companion association can handle it, Unpair opens PoGo+LE to create the association instead of failing, and
+         * is omitted where companion device setup is unavailable.
+         */
+        private fun makeUnpairPendingIntent(device: BluetoothDevice) = when {
+            Build.VERSION.SDK_INT < 37 || latestCompanionStopAction != null ||
+                    app.checkSelfPermission(android.Manifest.permission.BLUETOOTH_PRIVILEGED) ==
+                    PackageManager.PERMISSION_GRANTED || SfidaManager.hasCompanionAssociation(device) ->
+                makeDisconnectingPendingIntent(device)
+            SfidaManager.companionDeviceSetupSupported -> MainActivity.makeUnpairPendingIntent(device)
+            else -> null
+        }
         private fun pushNotification(
             id: Int,
             channel: String,
@@ -172,10 +186,10 @@ class GameNotificationService : NotificationListenerService() {
                             target.bondState
                         } catch (_: SecurityException) {
                             BluetoothDevice.BOND_BONDED
-                        } != BluetoothDevice.BOND_NONE) addAction(Notification.Action.Builder(
-                        Icon.createWithResource(app, R.drawable.ic_link_off),
-                        app.getText(R.string.notification_action_unpair),
-                        makeDisconnectingPendingIntent(target)).build())
+                        } != BluetoothDevice.BOND_NONE) makeUnpairPendingIntent(target)?.let {
+                        addAction(Notification.Action.Builder(Icon.createWithResource(app, R.drawable.ic_link_off),
+                            app.getText(R.string.notification_action_unpair), it).build())
+                    }
                 }
                 setPublicVersion(build().clone())
                 setVisibility(Notification.VISIBILITY_PRIVATE)

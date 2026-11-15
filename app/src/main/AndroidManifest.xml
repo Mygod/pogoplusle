@@ -76,6 +76,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Unpair notification actions open MainActivity through this unexported alias, so other apps cannot. -->
+        <activity-alias
+            android:name=".UnpairActivity"
+            android:exported="false"
+            android:targetActivity=".MainActivity" />
         <service
             android:name=".BluetoothPairingService"
             android:exported="true"
