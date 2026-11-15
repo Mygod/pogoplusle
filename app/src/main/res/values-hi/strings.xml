@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">Bluetooth को अपने-आप पेयर करें</string>
   <string name="settings_service_pairing_privileged_summary">सिस्टम विशेषाधिकारों या Shizuku से पेयरिंग अनुरोधों की पुष्टि करें</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku उपलब्ध नहीं है या अनुमति नहीं दी गई</string>
+  <string name="settings_service_pairing_shizuku_unsupported">Shizuku पेयरिंग की पुष्टि नहीं कर सकता; Android 13 से पहले इसे root के रूप में चलाना ज़रूरी है</string>
   <string name="settings_companion_association">Bluetooth ऐक्सेसरी संबद्ध करें</string>
   <string name="settings_companion_association_summary">सिस्टम विशेषाधिकारों के बिना अनपेयर करने दें</string>
   <string name="settings_companion_association_summary_count">सिस्टम विशेषाधिकारों के बिना अनपेयर करने दें · संबद्ध: %1$d</string>

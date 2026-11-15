@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">จับคู่ Bluetooth โดยอัตโนมัติ</string>
   <string name="settings_service_pairing_privileged_summary">ยืนยันคำขอจับคู่โดยใช้สิทธิ์ของระบบหรือ Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku ไม่พร้อมใช้งานหรือไม่ได้รับสิทธิ์</string>
+  <string name="settings_service_pairing_shizuku_unsupported">Shizuku ไม่สามารถยืนยันการจับคู่ได้ ก่อน Android 13 ต้องเรียกใช้ Shizuku ด้วยสิทธิ์ root</string>
   <string name="settings_companion_association">เชื่อมโยงอุปกรณ์เสริม Bluetooth</string>
   <string name="settings_companion_association_summary">อนุญาตให้เลิกจับคู่โดยไม่ใช้สิทธิ์ของระบบ</string>
   <string name="settings_companion_association_summary_count">อนุญาตให้เลิกจับคู่โดยไม่ใช้สิทธิ์ของระบบ · เชื่อมโยงแล้ว: %1$d</string>

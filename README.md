@@ -41,7 +41,7 @@ when that package contains one of the exact supported AOSP GATT implementations.
 
 Q: Why should I use the Shizuku pairing mode?
 
-A: It confirms pairing without the system pop-up. It requires a running Shizuku service and permission for PoGo+LE; if Shizuku is unavailable, Android's normal pairing dialog remains available.
+A: It confirms pairing without the system pop-up. It requires a running Shizuku service and permission for PoGo+LE. Before Android 13, Shizuku must run as root, since ADB-started Shizuku lacks the Bluetooth privilege needed to confirm pairing. If Shizuku is unavailable, Android's normal pairing dialog remains available.
 
 Q: Why should I associate my Bluetooth accessory?
 

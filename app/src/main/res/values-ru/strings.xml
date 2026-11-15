@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">Автоматически сопрягать по Bluetooth</string>
   <string name="settings_service_pairing_privileged_summary">Подтверждать запросы на сопряжение с помощью системных привилегий или Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku недоступен или разрешение не предоставлено</string>
+  <string name="settings_service_pairing_shizuku_unsupported">Shizuku не может подтвердить сопряжение; до Android 13 его нужно запускать с правами root</string>
   <string name="settings_companion_association">Связать Bluetooth-аксессуар</string>
   <string name="settings_companion_association_summary">Разрешить разрыв сопряжения без системных привилегий</string>
   <string name="settings_companion_association_summary_count">Разрешить разрыв сопряжения без системных привилегий · Связано: %1$d</string>

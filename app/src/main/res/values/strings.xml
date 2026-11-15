@@ -55,6 +55,8 @@
     <string name="settings_service_pairing_privileged_summary">Confirm pairing requests using system privileges or
         Shizuku</string>
     <string name="settings_service_pairing_shizuku_missing">Shizuku is unavailable or permission was not granted</string>
+    <string name="settings_service_pairing_shizuku_unsupported">Shizuku cannot confirm pairing; before Android 13, it
+        must run as root</string>
     <string name="settings_companion_association">Associate Bluetooth accessory</string>
     <string name="settings_companion_association_summary">Allow unpairing without system privileges</string>
     <string name="settings_companion_association_summary_count">Allow unpairing without system privileges · Associated:

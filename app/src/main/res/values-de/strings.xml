@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">Bluetooth automatisch koppeln</string>
   <string name="settings_service_pairing_privileged_summary">Kopplungsanfragen mit Systemprivilegien oder Shizuku bestätigen</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku ist nicht verfügbar oder die Berechtigung wurde nicht erteilt</string>
+  <string name="settings_service_pairing_shizuku_unsupported">Shizuku kann die Kopplung nicht bestätigen; vor Android 13 muss Shizuku mit Root-Rechten laufen</string>
   <string name="settings_companion_association">Bluetooth-Zubehör verknüpfen</string>
   <string name="settings_companion_association_summary">Entkoppeln ohne Systemprivilegien ermöglichen</string>
   <string name="settings_companion_association_summary_count">Entkoppeln ohne Systemprivilegien ermöglichen · Verknüpft: %1$d</string>

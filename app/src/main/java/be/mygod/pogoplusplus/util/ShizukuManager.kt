@@ -1,5 +1,6 @@
 package be.mygod.pogoplusplus.util
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -109,6 +110,16 @@ object ShizukuManager {
 
     fun isAuthorized() = Shizuku.pingBinder() && !Shizuku.isPreV11() &&
             Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+
+    /**
+     * Requires [isAuthorized]. Bluetooth enforces BLUETOOTH_PRIVILEGED on the Shizuku server's UID, which shell
+     * only holds since API 33, so ADB-started Shizuku cannot confirm pairing before that:
+     * https://android.googlesource.com/platform/packages/apps/Bluetooth/+/android-12.0.0_r1/src/com/android/bluetooth/btservice/AdapterService.java#1983
+     * https://android.googlesource.com/platform/frameworks/base/+/android-12.1.0_r1/packages/Shell/AndroidManifest.xml#120
+     * https://android.googlesource.com/platform/frameworks/base/+/android-13.0.0_r1/packages/Shell/AndroidManifest.xml#126
+     */
+    fun canConfirmPairing() = Shizuku.checkRemotePermission(Manifest.permission.BLUETOOTH_PRIVILEGED) ==
+            PackageManager.PERMISSION_GRANTED
 
     fun setPairingConfirmation(device: BluetoothDevice) = hiddenApiAccess.run {
         setPairingConfirmation(asInterface(null, ShizukuBinderWrapper(getBluetoothService(

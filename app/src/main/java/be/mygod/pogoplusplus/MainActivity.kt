@@ -83,9 +83,7 @@ class MainActivity : ComponentActivity() {
 
     private val requestShizukuPermission = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
         if (requestCode == REQUEST_SHIZUKU_PAIRING) runOnUiThread {
-            if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                app.setEnabled<ShizukuPairingReceiver>(true)
-            } else {
+            if (grantResult == PackageManager.PERMISSION_GRANTED) enableShizukuPairing() else {
                 app.setEnabled<ShizukuPairingReceiver>(false)
                 showSnackbar(R.string.settings_service_pairing_shizuku_missing)
             }
@@ -217,7 +215,7 @@ class MainActivity : ComponentActivity() {
             app.isEnabled<ShizukuPairingReceiver>(false)
         val shizukuAuthorized = bluetoothPermissionGranted && privilegedPairingComponentEnabled &&
             !hasBluetoothPrivilegedPermission && try {
-                ShizukuManager.isAuthorized()
+                ShizukuManager.isAuthorized() && ShizukuManager.canConfirmPairing()
             } catch (e: RuntimeException) {
                 Timber.w(e)
                 false
@@ -245,7 +243,7 @@ class MainActivity : ComponentActivity() {
         }
         try {
             if (ShizukuManager.isAuthorized()) {
-                app.setEnabled<ShizukuPairingReceiver>(true)
+                enableShizukuPairing()
                 return
             }
             if (Shizuku.pingBinder() && !Shizuku.isPreV11() &&
@@ -257,6 +255,18 @@ class MainActivity : ComponentActivity() {
             Timber.w(e)
         }
         showSnackbar(R.string.settings_service_pairing_shizuku_missing)
+    }
+
+    /** Requires [ShizukuManager.isAuthorized]. */
+    private fun enableShizukuPairing() {
+        val failure = try {
+            if (ShizukuManager.canConfirmPairing()) null else R.string.settings_service_pairing_shizuku_unsupported
+        } catch (e: RuntimeException) {
+            Timber.w(e)
+            R.string.settings_service_pairing_shizuku_missing
+        }
+        app.setEnabled<ShizukuPairingReceiver>(failure == null)
+        if (failure != null) showSnackbar(failure)
     }
 
     @RequiresApi(36)

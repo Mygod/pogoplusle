@@ -27,7 +27,7 @@ class ShizukuPairingReceiver : BroadcastReceiver() {
             directFailure?.let(Timber::d)
             false
         } else try {
-            ShizukuManager.setPairingConfirmation(device.first)
+            ShizukuManager.canConfirmPairing() && ShizukuManager.setPairingConfirmation(device.first)
         } catch (e: Exception) {
             directFailure?.let(e::addSuppressed)
             Timber.w(e)

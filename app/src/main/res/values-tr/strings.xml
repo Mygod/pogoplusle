@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">Bluetooth\'u otomatik eşleştir</string>
   <string name="settings_service_pairing_privileged_summary">Eşleştirme isteklerini sistem ayrıcalıkları veya Shizuku ile onaylar</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku kullanılamıyor veya izin verilmedi</string>
+  <string name="settings_service_pairing_shizuku_unsupported">Shizuku eşleştirmeyi onaylayamıyor; Android 13\'ten önce root olarak çalışması gerekir</string>
   <string name="settings_companion_association">Bluetooth aksesuarını ilişkilendir</string>
   <string name="settings_companion_association_summary">Sistem ayrıcalıkları olmadan eşleştirmeyi kaldırmaya izin verir</string>
   <string name="settings_companion_association_summary_count">Sistem ayrıcalıkları olmadan eşleştirmeyi kaldırmaya izin verir · İlişkilendirilen: %1$d</string>

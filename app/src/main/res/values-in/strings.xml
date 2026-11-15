@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">Sambungkan Bluetooth secara otomatis</string>
   <string name="settings_service_pairing_privileged_summary">Konfirmasi permintaan penyambungan menggunakan hak istimewa sistem atau Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku tidak tersedia atau izin tidak diberikan</string>
+  <string name="settings_service_pairing_shizuku_unsupported">Shizuku tidak dapat mengonfirmasi penyambungan; sebelum Android 13, Shizuku harus dijalankan sebagai root</string>
   <string name="settings_companion_association">Kaitkan aksesori Bluetooth</string>
   <string name="settings_companion_association_summary">Izinkan pemutusan penyambungan tanpa hak istimewa sistem</string>
   <string name="settings_companion_association_summary_count">Izinkan pemutusan penyambungan tanpa hak istimewa sistem · Terkait: %1$d</string>

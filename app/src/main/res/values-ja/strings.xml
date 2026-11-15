@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">Bluetoothを自動でペアリング</string>
   <string name="settings_service_pairing_privileged_summary">システム権限またはShizukuを使用してペアリングリクエストを確認します</string>
   <string name="settings_service_pairing_shizuku_missing">Shizukuを利用できないか、権限が付与されていません</string>
+  <string name="settings_service_pairing_shizuku_unsupported">Shizukuはペアリングを確認できません。Android 13より前ではrootで実行する必要があります</string>
   <string name="settings_companion_association">Bluetoothアクセサリを関連付け</string>
   <string name="settings_companion_association_summary">システム権限なしでペアリング解除を可能にします</string>
   <string name="settings_companion_association_summary_count">システム権限なしでペアリング解除を可能にします · 関連付け済み: %1$d</string>

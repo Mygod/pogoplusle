@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">Parear Bluetooth automaticamente</string>
   <string name="settings_service_pairing_privileged_summary">Confirma solicitações de pareamento usando privilégios do sistema ou Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">O Shizuku não está disponível ou a permissão não foi concedida</string>
+  <string name="settings_service_pairing_shizuku_unsupported">O Shizuku não pode confirmar o pareamento; antes do Android 13, ele precisa ser executado como root</string>
   <string name="settings_companion_association">Associar acessório Bluetooth</string>
   <string name="settings_companion_association_summary">Permite desemparelhar sem privilégios do sistema</string>
   <string name="settings_companion_association_summary_count">Permite desemparelhar sem privilégios do sistema · Associados: %1$d</string>

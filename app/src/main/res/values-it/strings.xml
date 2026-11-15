@@ -37,6 +37,7 @@
   <string name="settings_service_pairing_privileged">Associa automaticamente via Bluetooth</string>
   <string name="settings_service_pairing_privileged_summary">Conferma le richieste di associazione usando i privilegi di sistema o Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku non è disponibile o l\'autorizzazione non è stata concessa</string>
+  <string name="settings_service_pairing_shizuku_unsupported">Shizuku non può confermare l\'associazione; prima di Android 13 deve essere eseguito come root</string>
   <string name="settings_companion_association">Associa accessorio Bluetooth</string>
   <string name="settings_companion_association_summary">Consenti di annullare l\'associazione senza privilegi di sistema</string>
   <string name="settings_companion_association_summary_count">Consenti di annullare l\'associazione senza privilegi di sistema · Associati: %1$d</string>
