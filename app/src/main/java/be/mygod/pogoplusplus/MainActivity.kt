@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -181,7 +182,11 @@ class MainActivity : ComponentActivity() {
                     },
                     onOpenSource = { app.launchUrl(this, "https://github.com/Mygod/pogoplusle") },
                     onDonate = { app.launchUrl(this, "https://mygod.be/donate/") },
-                    onOpenLicenses = { startActivity(Intent(this, OssLicensesMenuActivity::class.java)) },
+                    onOpenLicenses = {
+                        OssLicensesMenuActivity.setTheme(appColorScheme(this, false), appColorScheme(this, true),
+                            Typography())
+                        startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+                    },
                 )
             }
         }
