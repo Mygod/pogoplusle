@@ -116,25 +116,36 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
         resetTimeout()
         return node
     }
+    /**
+     * AOSP never returns null from these lookups, only an empty list:
+     * https://android.googlesource.com/platform/frameworks/base/+/android-17.0.0_r1/core/java/android/view/accessibility/AccessibilityNodeInfo.java#2252
+     * https://android.googlesource.com/platform/frameworks/base/+/android-17.0.0_r1/core/java/android/view/accessibility/AccessibilityInteractionClient.java#756
+     * Yet Pixel 10 Android 17 builds CP3A.260905.009 and CP3A.261005.005 returned null, crashing on List.size().
+     * The return types carry no nullability annotation, so these null checks are kept.
+     */
+    private fun AccessibilityNodeInfo.findByViewId(viewId: String) =
+        findAccessibilityNodeInfosByViewId(viewId).orEmpty()
+    private fun AccessibilityNodeInfo.findByText(text: String?) = findAccessibilityNodeInfosByText(text).orEmpty()
+
     private fun tryLocateById(root: AccessibilityNodeInfo): AccessibilityNodeInfo? {
-        var confirm = root.findAccessibilityNodeInfosByViewId("android:id/button1")
+        var confirm = root.findByViewId("android:id/button1")
         when (confirm.size) {
             0 -> {
                 // Some devices (eg Samsung) use AppCompat (?) AlertDialog and "OK" instead of "Pair"
-                confirm = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/button1")
+                confirm = root.findByViewId("${root.packageName}:id/button1")
                 if (confirm.size == 0) {
                     // Android 16 Pixel pairing dialog uses an expressive button container.
-                    confirm = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/positive_button_container")
+                    confirm = root.findByViewId("${root.packageName}:id/positive_button_container")
                 }
                 if (confirm.size != 1) return null
             }
             1 -> { }
             else -> return null
         }
-        var title = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/alertTitle")
+        var title = root.findByViewId("${root.packageName}:id/alertTitle")
         when (title.size) {
             0 -> {
-                title = root.findAccessibilityNodeInfosByViewId("android:id/alertTitle")
+                title = root.findByViewId("android:id/alertTitle")
                 if (title.size == 1 && title[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) == true) {
                     // Some devices (eg Huawei) use Android AlertDialog instead of AppCompat
                     Timber.w("Locate title success: ${title[0].text}")
@@ -144,13 +155,13 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
             1 -> if (title[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) == true) return confirm[0]
         }
         // Some devices (eg Samsung) put device name in message (#6)
-        val message = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/message")
+        val message = root.findByViewId("${root.packageName}:id/message")
         if (message.size == 1 && message[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) == true) {
             Timber.w("Locate message success: ${message[0].text}")
             return confirm[0]
         }
         // Oplus/Realme uses a full sentence in a name field instead of a message. So rude!
-        val name = root.findAccessibilityNodeInfosByViewId("${root.packageName}:id/name")
+        val name = root.findByViewId("${root.packageName}:id/name")
         if (name.size == 1 &&
             name[0].text?.contains(SfidaManager.DEVICE_NAME_PGP) == true) {
             Timber.w("Locate name success: ${name[0].text}")
@@ -167,18 +178,18 @@ class BluetoothPairingService : AccessibilityService(), CoroutineScope {
             return null
         }
         val confirmText = resources.findString("bluetooth_pairing_accept", packageName) ?: return null
-        val confirm = root.findAccessibilityNodeInfosByText(confirmText).filter {
+        val confirm = root.findByText(confirmText).filter {
             confirmText.equals(it.text?.toString(), true)
         }
         if (confirm.size != 1) return null
         var promptText = resources.findString(
             "bluetooth_pairing_request", packageName, SfidaManager.DEVICE_NAME_PGP)
-        if (root.findAccessibilityNodeInfosByText(promptText).any { it.text == promptText }) return confirm[0]
+        if (root.findByText(promptText).any { it.text == promptText }) return confirm[0]
         // OxygenOS 14+
         promptText = resources.findString("bluetooth_pair_message_2", packageName, SfidaManager.DEVICE_NAME_PGP)
-        if (root.findAccessibilityNodeInfosByText(promptText).any { it.text == promptText }) return confirm[0]
+        if (root.findByText(promptText).any { it.text == promptText }) return confirm[0]
         // Some ROM uses nonstandard pair text, like ColorOS seems to use the entire device name as a textview
-        val deviceName = root.findAccessibilityNodeInfosByText(SfidaManager.DEVICE_NAME_PGP)
+        val deviceName = root.findByText(SfidaManager.DEVICE_NAME_PGP)
         if (deviceName.isNotEmpty() &&
             deviceName.all { it.text == SfidaManager.DEVICE_NAME_PGP }) return confirm[0]
         val filtered = deviceName.filter { it.text?.contains(SfidaManager.DEVICE_NAME_PGPP) != true }
