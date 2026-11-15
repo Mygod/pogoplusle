@@ -340,11 +340,9 @@ private fun PreferenceRow(
     val position = LocalPreferenceRowPosition.current
     SegmentedListItem(
         onClick = onClick,
-        shapes = when {
-            position == null -> ListItemDefaults.shapes()
-            position.count == 1 -> ListItemDefaults.shapes(shape = MaterialTheme.shapes.large)
-            else -> ListItemDefaults.segmentedShapes(position.index, position.count)
-        },
+        shapes = if (position == null) {
+            ListItemDefaults.shapes()
+        } else ListItemDefaults.segmentedShapes(position.index, position.count),
         modifier = modifier.fillMaxWidth(),
         leadingContent = {
             Icon(

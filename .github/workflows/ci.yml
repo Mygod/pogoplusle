@@ -37,7 +37,7 @@ jobs:
         run: |
           yes | sdkmanager --licenses >/dev/null
           sdkmanager \
-            "platforms;android-37.0" \
+            "platforms;android-37.1" \
             "build-tools;37.0.0"
 
       - name: Run build and checks
