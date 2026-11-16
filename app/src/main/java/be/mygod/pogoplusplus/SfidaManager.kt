@@ -105,6 +105,16 @@ object SfidaManager : BluetoothGattCallback() {
         null
     }
 
+    /** Whether a connection of [device] counts as an accessory connection, as [BluetoothReceiver] treats it. */
+    @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
+    fun isAuxiliary(device: Pair<BluetoothDevice, String?>) =
+        device.second != DEVICE_NAME_PGP || device.first.bondState != BluetoothDevice.BOND_NONE
+
+    @get:RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
+    val connectedAuxiliaries get() = bluetooth.getConnectedDevices(BluetoothProfile.GATT).filter { device ->
+        getDeviceName(device)?.let { isAuxiliary(device to it.getOrNull()) } == true
+    }
+
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     private fun getDeviceName(device: BluetoothDevice, action: String? = null): Optional<String>? {
         val name = device.name

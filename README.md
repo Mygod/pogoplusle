@@ -63,6 +63,9 @@ Hidden whitelisted APIs:
 Private APIs:
 
 * `Landroid/bluetooth/BluetoothGatt;->mClientIf:I,unsupported`
+* (overridden) `Landroid/bluetooth/BluetoothGattCallback;->onConnectionUpdated(Landroid/bluetooth/BluetoothGatt;IIII)V,lo-prio,max-target-o`
+* (API 28-36) `Landroid/bluetooth/BluetoothDevice;->connectGatt(Landroid/content/Context;ZLandroid/bluetooth/BluetoothGattCallback;IZILandroid/os/Handler;)Landroid/bluetooth/BluetoothGatt;,max-target-r`
+* (API 36 with a newer Bluetooth module) `Landroid/bluetooth/BluetoothDevice;->connectGatt(Landroid/content/Context;ZLandroid/bluetooth/BluetoothGattCallback;IZILjava/util/concurrent/Executor;)Landroid/bluetooth/BluetoothGatt;,max-target-r`
 * (API 28-30) `Landroid/bluetooth/BluetoothAdapter;->getBluetoothService(Landroid/bluetooth/IBluetoothManagerCallback;)Landroid/bluetooth/IBluetooth;,greylist`
 * (API 31+) `Landroid/bluetooth/BluetoothAdapter;->getBluetoothService()Landroid/bluetooth/IBluetooth;,blocked`
 * `Landroid/bluetooth/IBluetooth$Stub;->asInterface(Landroid/os/IBinder;)Landroid/bluetooth/IBluetooth;,unsupported`

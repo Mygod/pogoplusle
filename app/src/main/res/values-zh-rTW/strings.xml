@@ -52,6 +52,18 @@
     <string name="settings_companion_association_summary_count">無需系統特權即可取消配對 · 已關聯：%1$d</string>
     <string name="settings_companion_association_unavailable">請先配對一個尚未關聯的配件</string>
     <string name="settings_companion_association_failed">無法關聯藍牙配件</string>
+    <string name="settings_connection_priority">連線優先順序</string>
+    <string name="settings_connection_priority_message">初代 Pokémon GO Plus 和部分其他配件會放慢藍牙連線以節省電量，導致轉補和捕捉延遲。PoGo+LE 可以要求 Android 加快連線，並在配件再次放慢時重新要求。每個選項決定手機和配件通訊的頻率；越快的選項越耗配件電量。時間為 Android 預設值，可能因手機而異。</string>
+    <string name="settings_connection_priority_default">配件預設</string>
+    <string name="settings_connection_priority_default_summary">維持配件設定的連線。下次連線時生效。</string>
+    <string name="settings_connection_priority_low_power">低耗電</string>
+    <string name="settings_connection_priority_low_power_summary">每 100–125 毫秒。加速最少，耗電最少。</string>
+    <string name="settings_connection_priority_balanced">平衡</string>
+    <string name="settings_connection_priority_balanced_summary">每 30–50 毫秒。以適中的耗電取得大部分加速。</string>
+    <string name="settings_connection_priority_dck">數位車鑰匙</string>
+    <string name="settings_connection_priority_dck_summary">每 30 毫秒，Android 用於車鑰匙的預設值。比「平衡」反應更快，但更耗電。</string>
+    <string name="settings_connection_priority_high">高</string>
+    <string name="settings_connection_priority_high_summary">每 11–15 毫秒。反應最快，最耗電。</string>
 
     <string name="settings_advanced">進階</string>
     <string name="settings_about">關於</string>

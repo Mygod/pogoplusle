@@ -23,6 +23,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.IntentCompat
@@ -75,6 +76,7 @@ class MainActivity : ComponentActivity() {
     private val snackbarHostState = SnackbarHostState()
     private var platformState by mutableStateOf(PlatformState())
     private var showPairingDisclosure by mutableStateOf(false)
+    private var connectionPriority by mutableIntStateOf(SfidaConnectionPriority.preferredPriority)
     private var pendingShizukuPairingEnable = false
     private var shizukuPairingReady = false
     private var enableJob: Job? = null
@@ -162,6 +164,7 @@ class MainActivity : ComponentActivity() {
                         showPairingServices = pairingServicesVisible,
                         showCompanionAssociation = SfidaManager.companionDeviceSetupSupported,
                         companionAssociationCount = platformState.companionAssociationCount,
+                        connectionPriority = connectionPriority,
                     ),
                     snackbarHostState = snackbarHostState,
                     showPairingDisclosure = showPairingDisclosure,
@@ -219,6 +222,10 @@ class MainActivity : ComponentActivity() {
                         if (shouldEnable) enablePrivilegedPairing()
                         else app.setEnabled<ShizukuPairingReceiver>(false)
                         refreshPlatformState()
+                    },
+                    onConnectionPriorityChange = {
+                        SfidaConnectionPriority.preferredPriority = it
+                        connectionPriority = it
                     },
                     onOpenSource = { app.launchUrl(this, "https://github.com/Mygod/pogoplusle") },
                     onDonate = { app.launchUrl(this, "https://mygod.be/donate/") },

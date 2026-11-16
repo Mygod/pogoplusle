@@ -1,12 +1,14 @@
 package be.mygod.pogoplusplus
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothGatt
 import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import android.text.Spanned
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.ScrollIndicatorState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -25,10 +28,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.MotionScheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Snackbar
@@ -49,7 +55,11 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key as composeKey
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -81,7 +91,26 @@ internal data class MainUiState(
     val showPairingServices: Boolean,
     val showCompanionAssociation: Boolean,
     val companionAssociationCount: Int,
+    val connectionPriority: Int,
 )
+
+@StringRes
+private fun connectionPriorityLabel(priority: Int) = when (priority) {
+    BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER -> R.string.settings_connection_priority_low_power
+    BluetoothGatt.CONNECTION_PRIORITY_BALANCED -> R.string.settings_connection_priority_balanced
+    BluetoothGatt.CONNECTION_PRIORITY_DCK -> R.string.settings_connection_priority_dck
+    BluetoothGatt.CONNECTION_PRIORITY_HIGH -> R.string.settings_connection_priority_high
+    else -> R.string.settings_connection_priority_default
+}
+
+@StringRes
+private fun connectionPrioritySummary(priority: Int) = when (priority) {
+    BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER -> R.string.settings_connection_priority_low_power_summary
+    BluetoothGatt.CONNECTION_PRIORITY_BALANCED -> R.string.settings_connection_priority_balanced_summary
+    BluetoothGatt.CONNECTION_PRIORITY_DCK -> R.string.settings_connection_priority_dck_summary
+    BluetoothGatt.CONNECTION_PRIORITY_HIGH -> R.string.settings_connection_priority_high_summary
+    else -> R.string.settings_connection_priority_default_summary
+}
 
 internal fun appColorScheme(context: Context, darkTheme: Boolean) = if (Build.VERSION.SDK_INT >= 31) {
     if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -110,11 +139,13 @@ internal fun MainScreen(
     onLaunchGame: () -> Unit,
     onCompanionAssociation: () -> Unit,
     onPrivilegedPairingChange: (Boolean) -> Unit,
+    onConnectionPriorityChange: (Int) -> Unit,
     onOpenSource: () -> Unit,
     onDonate: () -> Unit,
     onOpenLicenses: () -> Unit,
 ) {
     val bottomSafePadding = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
+    var selectingConnectionPriority by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.app_name)) }) },
         snackbarHost = {
@@ -183,21 +214,31 @@ internal fun MainScreen(
                 }
             }
 
-            if (state.showPairingServices) preferenceGroup(title = R.string.settings_advanced) {
-                if (state.showCompanionAssociation) row(R.string.settings_companion_association) {
+            preferenceGroup(title = R.string.settings_advanced) {
+                if (state.showPairingServices && state.showCompanionAssociation) {
+                    row(R.string.settings_companion_association) {
+                        PreferenceRow(
+                            icon = R.drawable.ic_bluetooth_connected,
+                            title = stringResource(R.string.settings_companion_association),
+                            summary = if (state.companionAssociationCount == 0) {
+                                stringResource(R.string.settings_companion_association_summary)
+                            } else stringResource(
+                                R.string.settings_companion_association_summary_count,
+                                state.companionAssociationCount,
+                            ),
+                            onClick = onCompanionAssociation,
+                        )
+                    }
+                }
+                row(R.string.settings_connection_priority) {
                     PreferenceRow(
-                        icon = R.drawable.ic_bluetooth_connected,
-                        title = stringResource(R.string.settings_companion_association),
-                        summary = if (state.companionAssociationCount == 0) {
-                            stringResource(R.string.settings_companion_association_summary)
-                        } else stringResource(
-                            R.string.settings_companion_association_summary_count,
-                            state.companionAssociationCount,
-                        ),
-                        onClick = onCompanionAssociation,
+                        icon = R.drawable.ic_speed,
+                        title = stringResource(R.string.settings_connection_priority),
+                        summary = stringResource(connectionPriorityLabel(state.connectionPriority)),
+                        onClick = { selectingConnectionPriority = true },
                     )
                 }
-                row(R.string.settings_service_pairing_privileged) {
+                if (state.showPairingServices) row(R.string.settings_service_pairing_privileged) {
                     PreferenceSwitchRow(
                         checked = state.privilegedPairingEnabled,
                         icon = R.drawable.ic_electric_bolt,
@@ -241,7 +282,28 @@ internal fun MainScreen(
         onDismissRequest = onDismissPairingDisclosure,
         onAccept = onAcceptPairingDisclosure,
     )
+    if (selectingConnectionPriority) {
+        val priorities = SfidaConnectionPriority.priorities
+        PreferenceSelectionSheet(
+            title = stringResource(R.string.settings_connection_priority),
+            entryCount = priorities.size,
+            selectedIndex = priorities.indexOf(state.connectionPriority),
+            entryLabel = { stringResource(connectionPriorityLabel(priorities[it])) },
+            entrySummary = { stringResource(connectionPrioritySummary(priorities[it])) },
+            description = stringResource(R.string.settings_connection_priority_message),
+            onDismissRequest = { selectingConnectionPriority = false },
+            onSelect = { onConnectionPriorityChange(priorities[it]) },
+        )
+    }
 }
+
+@Composable
+private fun Modifier.nonInteractiveVerticalScrollbar(state: ScrollIndicatorState?) = state?.let {
+    nonInteractiveScrollbar(
+        state = it,
+        orientation = Orientation.Vertical,
+    )
+} ?: this
 
 @Composable
 private fun SettingsList(
@@ -250,23 +312,76 @@ private fun SettingsList(
     content: LazyListScope.() -> Unit,
 ) {
     val state = rememberLazyListState()
-    val scrollIndicatorState = state.scrollIndicatorState
-    val scrollbarModifier = if (scrollIndicatorState != null) {
-        Modifier.nonInteractiveScrollbar(
-            state = scrollIndicatorState,
-            orientation = Orientation.Vertical,
-        )
-    } else {
-        Modifier
-    }
     LazyColumn(
         state = state,
         modifier = modifier
             .fillMaxSize()
-            .then(scrollbarModifier),
+            .nonInteractiveVerticalScrollbar(state.scrollIndicatorState),
         contentPadding = contentPadding,
         content = content,
     )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun PreferenceSelectionSheet(
+    title: String,
+    entryCount: Int,
+    selectedIndex: Int,
+    entryLabel: @Composable (Int) -> String,
+    entrySummary: @Composable (Int) -> String? = { null },
+    description: String? = null,
+    onDismissRequest: () -> Unit,
+    onSelect: (Int) -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        contentWindowInsets = { WindowInsets.safeDrawing.only(WindowInsetsSides.Top) },
+    ) {
+        val state = rememberLazyListState()
+        Text(
+            text = title,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+            style = MaterialTheme.typography.titleLarge,
+        )
+        LazyColumn(
+            state = state,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f, fill = false)
+                .nonInteractiveVerticalScrollbar(state.scrollIndicatorState),
+            contentPadding = PaddingValues(
+                start = 24.dp,
+                end = 24.dp,
+                bottom = 24.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
+            ),
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+        ) {
+            description?.let {
+                item("description") {
+                    Text(
+                        text = it,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+            items(entryCount, key = { it }) { index ->
+                CompositionLocalProvider(
+                    LocalPreferenceRowPosition provides PreferenceRowPosition(index, entryCount),
+                ) {
+                    PreferenceRadioRow(
+                        selected = index == selectedIndex,
+                        title = entryLabel(index),
+                        summary = entrySummary(index),
+                    ) {
+                        onSelect(index)
+                        onDismissRequest()
+                    }
+                }
+            }
+        }
+    }
 }
 
 private fun LazyListScope.preferenceGroup(
@@ -340,9 +455,7 @@ private fun PreferenceRow(
     val position = LocalPreferenceRowPosition.current
     SegmentedListItem(
         onClick = onClick,
-        shapes = if (position == null) {
-            ListItemDefaults.shapes()
-        } else ListItemDefaults.segmentedShapes(position.index, position.count),
+        shapes = preferenceRowShapes(position),
         modifier = modifier.fillMaxWidth(),
         leadingContent = {
             Icon(
@@ -354,15 +467,43 @@ private fun PreferenceRow(
         trailingContent = trailingContent,
         supportingContent = { Text(summary) },
         verticalAlignment = Alignment.CenterVertically,
-        colors = if (position == null) {
-            ListItemDefaults.colors()
-        } else {
-            ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-        },
+        colors = preferenceRowColors(position),
     ) {
         Text(title)
     }
 }
+
+@Composable
+private fun PreferenceRadioRow(
+    selected: Boolean,
+    title: String,
+    summary: String?,
+    onClick: () -> Unit,
+) {
+    val position = LocalPreferenceRowPosition.current
+    SegmentedListItem(
+        selected = selected,
+        onClick = onClick,
+        shapes = preferenceRowShapes(position),
+        modifier = Modifier.fillMaxWidth(),
+        leadingContent = { RadioButton(selected = selected, onClick = null) },
+        supportingContent = summary?.let { { Text(it) } },
+        verticalAlignment = Alignment.CenterVertically,
+        colors = preferenceRowColors(position),
+    ) {
+        Text(title)
+    }
+}
+
+@Composable
+private fun preferenceRowShapes(position: PreferenceRowPosition?) = if (position == null) {
+    ListItemDefaults.shapes()
+} else ListItemDefaults.segmentedShapes(position.index, position.count)
+
+@Composable
+private fun preferenceRowColors(position: PreferenceRowPosition?) = if (position == null) {
+    ListItemDefaults.colors()
+} else ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
 
 @Composable
 private fun PreferenceSwitchRow(

@@ -63,6 +63,27 @@
         %1$d</string>
     <string name="settings_companion_association_unavailable">Pair an unassociated accessory first</string>
     <string name="settings_companion_association_failed">Unable to associate Bluetooth accessory</string>
+    <string name="settings_connection_priority">Connection priority</string>
+    <string name="settings_connection_priority_message">The original Pokémon GO Plus and some other accessories slow
+        their Bluetooth connection to save battery, which delays spins and catches. PoGo+LE can ask Android to speed it
+        up, and asks again whenever the accessory slows it back down. Each option sets how often the phone and the
+        accessory talk; faster options drain the accessory battery faster. Timings are Android defaults and can vary by
+        phone.</string>
+    <string name="settings_connection_priority_default">Accessory default</string>
+    <string name="settings_connection_priority_default_summary">Leave the connection as the accessory sets it. Takes
+        effect the next time it connects.</string>
+    <string name="settings_connection_priority_low_power">Low power</string>
+    <string name="settings_connection_priority_low_power_summary">Every 100–125 ms. Smallest speed-up, least battery
+        drain.</string>
+    <string name="settings_connection_priority_balanced">Balanced</string>
+    <string name="settings_connection_priority_balanced_summary">Every 30–50 ms. Most of the speed-up for moderate
+        battery drain.</string>
+    <string name="settings_connection_priority_dck">Digital car key</string>
+    <string name="settings_connection_priority_dck_summary">Every 30 ms, the preset Android uses for car keys. Responds
+        sooner than Balanced, with more battery drain.</string>
+    <string name="settings_connection_priority_high">High</string>
+    <string name="settings_connection_priority_high_summary">Every 11–15 ms. Fastest response, most battery
+        drain.</string>
 
     <string name="settings_advanced">Advanced</string>
     <string name="settings_about">About</string>
