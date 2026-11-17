@@ -92,7 +92,7 @@ class SfidaConnectionPriority private constructor(private val device: BluetoothD
 
         /**
          * (API 28-36) Landroid/bluetooth/BluetoothDevice;->connectGatt(Landroid/content/Context;ZLandroid/bluetooth/BluetoothGattCallback;IZILandroid/os/Handler;)Landroid/bluetooth/BluetoothGatt;,max-target-r
-         * (API 36 with a newer Bluetooth module) Landroid/bluetooth/BluetoothDevice;->connectGatt(Landroid/content/Context;ZLandroid/bluetooth/BluetoothGattCallback;IZILjava/util/concurrent/Executor;)Landroid/bluetooth/BluetoothGatt;,max-target-r
+         * (API 36) Landroid/bluetooth/BluetoothDevice;->connectGatt(Landroid/content/Context;ZLandroid/bluetooth/BluetoothGattCallback;IZILjava/util/concurrent/Executor;)Landroid/bluetooth/BluetoothGatt;,max-target-r
          */
         private val hiddenConnectGattOpportunistic: ((BluetoothDevice, BluetoothGattCallback) -> BluetoothGatt?)? by lazy {
             HiddenApiBypass.addHiddenApiExemptions("Landroid/bluetooth/BluetoothDevice;->connectGatt(")
