@@ -66,13 +66,13 @@ room3 {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-    implementation(platform("androidx.compose:compose-bom-beta:2026.11.00"))
+    implementation(platform("androidx.compose:compose-bom:2026.11.01"))
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.browser:browser:1.10.0")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.core:core:1.19.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.1")
     implementation("androidx.preference:preference:1.2.1")
     implementation("androidx.room3:room3-runtime:3.0.3")
     implementation("com.google.android.gms:play-services-oss-licenses:17.5.3")
