@@ -184,10 +184,9 @@ class SfidaConnectionPriority private constructor(private val device: BluetoothD
 
     /**
      * Landroid/bluetooth/BluetoothGattCallback;->onConnectionUpdated(Landroid/bluetooth/BluetoothGatt;IIII)V,lo-prio,max-target-o
-     * Overriding the hidden callback is not access to it, and API 37 allows it as sdk,test-api; kept by the keep rules.
+     * Overriding the hidden callback is not access to it, and API 37 allows it as sdk,test-api; public since SDK 37.2.
      */
-    @Suppress("unused")
-    fun onConnectionUpdated(gatt: BluetoothGatt, interval: Int, latency: Int, timeout: Int, status: Int) {
+    override fun onConnectionUpdated(gatt: BluetoothGatt, interval: Int, latency: Int, timeout: Int, status: Int) {
         if (gatt != this.gatt) return
         Timber.d("Connection updated for ${device.address}: interval=$interval, latency=$latency, " +
                 "timeout=$timeout, status=$status")

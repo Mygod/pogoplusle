@@ -35,7 +35,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+        run: sdkmanager "platforms;android-37.2" "build-tools;37.0.0"
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4

@@ -13,10 +13,6 @@
     public <init>();
     public void handleLoadPackage(de.robv.android.xposed.callbacks.XC_LoadPackage$LoadPackageParam);
 }
-# Overrides a hidden BluetoothGattCallback method that only the framework calls.
--keepclassmembers class be.mygod.pogoplusplus.SfidaConnectionPriority {
-    public void onConnectionUpdated(android.bluetooth.BluetoothGatt, int, int, int, int);
-}
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
