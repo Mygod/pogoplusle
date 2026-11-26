@@ -34,6 +34,12 @@
   <string name="settings_permission_notification_summary">Attiva le tue notifiche preferite</string>
   <string name="settings_game">Avvia gioco</string>
   <string name="settings_game_summary">Ripotami al giuoco subbito!</string>
+  <string name="settings_stats">Statistiche</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="one">Statistiche su %d connessione</item>
+    <item quantity="many">Statistiche su %d connessioni</item>
+    <item quantity="other">Statistiche su %d connessioni</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Associa automaticamente via Bluetooth</string>
   <string name="settings_service_pairing_privileged_summary">Conferma le richieste di associazione usando i privilegi di sistema o Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku non è disponibile o l\'autorizzazione non è stata concessa</string>
@@ -55,6 +61,23 @@
   <string name="settings_connection_priority_dck_summary">Ogni 30 ms, il preset di Android per le chiavi dell\'auto. Risponde prima di Bilanciata, con un consumo di batteria maggiore.</string>
   <string name="settings_connection_priority_high">Alta</string>
   <string name="settings_connection_priority_high_summary">Ogni 11–15 ms. Risposta più rapida, consumo di batteria massimo.</string>
+  <string name="stats_empty">Nessuna sessione ancora registrata.</string>
+  <string name="stats_all_devices">Tutti i dispositivi</string>
+  <plurals name="stats_session_count">
+    <item quantity="one">%d sessione</item>
+    <item quantity="many">%d sessioni</item>
+    <item quantity="other">%d sessioni</item>
+  </plurals>
+  <string name="stats_catch_rate">Tasso di cattura: %s</string>
+  <string name="stats_items_per_spin">Strumenti per giro: %s</string>
+  <string name="stats_per_hour">All\'ora: %s</string>
+  <string name="stats_ongoing">In corso</string>
+  <string name="stats_delete_session">Elimina sessione</string>
+  <string name="stats_session_deleted">Sessione eliminata</string>
+  <string name="stats_cleared">Statistiche cancellate</string>
+  <string name="stats_undo">Annulla</string>
+  <string name="stats_export">Esporta come CSV</string>
+  <string name="stats_clear">Cancella statistiche</string>
   <string name="settings_advanced">Avanzate</string>
   <string name="settings_about">Informazioni</string>
   <string name="settings_misc_source">Pagina del progetto su GitHub</string>

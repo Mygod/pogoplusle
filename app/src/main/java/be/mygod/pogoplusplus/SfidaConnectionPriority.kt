@@ -13,7 +13,6 @@ import android.os.Looper
 import android.os.SystemClock
 import androidx.annotation.RequiresPermission
 import androidx.core.content.edit
-import androidx.preference.PreferenceManager
 import be.mygod.pogoplusplus.App.Companion.app
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
@@ -43,14 +42,13 @@ import java.util.concurrent.Executor
 class SfidaConnectionPriority private constructor(private val device: BluetoothDevice, private val priority: Int,
                                                   private val maxInterval: Int) : BluetoothGattCallback() {
     companion object {
-        private const val KEY_PRIORITY = "connectionPriority"
+        const val KEY_PRIORITY = "connectionPriority"
         const val PRIORITY_DEFAULT = -1
         private const val CONNECT_TIMEOUT_MILLIS = 10_000L
         /** An accessory overriding more often than this is fighting back; going on would only keep both radios busy. */
         private const val MAX_REQUESTS = 6
         private const val REQUEST_WINDOW_MILLIS = 60_000L
 
-        private val pref by lazy { PreferenceManager.getDefaultSharedPreferences(app) }
         private val handler = Handler(Looper.getMainLooper())
         /** Accessed on the main thread only. */
         private val sessions = mutableMapOf<String, SfidaConnectionPriority>()
@@ -66,9 +64,10 @@ class SfidaConnectionPriority private constructor(private val device: BluetoothD
 
         /** Called on the main thread; applies to accessories that are already connected. */
         var preferredPriority: Int
-            get() = pref.getInt(KEY_PRIORITY, PRIORITY_DEFAULT)
+            // a restored backup can hold a priority this device lacks
+            get() = Prefs.backup.getInt(KEY_PRIORITY, PRIORITY_DEFAULT).takeIf { it in priorities } ?: PRIORITY_DEFAULT
             set(value) {
-                pref.edit { putInt(KEY_PRIORITY, value) }
+                Prefs.backup.edit { putInt(KEY_PRIORITY, value) }
                 for (session in sessions.values.toList()) session.close()
                 try {
                     for (device in SfidaManager.connectedAuxiliaries) onConnected(device)

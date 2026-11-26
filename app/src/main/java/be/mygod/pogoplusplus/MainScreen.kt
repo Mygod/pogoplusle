@@ -65,6 +65,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -92,6 +93,8 @@ internal data class MainUiState(
     val showCompanionAssociation: Boolean,
     val companionAssociationCount: Int,
     val connectionPriority: Int,
+    val lifetimeConnections: Long,
+    val lifetimeStats: String,
 )
 
 @StringRes
@@ -137,6 +140,7 @@ internal fun MainScreen(
     onBluetoothMonitorChange: (Boolean) -> Unit,
     onManageNotifications: () -> Unit,
     onLaunchGame: () -> Unit,
+    onOpenStats: () -> Unit,
     onCompanionAssociation: () -> Unit,
     onPrivilegedPairingChange: (Boolean) -> Unit,
     onConnectionPriorityChange: (Int) -> Unit,
@@ -210,6 +214,16 @@ internal fun MainScreen(
                         title = stringResource(R.string.settings_game),
                         summary = stringResource(R.string.settings_game_summary),
                         onClick = onLaunchGame,
+                    )
+                }
+                row(R.string.settings_stats) {
+                    PreferenceRow(
+                        icon = R.drawable.ic_bar_chart,
+                        title = pluralStringResource(R.plurals.settings_stats_connections,
+                            state.lifetimeConnections.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+                            state.lifetimeConnections),
+                        summary = state.lifetimeStats,
+                        onClick = onOpenStats,
                     )
                 }
             }
@@ -298,7 +312,7 @@ internal fun MainScreen(
 }
 
 @Composable
-private fun Modifier.nonInteractiveVerticalScrollbar(state: ScrollIndicatorState?) = state?.let {
+internal fun Modifier.nonInteractiveVerticalScrollbar(state: ScrollIndicatorState?) = state?.let {
     nonInteractiveScrollbar(
         state = it,
         orientation = Orientation.Vertical,

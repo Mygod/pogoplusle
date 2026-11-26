@@ -21,8 +21,15 @@ class BluetoothReceiver : BroadcastReceiver() {
                 } else SfidaSessionManager.onDisconnect(device)
             }
             BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                val writes = SfidaSessionManager.writes
                 SfidaConnectionPriority.onDisconnected(device.first)
                 GameNotificationService.onAuxiliaryDisconnected(device)
+                // the broadcast may have started the process, which can be killed before the session is saved;
+                // connections are not held, see SfidaConnectionPriority
+                if (SfidaSessionManager.writes != writes) {
+                    val result = goAsync()
+                    SfidaSessionManager.flush().invokeOnCompletion { result.finish() }
+                }
             }
         }
     }

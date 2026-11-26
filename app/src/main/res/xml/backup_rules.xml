@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Used before Android 12; keep in sync with data_extraction_rules.xml. -->
+<full-backup-content>
+    <include domain="database" path="sessions.db" />
+    <include domain="sharedpref" path="backup.xml" />
+</full-backup-content>

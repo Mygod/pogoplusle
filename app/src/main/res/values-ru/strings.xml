@@ -34,6 +34,13 @@
   <string name="settings_permission_notification_summary">Включите любимые уведомления</string>
   <string name="settings_game">Запустить игру</string>
   <string name="settings_game_summary">Верни миня в игру прям щас!</string>
+  <string name="settings_stats">Статистика</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="one">Статистика за %d подключение</item>
+    <item quantity="few">Статистика за %d подключения</item>
+    <item quantity="many">Статистика за %d подключений</item>
+    <item quantity="other">Статистика за %d подключения</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Автоматически сопрягать по Bluetooth</string>
   <string name="settings_service_pairing_privileged_summary">Подтверждать запросы на сопряжение с помощью системных привилегий или Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku недоступен или разрешение не предоставлено</string>
@@ -55,6 +62,24 @@
   <string name="settings_connection_priority_dck_summary">Каждые 30 мс, предустановка Android для автомобильных ключей. Реагирует быстрее, чем «Сбалансированный», но расходует больше заряда.</string>
   <string name="settings_connection_priority_high">Высокий</string>
   <string name="settings_connection_priority_high_summary">Каждые 11–15 мс. Самый быстрый отклик, наибольший расход заряда.</string>
+  <string name="stats_empty">Записанных сеансов пока нет.</string>
+  <string name="stats_all_devices">Все устройства</string>
+  <plurals name="stats_session_count">
+    <item quantity="one">%d сеанс</item>
+    <item quantity="few">%d сеанса</item>
+    <item quantity="many">%d сеансов</item>
+    <item quantity="other">%d сеанса</item>
+  </plurals>
+  <string name="stats_catch_rate">Процент поимки: %s</string>
+  <string name="stats_items_per_spin">Предметов за вращение: %s</string>
+  <string name="stats_per_hour">В час: %s</string>
+  <string name="stats_ongoing">Идёт</string>
+  <string name="stats_delete_session">Удалить сеанс</string>
+  <string name="stats_session_deleted">Сеанс удалён</string>
+  <string name="stats_cleared">Статистика очищена</string>
+  <string name="stats_undo">Отменить</string>
+  <string name="stats_export">Экспорт в CSV</string>
+  <string name="stats_clear">Очистить статистику</string>
   <string name="settings_advanced">Дополнительные настройки</string>
   <string name="settings_about">О приложении</string>
   <string name="settings_misc_source">Страница проекта на GitHub</string>

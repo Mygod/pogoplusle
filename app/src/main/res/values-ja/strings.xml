@@ -34,6 +34,10 @@
   <string name="settings_permission_notification_summary">必要な通知をオンにします</string>
   <string name="settings_game">ゲームを起動</string>
   <string name="settings_game_summary">いますぐゲームにもどしてぇ！</string>
+  <string name="settings_stats">統計</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="other">%d 回の接続の統計</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Bluetoothを自動でペアリング</string>
   <string name="settings_service_pairing_privileged_summary">システム権限またはShizukuを使用してペアリングリクエストを確認します</string>
   <string name="settings_service_pairing_shizuku_missing">Shizukuを利用できないか、権限が付与されていません</string>
@@ -55,6 +59,21 @@
   <string name="settings_connection_priority_dck_summary">30 msごと。Androidの車のキー用プリセットです。バランスより早く応答しますが、電池消費が増えます。</string>
   <string name="settings_connection_priority_high">高</string>
   <string name="settings_connection_priority_high_summary">11～15 msごと。応答が最も速く、電池消費も最大です。</string>
+  <string name="stats_empty">記録されたセッションはまだありません。</string>
+  <string name="stats_all_devices">すべてのデバイス</string>
+  <plurals name="stats_session_count">
+    <item quantity="other">%d 件のセッション</item>
+  </plurals>
+  <string name="stats_catch_rate">捕獲率: %s</string>
+  <string name="stats_items_per_spin">スピン 1 回あたりの道具: %s</string>
+  <string name="stats_per_hour">1 時間あたり: %s</string>
+  <string name="stats_ongoing">進行中</string>
+  <string name="stats_delete_session">セッションを削除</string>
+  <string name="stats_session_deleted">セッションを削除しました</string>
+  <string name="stats_cleared">統計をクリアしました</string>
+  <string name="stats_undo">元に戻す</string>
+  <string name="stats_export">CSV としてエクスポート</string>
+  <string name="stats_clear">統計をクリア</string>
   <string name="settings_advanced">詳細設定</string>
   <string name="settings_about">このアプリについて</string>
   <string name="settings_misc_source">GitHubのプロジェクトホームページ</string>

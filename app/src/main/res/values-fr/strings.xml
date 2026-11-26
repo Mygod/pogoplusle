@@ -34,6 +34,12 @@
   <string name="settings_permission_notification_summary">Activez vos notifications préférées</string>
   <string name="settings_game">Lancer le jeu</string>
   <string name="settings_game_summary">Ramène-moi au jeu maint\'nant !</string>
+  <string name="settings_stats">Statistiques</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="one">Statistiques sur %d connexion</item>
+    <item quantity="many">Statistiques sur %d connexions</item>
+    <item quantity="other">Statistiques sur %d connexions</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Associer automatiquement en Bluetooth</string>
   <string name="settings_service_pairing_privileged_summary">Confirme les demandes d\'association avec les privilèges système ou Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku n\'est pas disponible ou l\'autorisation n\'a pas été accordée</string>
@@ -55,6 +61,23 @@
   <string name="settings_connection_priority_dck_summary">Toutes les 30 ms, le préréglage d\'Android pour les clés de voiture. Réagit plus vite qu\'Équilibrée, avec une consommation de batterie plus élevée.</string>
   <string name="settings_connection_priority_high">Élevée</string>
   <string name="settings_connection_priority_high_summary">Toutes les 11–15 ms. Réponse la plus rapide, consommation de batterie maximale.</string>
+  <string name="stats_empty">Aucune session enregistrée pour l\'instant.</string>
+  <string name="stats_all_devices">Tous les appareils</string>
+  <plurals name="stats_session_count">
+    <item quantity="one">%d session</item>
+    <item quantity="many">%d sessions</item>
+    <item quantity="other">%d sessions</item>
+  </plurals>
+  <string name="stats_catch_rate">Taux de capture : %s</string>
+  <string name="stats_items_per_spin">Objets par rotation : %s</string>
+  <string name="stats_per_hour">Par heure : %s</string>
+  <string name="stats_ongoing">En cours</string>
+  <string name="stats_delete_session">Supprimer la session</string>
+  <string name="stats_session_deleted">Session supprimée</string>
+  <string name="stats_cleared">Statistiques effacées</string>
+  <string name="stats_undo">Annuler</string>
+  <string name="stats_export">Exporter au format CSV</string>
+  <string name="stats_clear">Effacer les statistiques</string>
   <string name="settings_advanced">Paramètres avancés</string>
   <string name="settings_about">À propos</string>
   <string name="settings_misc_source">Page d\'accueil du projet sur GitHub</string>

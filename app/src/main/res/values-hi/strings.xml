@@ -34,6 +34,11 @@
   <string name="settings_permission_notification_summary">अपनी पसंदीदा सूचनाएँ चालू करें</string>
   <string name="settings_game">गेम शुरू करें</string>
   <string name="settings_game_summary">मुझे अभी गेमवा में वापस ले चलो!</string>
+  <string name="settings_stats">आँकड़े</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="one">%d कनेक्शन के आँकड़े</item>
+    <item quantity="other">%d कनेक्शन के आँकड़े</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Bluetooth को अपने-आप पेयर करें</string>
   <string name="settings_service_pairing_privileged_summary">सिस्टम विशेषाधिकारों या Shizuku से पेयरिंग अनुरोधों की पुष्टि करें</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku उपलब्ध नहीं है या अनुमति नहीं दी गई</string>
@@ -55,6 +60,22 @@
   <string name="settings_connection_priority_dck_summary">हर 30 ms पर, कार की चाबियों के लिए Android का प्रीसेट। संतुलित से जल्दी जवाब देता है, लेकिन बैटरी ज़्यादा खर्च होती है।</string>
   <string name="settings_connection_priority_high">उच्च</string>
   <string name="settings_connection_priority_high_summary">हर 11–15 ms पर। सबसे तेज़ जवाब, सबसे ज़्यादा बैटरी खपत।</string>
+  <string name="stats_empty">अभी तक कोई सेशन रिकॉर्ड नहीं हुआ है।</string>
+  <string name="stats_all_devices">सभी डिवाइस</string>
+  <plurals name="stats_session_count">
+    <item quantity="one">%d सेशन</item>
+    <item quantity="other">%d सेशन</item>
+  </plurals>
+  <string name="stats_catch_rate">पकड़ने की दर: %s</string>
+  <string name="stats_items_per_spin">हर स्पिन पर आइटम: %s</string>
+  <string name="stats_per_hour">हर घंटे: %s</string>
+  <string name="stats_ongoing">जारी है</string>
+  <string name="stats_delete_session">सेशन मिटाएं</string>
+  <string name="stats_session_deleted">सेशन मिटाया गया</string>
+  <string name="stats_cleared">आँकड़े मिटाए गए</string>
+  <string name="stats_undo">पहले जैसा करें</string>
+  <string name="stats_export">CSV के रूप में एक्सपोर्ट करें</string>
+  <string name="stats_clear">आँकड़े मिटाएं</string>
   <string name="settings_advanced">बेहतर विकल्प</string>
   <string name="settings_about">ऐप्लिकेशन के बारे में</string>
   <string name="settings_misc_source">GitHub पर प्रोजेक्ट का होम पेज</string>

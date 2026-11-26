@@ -34,6 +34,10 @@
   <string name="settings_permission_notification_summary">Aktifkan notifikasi favorit Anda</string>
   <string name="settings_game">Luncurkan game</string>
   <string name="settings_game_summary">Bawa aku balik ke gim skarang!</string>
+  <string name="settings_stats">Statistik</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="other">Statistik dari %d koneksi</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Sambungkan Bluetooth secara otomatis</string>
   <string name="settings_service_pairing_privileged_summary">Konfirmasi permintaan penyambungan menggunakan hak istimewa sistem atau Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku tidak tersedia atau izin tidak diberikan</string>
@@ -55,6 +59,21 @@
   <string name="settings_connection_priority_dck_summary">Setiap 30 ms, preset Android untuk kunci mobil. Merespons lebih cepat daripada Seimbang, dengan pemakaian baterai lebih besar.</string>
   <string name="settings_connection_priority_high">Tinggi</string>
   <string name="settings_connection_priority_high_summary">Setiap 11–15 ms. Respons tercepat, pemakaian baterai terbesar.</string>
+  <string name="stats_empty">Belum ada sesi yang tercatat.</string>
+  <string name="stats_all_devices">Semua perangkat</string>
+  <plurals name="stats_session_count">
+    <item quantity="other">%d sesi</item>
+  </plurals>
+  <string name="stats_catch_rate">Tingkat tangkapan: %s</string>
+  <string name="stats_items_per_spin">Item per putaran: %s</string>
+  <string name="stats_per_hour">Per jam: %s</string>
+  <string name="stats_ongoing">Berlangsung</string>
+  <string name="stats_delete_session">Hapus sesi</string>
+  <string name="stats_session_deleted">Sesi dihapus</string>
+  <string name="stats_cleared">Statistik dihapus</string>
+  <string name="stats_undo">Urungkan</string>
+  <string name="stats_export">Ekspor sebagai CSV</string>
+  <string name="stats_clear">Hapus statistik</string>
   <string name="settings_advanced">Lanjutan</string>
   <string name="settings_about">Tentang</string>
   <string name="settings_misc_source">Beranda proyek di GitHub</string>

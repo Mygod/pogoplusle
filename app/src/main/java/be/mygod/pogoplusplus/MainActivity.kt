@@ -155,6 +155,7 @@ class MainActivity : ComponentActivity() {
             PoGoPlusPlusTheme {
                 val pairingServiceRunning by BluetoothPairingService.running.collectAsStateWithLifecycle()
                 val gameNotificationServiceRunning by GameNotificationService.running.collectAsStateWithLifecycle()
+                val lifetime by SfidaSessionManager.lifetimeTotals.collectAsStateWithLifecycle()
                 MainScreen(
                     state = MainUiState(
                         pairingServiceRunning = pairingServiceRunning,
@@ -165,6 +166,8 @@ class MainActivity : ComponentActivity() {
                         showCompanionAssociation = SfidaManager.companionDeviceSetupSupported,
                         companionAssociationCount = platformState.companionAssociationCount,
                         connectionPriority = connectionPriority,
+                        lifetimeConnections = lifetime.connections,
+                        lifetimeStats = lifetime.stats,
                     ),
                     snackbarHostState = snackbarHostState,
                     showPairingDisclosure = showPairingDisclosure,
@@ -208,6 +211,7 @@ class MainActivity : ComponentActivity() {
                         })
                     },
                     onLaunchGame = { startActivity(GameNotificationService.gameIntent) },
+                    onOpenStats = { startActivity(Intent(this, StatsActivity::class.java)) },
                     onCompanionAssociation = {
                         if (Build.VERSION.SDK_INT >= 36) {
                             pendingUnpairDevice = null

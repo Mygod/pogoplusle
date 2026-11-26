@@ -294,14 +294,26 @@ class GameNotificationService : NotificationListenerService() {
         if (Build.VERSION.SDK_INT < 31 && sbn.notification.flags and Notification.FLAG_FOREGROUND_SERVICE !=
             Notification.FLAG_FOREGROUND_SERVICE) return    // ignore reposted notification
         when (text) {
-            in gameStrings.itemInventoryFull -> pushNotification(NOTIFICATION_ITEM_FULL,
-                CHANNEL_ITEM_FULL, text, R.drawable.ic_shopping_bag, sbn.packageName) {
-                setOnlyAlertOnce(!notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
+            in gameStrings.itemInventoryFull -> {
+                pushNotification(NOTIFICATION_ITEM_FULL, CHANNEL_ITEM_FULL, text, R.drawable.ic_shopping_bag,
+                    sbn.packageName) {
+                    setOnlyAlertOnce(!notificationManager.getNotificationChannel(CHANNEL_ITEM_FULL).canBypassDnd())
+                }
+                val stats = SfidaSessionManager.onItemFull(isConnected)
+                if (isConnected) updateConnectionStatus(stats)
             }
-            in gameStrings.pokemonInventoryFull -> pushNotification(NOTIFICATION_POKEMON_FULL,
-                CHANNEL_POKEMON_FULL, text, R.drawable.ic_disc_full, sbn.packageName)
-            in gameStrings.outOfPokeballs -> pushNotification(NOTIFICATION_NO_BALL,
-                CHANNEL_NO_BALL, text, R.drawable.ic_hide_source, sbn.packageName)
+            in gameStrings.pokemonInventoryFull -> {
+                pushNotification(NOTIFICATION_POKEMON_FULL, CHANNEL_POKEMON_FULL, text, R.drawable.ic_disc_full,
+                    sbn.packageName)
+                val stats = SfidaSessionManager.onPokemonFull(isConnected)
+                if (isConnected) updateConnectionStatus(stats)
+            }
+            in gameStrings.outOfPokeballs -> {
+                pushNotification(NOTIFICATION_NO_BALL, CHANNEL_NO_BALL, text, R.drawable.ic_hide_source,
+                    sbn.packageName)
+                val stats = SfidaSessionManager.onNoBall(isConnected)
+                if (isConnected) updateConnectionStatus(stats)
+            }
             in gameStrings.capturedPokemon -> {
                 notificationManager.cancel(NOTIFICATION_POKEMON_FULL)
                 notificationManager.cancel(NOTIFICATION_NO_BALL)
@@ -341,8 +353,12 @@ class GameNotificationService : NotificationListenerService() {
                         notificationManager.cancel(NOTIFICATION_SPIN_FAIL)
                         val stats = SfidaSessionManager.onSpin(items, isConnected)
                         if (isConnected) updateConnectionStatus(stats)
-                    } else pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text,
-                        R.drawable.ic_error, sbn.packageName)
+                    } else {
+                        pushNotification(NOTIFICATION_SPIN_FAIL, CHANNEL_SPIN_FAIL, text, R.drawable.ic_error,
+                            sbn.packageName)
+                        val stats = SfidaSessionManager.onSpinFailed(isConnected)
+                        if (isConnected) updateConnectionStatus(stats)
+                    }
                     // Ignore Samsung stupid shit: https://github.com/universal9611-dev/framework-res/blob/4645162b385057fb77ee91565c802cdf528613da/res/values/strings.xml#L2895
                 } else if (Build.VERSION.SDK_INT < 33 || text != resources.findString("sanitized_content_text_sf",
                         "android")) Timber.e(Exception("Unrecognized notification text: $text"))

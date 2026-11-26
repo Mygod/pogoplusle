@@ -46,6 +46,11 @@
     <string name="settings_permission_notification_summary">Turn on your favorite notifications</string>
     <string name="settings_game">Launch game</string>
     <string name="settings_game_summary">Take me back to teh gaem nau!</string>
+    <string name="settings_stats">Statistics</string>
+    <plurals name="settings_stats_connections">
+        <item quantity="one">Statistics across %d connection</item>
+        <item quantity="other">Statistics across %d connections</item>
+    </plurals>
     <!--
     <string name="settings_game_battery_optimized">Game battery usage optimized</string>
     <string name="settings_game_battery_optimized_summary">Game may crash when put in the background. Get around this
@@ -84,6 +89,23 @@
     <string name="settings_connection_priority_high">High</string>
     <string name="settings_connection_priority_high_summary">Every 11–15 ms. Fastest response, most battery
         drain.</string>
+
+    <string name="stats_empty">No sessions recorded yet.</string>
+    <string name="stats_all_devices">All devices</string>
+    <plurals name="stats_session_count">
+        <item quantity="one">%d session</item>
+        <item quantity="other">%d sessions</item>
+    </plurals>
+    <string name="stats_catch_rate">Catch rate: %s</string>
+    <string name="stats_items_per_spin">Items per spin: %s</string>
+    <string name="stats_per_hour">Per hour: %s</string>
+    <string name="stats_ongoing">Ongoing</string>
+    <string name="stats_delete_session">Delete session</string>
+    <string name="stats_session_deleted">Session deleted</string>
+    <string name="stats_cleared">Statistics cleared</string>
+    <string name="stats_undo">Undo</string>
+    <string name="stats_export">Export as CSV</string>
+    <string name="stats_clear">Clear statistics</string>
 
     <string name="settings_advanced">Advanced</string>
     <string name="settings_about">About</string>

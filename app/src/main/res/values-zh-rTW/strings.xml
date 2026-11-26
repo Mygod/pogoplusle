@@ -39,6 +39,10 @@
     <string name="settings_permission_notification_summary">打開您最喜愛的通知</string>
     <string name="settings_game">開啟遊戲</string>
     <string name="settings_game_summary">立即回到遊戲！</string>
+    <string name="settings_stats">統計資料</string>
+    <plurals name="settings_stats_connections">
+        <item quantity="other">%d 次連線的統計資料</item>
+    </plurals>
     <!--
     <string name="settings_game_battery_optimized">已優化遊戲電池用量</string>
     <string name="settings_game_battery_optimized_summary">遊戲置於背景運行時可能會崩潰，請至「電池與電量」中為遊戲設置「無限制」以解決此問題</string>
@@ -65,6 +69,21 @@
     <string name="settings_connection_priority_high">高</string>
     <string name="settings_connection_priority_high_summary">每 11–15 毫秒。反應最快，最耗電。</string>
 
+    <string name="stats_empty">尚無連線紀錄。</string>
+    <string name="stats_all_devices">所有裝置</string>
+    <plurals name="stats_session_count">
+        <item quantity="other">%d 次連線</item>
+    </plurals>
+    <string name="stats_catch_rate">捕捉率：%s</string>
+    <string name="stats_items_per_spin">每次轉動道具數：%s</string>
+    <string name="stats_per_hour">每小時：%s</string>
+    <string name="stats_ongoing">進行中</string>
+    <string name="stats_delete_session">刪除連線紀錄</string>
+    <string name="stats_session_deleted">已刪除連線紀錄</string>
+    <string name="stats_cleared">已清除統計資料</string>
+    <string name="stats_undo">復原</string>
+    <string name="stats_export">匯出為 CSV</string>
+    <string name="stats_clear">清除統計資料</string>
     <string name="settings_advanced">進階</string>
     <string name="settings_about">關於</string>
     <string name="settings_misc_source">在 GitHub 上打開專案首頁</string>

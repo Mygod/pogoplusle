@@ -34,6 +34,10 @@
   <string name="settings_permission_notification_summary">원하는 알림을 켭니다</string>
   <string name="settings_game">게임 실행</string>
   <string name="settings_game_summary">나 겜으로 당장 데려가 줘어!</string>
+  <string name="settings_stats">통계</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="other">연결 %d회의 통계</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Bluetooth 자동 페어링</string>
   <string name="settings_service_pairing_privileged_summary">시스템 권한 또는 Shizuku를 사용하여 페어링 요청을 확인합니다</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku를 사용할 수 없거나 권한이 부여되지 않았습니다</string>
@@ -55,6 +59,21 @@
   <string name="settings_connection_priority_dck_summary">30ms마다, Android의 차 키용 프리셋입니다. 균형보다 빠르게 반응하지만 배터리 소모가 더 큽니다.</string>
   <string name="settings_connection_priority_high">높음</string>
   <string name="settings_connection_priority_high_summary">11–15ms마다. 가장 빠르게 반응하고 배터리 소모도 가장 큽니다.</string>
+  <string name="stats_empty">아직 기록된 세션이 없습니다.</string>
+  <string name="stats_all_devices">모든 기기</string>
+  <plurals name="stats_session_count">
+    <item quantity="other">세션 %d개</item>
+  </plurals>
+  <string name="stats_catch_rate">포획률: %s</string>
+  <string name="stats_items_per_spin">스핀당 도구: %s</string>
+  <string name="stats_per_hour">시간당: %s</string>
+  <string name="stats_ongoing">진행 중</string>
+  <string name="stats_delete_session">세션 삭제</string>
+  <string name="stats_session_deleted">세션이 삭제되었습니다</string>
+  <string name="stats_cleared">통계를 지웠습니다</string>
+  <string name="stats_undo">실행 취소</string>
+  <string name="stats_export">CSV로 내보내기</string>
+  <string name="stats_clear">통계 지우기</string>
   <string name="settings_advanced">고급</string>
   <string name="settings_about">정보</string>
   <string name="settings_misc_source">GitHub의 프로젝트 홈페이지</string>

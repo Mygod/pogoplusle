@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Keep in sync with backup_rules.xml. Device-specific state stays in the default preferences, which are left out. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="database" path="sessions.db" />
+        <include domain="sharedpref" path="backup.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="database" path="sessions.db" />
+        <include domain="sharedpref" path="backup.xml" />
+    </device-transfer>
+</data-extraction-rules>

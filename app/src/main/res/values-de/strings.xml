@@ -34,6 +34,11 @@
   <string name="settings_permission_notification_summary">Aktiviere deine bevorzugten Benachrichtigungen</string>
   <string name="settings_game">Spiel starten</string>
   <string name="settings_game_summary">Zurück zum Schpiel, aba sofort!</string>
+  <string name="settings_stats">Statistiken</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="one">Statistiken über %d Verbindung</item>
+    <item quantity="other">Statistiken über %d Verbindungen</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Bluetooth automatisch koppeln</string>
   <string name="settings_service_pairing_privileged_summary">Kopplungsanfragen mit Systemprivilegien oder Shizuku bestätigen</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku ist nicht verfügbar oder die Berechtigung wurde nicht erteilt</string>
@@ -55,6 +60,22 @@
   <string name="settings_connection_priority_dck_summary">Alle 30 ms, die Android-Voreinstellung für Autoschlüssel. Reagiert schneller als Ausgewogen, bei höherem Akkuverbrauch.</string>
   <string name="settings_connection_priority_high">Hoch</string>
   <string name="settings_connection_priority_high_summary">Alle 11–15 ms. Schnellste Reaktion, höchster Akkuverbrauch.</string>
+  <string name="stats_empty">Noch keine Sitzungen aufgezeichnet.</string>
+  <string name="stats_all_devices">Alle Geräte</string>
+  <plurals name="stats_session_count">
+    <item quantity="one">%d Sitzung</item>
+    <item quantity="other">%d Sitzungen</item>
+  </plurals>
+  <string name="stats_catch_rate">Fangquote: %s</string>
+  <string name="stats_items_per_spin">Items pro Drehung: %s</string>
+  <string name="stats_per_hour">Pro Stunde: %s</string>
+  <string name="stats_ongoing">Läuft</string>
+  <string name="stats_delete_session">Sitzung löschen</string>
+  <string name="stats_session_deleted">Sitzung gelöscht</string>
+  <string name="stats_cleared">Statistiken gelöscht</string>
+  <string name="stats_undo">Rückgängig</string>
+  <string name="stats_export">Als CSV exportieren</string>
+  <string name="stats_clear">Statistiken löschen</string>
   <string name="settings_advanced">Erweitert</string>
   <string name="settings_about">Info</string>
   <string name="settings_misc_source">Projekt-Homepage auf GitHub</string>

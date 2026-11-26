@@ -34,6 +34,10 @@
   <string name="settings_permission_notification_summary">เปิดการแจ้งเตือนที่คุณชื่นชอบ</string>
   <string name="settings_game">เปิดเกม</string>
   <string name="settings_game_summary">พากลับเข้าเกมเดี๋ยวเน้!</string>
+  <string name="settings_stats">สถิติ</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="other">สถิติจากการเชื่อมต่อ %d ครั้ง</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">จับคู่ Bluetooth โดยอัตโนมัติ</string>
   <string name="settings_service_pairing_privileged_summary">ยืนยันคำขอจับคู่โดยใช้สิทธิ์ของระบบหรือ Shizuku</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku ไม่พร้อมใช้งานหรือไม่ได้รับสิทธิ์</string>
@@ -55,6 +59,21 @@
   <string name="settings_connection_priority_dck_summary">ทุก 30 ms ซึ่งเป็นค่าที่ Android ใช้สำหรับกุญแจรถ ตอบสนองเร็วกว่าสมดุล แต่ใช้แบตเตอรี่มากกว่า</string>
   <string name="settings_connection_priority_high">สูง</string>
   <string name="settings_connection_priority_high_summary">ทุก 11–15 ms ตอบสนองเร็วที่สุด ใช้แบตเตอรี่มากที่สุด</string>
+  <string name="stats_empty">ยังไม่มีเซสชันที่บันทึกไว้</string>
+  <string name="stats_all_devices">อุปกรณ์ทั้งหมด</string>
+  <plurals name="stats_session_count">
+    <item quantity="other">%d เซสชัน</item>
+  </plurals>
+  <string name="stats_catch_rate">อัตราการจับ: %s</string>
+  <string name="stats_items_per_spin">ไอเท็มต่อการหมุน: %s</string>
+  <string name="stats_per_hour">ต่อชั่วโมง: %s</string>
+  <string name="stats_ongoing">กำลังดำเนินอยู่</string>
+  <string name="stats_delete_session">ลบเซสชัน</string>
+  <string name="stats_session_deleted">ลบเซสชันแล้ว</string>
+  <string name="stats_cleared">ล้างสถิติแล้ว</string>
+  <string name="stats_undo">เลิกทำ</string>
+  <string name="stats_export">ส่งออกเป็น CSV</string>
+  <string name="stats_clear">ล้างสถิติ</string>
   <string name="settings_advanced">ขั้นสูง</string>
   <string name="settings_about">เกี่ยวกับ</string>
   <string name="settings_misc_source">หน้าแรกของโปรเจกต์บน GitHub</string>

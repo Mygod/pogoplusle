@@ -34,6 +34,11 @@
   <string name="settings_permission_notification_summary">En sevdiğiniz bildirimleri açın</string>
   <string name="settings_game">Oyunu başlat</string>
   <string name="settings_game_summary">Beni şimcik oyuna döndür!</string>
+  <string name="settings_stats">İstatistikler</string>
+  <plurals name="settings_stats_connections">
+    <item quantity="one">%d bağlantının istatistikleri</item>
+    <item quantity="other">%d bağlantının istatistikleri</item>
+  </plurals>
   <string name="settings_service_pairing_privileged">Bluetooth\'u otomatik eşleştir</string>
   <string name="settings_service_pairing_privileged_summary">Eşleştirme isteklerini sistem ayrıcalıkları veya Shizuku ile onaylar</string>
   <string name="settings_service_pairing_shizuku_missing">Shizuku kullanılamıyor veya izin verilmedi</string>
@@ -55,6 +60,22 @@
   <string name="settings_connection_priority_dck_summary">Her 30 ms\'de bir; Android\'in araç anahtarları için kullandığı ön ayar. Dengeli seçeneğinden daha hızlı yanıt verir, daha fazla pil tüketir.</string>
   <string name="settings_connection_priority_high">Yüksek</string>
   <string name="settings_connection_priority_high_summary">Her 11–15 ms\'de bir. En hızlı yanıt, en fazla pil tüketimi.</string>
+  <string name="stats_empty">Henüz kaydedilmiş oturum yok.</string>
+  <string name="stats_all_devices">Tüm cihazlar</string>
+  <plurals name="stats_session_count">
+    <item quantity="one">%d oturum</item>
+    <item quantity="other">%d oturum</item>
+  </plurals>
+  <string name="stats_catch_rate">Yakalama oranı: %s</string>
+  <string name="stats_items_per_spin">Çevirme başına eşya: %s</string>
+  <string name="stats_per_hour">Saat başına: %s</string>
+  <string name="stats_ongoing">Devam ediyor</string>
+  <string name="stats_delete_session">Oturumu sil</string>
+  <string name="stats_session_deleted">Oturum silindi</string>
+  <string name="stats_cleared">İstatistikler temizlendi</string>
+  <string name="stats_undo">Geri al</string>
+  <string name="stats_export">CSV olarak dışa aktar</string>
+  <string name="stats_clear">İstatistikleri temizle</string>
   <string name="settings_advanced">Gelişmiş</string>
   <string name="settings_about">Hakkında</string>
   <string name="settings_misc_source">GitHub\'daki proje ana sayfası</string>

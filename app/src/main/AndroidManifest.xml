@@ -29,8 +29,9 @@
     <application
         android:name=".App"
         android:appCategory="accessibility"
-        android:allowBackup="false"
-        android:dataExtractionRules="@xml/no_backup"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:localeConfig="@xml/locales_config"
@@ -76,6 +77,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".StatsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PoGoPlusPlus" />
         <!-- Unpair notification actions open MainActivity through this unexported alias, so other apps cannot. -->
         <activity-alias
             android:name=".UnpairActivity"
