@@ -23,8 +23,8 @@ android {
         applicationId = "be.mygod.pogoplusplus"
         minSdk = 28
         targetSdk = 37
-        versionCode = 44
-        versionName = "2.1.0"
+        versionCode = 45
+        versionName = "2.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         androidResources.localeFilters += listOf(
             "en", "fr", "de", "hi", "in", "zh-rTW", "it", "ja", "ko", "pt-rBR", "ru", "es-rES", "th",
